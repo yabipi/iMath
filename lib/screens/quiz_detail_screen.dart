@@ -1,0 +1,229 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_math_fork/flutter_math.dart';
+import '../models/quiz.dart';
+import '../widgets/geometry_drawer.dart';
+
+class QuizDetailScreen extends StatefulWidget {
+  final Quiz quiz;
+
+  const QuizDetailScreen({
+    super.key,
+    required this.quiz,
+  });
+
+  @override
+  State<QuizDetailScreen> createState() => _QuizDetailScreenState();
+}
+
+class _QuizDetailScreenState extends State<QuizDetailScreen> {
+  int currentIndex = 0;
+  final PageController _pageController = PageController();
+  final Map<int, int> answers = {};
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.quiz.title),
+        actions: [
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Text(
+                '${currentIndex + 1}/${widget.quiz.questions.length}',
+                style: const TextStyle(fontSize: 16),
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // 进度条
+          LinearProgressIndicator(
+            value: (currentIndex + 1) / widget.quiz.questions.length,
+            backgroundColor: Colors.grey[200],
+            valueColor: AlwaysStoppedAnimation<Color>(
+              Theme.of(context).primaryColor,
+            ),
+          ),
+          // 题目内容
+          Expanded(
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: widget.quiz.questions.length,
+              onPageChanged: (index) {
+                setState(() {
+                  currentIndex = index;
+                });
+              },
+              itemBuilder: (context, index) {
+                final question = widget.quiz.questions[index];
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 题目类型标签
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          question.type,
+                          style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // 题目内容
+                      Text(
+                        '第${index + 1}题（${question.score}分）',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      // 如果是几何题，显示图形
+                      if (question.type.contains('几何'))
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            child: GeometryDrawer(
+                              type: question.type,
+                              content: question.content,
+                            ),
+                          ),
+                        ),
+                      // 题目内容
+                      Math.tex(
+                        question.content,
+                        textStyle: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(height: 24),
+                      // 选项
+                      const Text(
+                        '选项：',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ...List.generate(
+                        question.options.length,
+                        (i) => RadioListTile<int>(
+                          value: i,
+                          groupValue: answers[index],
+                          onChanged: (value) {
+                            setState(() {
+                              answers[index] = value!;
+                            });
+                          },
+                          title: Math.tex(
+                            question.options[i],
+                            textStyle: const TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+          // 底部按钮
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (currentIndex > 0)
+                  ElevatedButton(
+                    onPressed: () {
+                      _pageController.previousPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    child: const Text('上一题'),
+                  )
+                else
+                  const SizedBox.shrink(),
+                if (currentIndex < widget.quiz.questions.length - 1)
+                  ElevatedButton(
+                    onPressed: () {
+                      _pageController.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    child: const Text('下一题'),
+                  )
+                else
+                  ElevatedButton(
+                    onPressed: () {
+                      _submitQuiz();
+                    },
+                    child: const Text('提交试卷'),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _submitQuiz() {
+    // 计算得分
+    int score = 0;
+    for (var entry in answers.entries) {
+      if (entry.value == widget.quiz.questions[entry.key].correctAnswer) {
+        score += widget.quiz.questions[entry.key].score;
+      }
+    }
+
+    // 显示结果
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('考试结果'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('总分：${widget.quiz.totalScore}分'),
+            const SizedBox(height: 8),
+            Text('得分：$score分'),
+            const SizedBox(height: 8),
+            Text('正确率：${(score / widget.quiz.totalScore * 100).toStringAsFixed(1)}%'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // 关闭对话框
+              Navigator.of(context).pop(); // 返回上一页
+            },
+            child: const Text('确定'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+} 
