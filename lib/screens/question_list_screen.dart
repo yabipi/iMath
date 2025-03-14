@@ -33,7 +33,7 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:8080/api/questions?pageNo=$_currentPage&pageSize=10'),
+        Uri.parse('http://192.168.1.100:8080/api/questions?pageNo=$_currentPage&pageSize=10'),
       );
 
       if (response.statusCode == 200) {
