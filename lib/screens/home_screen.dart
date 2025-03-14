@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'knowledge_screen.dart';
 import 'history_screen.dart';
-import 'quiz_screen.dart';
+// import 'quiz_screen.dart';
+import 'question_list_screen.dart';
 import 'profile_screen.dart';
 import 'login_screen.dart';
 import '../models/user.dart';
@@ -20,7 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const KnowledgeScreen(),
     const HistoryScreen(),
-    const QuizScreen(),
+    // const QuizScreen(),
+    const QuestionListScreen(),
   ];
 
   @override
