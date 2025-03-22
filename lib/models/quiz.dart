@@ -34,8 +34,8 @@ class Question {
   Question.fromJson(Map<String, dynamic> json)
       : questionId = json['questionId'],
         title = json['title'],
-        content = json['content'],
-        answer = json['answer']
+        content = json['content']??'',
+        answer = json['answer']??'' 
        ;
 
 }

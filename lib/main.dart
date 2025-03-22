@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'screens/geometry_solution_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/add_paper_screen.dart';
+import 'screens/paper_list_screen.dart';
+import 'screens/profile_screen.dart';
+import 'screens/history_screen.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -18,6 +23,16 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const HomeScreen(),
+      routes: {
+        '/add_paper': (context) => const AddPaperScreen(),
+      },
     );
   }
-} 
+}
+
+final List<Widget> _pages = [
+  const HomeScreen(),
+  const PaperListScreen(),
+  const HistoryScreen(),
+  // const ProfileScreen(),
+]; 

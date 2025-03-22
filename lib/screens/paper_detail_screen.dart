@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_math_fork/flutter_math.dart';
+import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/quiz.dart';
+import 'add_question_screen.dart';
 
-class QuestionListScreen extends StatefulWidget {
-  const QuestionListScreen({super.key});
+class PaperDetailScreen extends StatefulWidget {
+  final int paperId;
+
+  const PaperDetailScreen({super.key, required this.paperId});
 
   @override
-  State<QuestionListScreen> createState() => _QuestionListScreenState();
+  State<PaperDetailScreen> createState() => _PaperDetailScreenState();
 }
 
-class _QuestionListScreenState extends State<QuestionListScreen> {
+class _PaperDetailScreenState extends State<PaperDetailScreen> {
   final List<Question> _questions = [];
   final Map<int, bool> _expandedStates = {};
   bool _isLoading = false;
-  int _currentPage = 1;
   bool _hasMore = true;
+  int _currentPage = 1;
+  final int _pageSize = 10;
 
   @override
   void initState() {
@@ -33,102 +37,83 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.1.100:8080/api/questions?pageNo=$_currentPage&pageSize=10'),
+        Uri.parse('http://localhost:8080/api/quiz/listquestions?quizId=${widget.paperId}'),
       );
 
       if (response.statusCode == 200) {
         // final Map<String, dynamic> data = jsonDecode(response.body);
-        final Map<String, dynamic> data = jsonDecode(Utf8Decoder().convert(response.body.runes.toList()));
-        //  json.decode(const Utf8Decoder().convert(你的json字符串.runes.toList()));
-
-
-        final List<dynamic> content = data['content'];
+        final List<dynamic> content = jsonDecode(Utf8Decoder().convert(response.body.runes.toList()));
+        // final List<dynamic> content = jsonDecode(response.body);
+        // print(content);
         final newQuestions = content.map((json) => Question.fromJson(json)).toList();
-        
+
         setState(() {
           _questions.addAll(newQuestions);
           _currentPage++;
-          _hasMore = newQuestions.isNotEmpty;
+          _hasMore = newQuestions.length == _pageSize;
           _isLoading = false;
         });
       } else {
         throw Exception('Failed to load questions');
       }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('加载失败: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('加载失败: $e')),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
-  Widget _buildQuestionCard(Question question, int index) {
-    bool isExpanded = _expandedStates[index] ?? false;
+  Widget buildMixedText(String text) {
+    // print(text);
+    final List<Widget> widgets = [];
+    final RegExp latexPattern = RegExp(r'\\\((.*?)\\\)|\$(.*?)\$');
+    int lastIndex = 0;
 
-    // 处理单行文本中的混合内容（普通文本和数学公式）
-    Widget buildLineContent(String line) {
-      final List<Widget> widgets = [];
-      final RegExp latexPattern = RegExp(r'\\\((.*?)\\\)|\$(.*?)\$');
-
-      int lastIndex = 0;
-
-      // 在一行中查找所有的数学公式
-      for (final Match match in latexPattern.allMatches(line)) {
-        // 添加公式前的普通文本
-        if (match.start > lastIndex) {
-          // String txt = Utf8Decoder().convert(line.substring(lastIndex, match.start));
-          widgets.add(
-            Text(
-              line.substring(lastIndex, match.start),
-              style: const TextStyle(fontSize: 16),
-            ),
-          );
-        }
-
-        // 添加数学公式（去掉首尾的$符号）
-        final formula = match.group(1)!;
-        widgets.add(
-          Math.tex(
-            formula,
-            textStyle: const TextStyle(fontSize: 16),
-            mathStyle: MathStyle.text,
-          ),
-        );
-
-        lastIndex = match.end;
-      }
-
-      // 添加最后一段普通文本（如果有的话）
-      if (lastIndex < line.length) {
-        // String txt = Utf8Decoder().convert(line.substring(lastIndex));
+    for (final Match match in latexPattern.allMatches(text)) {
+      if (match.start > lastIndex) {
         widgets.add(
           Text(
-            line.substring(lastIndex),
+            text.substring(lastIndex, match.start),
             style: const TextStyle(fontSize: 16),
           ),
         );
       }
 
-      return Wrap(
-        children: widgets,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 4,
+      final formula = match.group(1)!;
+      widgets.add(
+        Math.tex(
+          formula,
+          textStyle: const TextStyle(fontSize: 16),
+          mathStyle: MathStyle.text,
+        ),
+      );
+
+      lastIndex = match.end;
+    }
+
+    if (lastIndex < text.length) {
+      widgets.add(
+        Text(
+          text.substring(lastIndex),
+          style: const TextStyle(fontSize: 16),
+        ),
       );
     }
 
-    // 处理多行文本
-    Widget buildMixedText(String text) {
-      final lines = text.split('\n');
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: lines.map((line) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: buildLineContent(line),
-        )).toList(),
-      );
-    }
+    return Wrap(
+      children: widgets,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 4,
+    );
+  }
+
+  Widget _buildQuestionCard(Question question, int index) {
+    bool isExpanded = _expandedStates[index] ?? false;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16.0),
@@ -162,14 +147,14 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              buildMixedText(question.content),
+              buildMixedText(question.content??''),
               const SizedBox(height: 8),
               const Text(
                 '答案:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              buildMixedText(question.answer),
+              buildMixedText(question.answer??''),
             ],
           ],
         ),
@@ -181,7 +166,7 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('题目列表'),
+        title: const Text('试卷详情'),
       ),
       body: _questions.isEmpty && _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -216,6 +201,27 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
                 return _buildQuestionCard(_questions[index], index);
               },
             ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddQuestionScreen(paperId: widget.paperId),
+            ),
+          ).then((value) {
+            if (value == true) {
+              // 如果添加成功，刷新题目列表
+              setState(() {
+                _questions.clear();
+                _currentPage = 1;
+                _hasMore = true;
+              });
+              _loadMoreQuestions();
+            }
+          });
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
-}
+} 
