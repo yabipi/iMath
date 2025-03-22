@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
 import 'dart:convert';
 
 class AddPaperScreen extends StatefulWidget {
@@ -44,16 +45,19 @@ class _AddPaperScreenState extends State<AddPaperScreen> {
     });
 
     try {
-      final response = await http.post(
-        Uri.parse('http://localhost:8080/api/papers'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
+      Map<String, String> params = {
           'title': _titleController.text,
-          'content': _contentController.text,
-          'level': _selectedLevel,
-        }),
+          'content': _contentController.text
+          // 'level': _selectedLevel,
+        };
+      // 对请求参数进行urlencode
+      // String encodedParams = Uri(queryParameters: params).buildQueryParameters();
+      final response = await http.post(
+        Uri.parse('http://192.168.1.100:8080/api/quiz'),
+        headers: {
+           'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: params
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
