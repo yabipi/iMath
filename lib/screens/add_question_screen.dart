@@ -67,7 +67,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
       }
 
       final response = await http.post(
-        Uri.parse('http://localhost:8080/api/papers/${widget.paperId}/questions'),
+        Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/papers/${widget.paperId}/questions'),
         headers: {
           'Content-Type': 'application/json',
         },

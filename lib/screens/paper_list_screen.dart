@@ -4,6 +4,7 @@ import 'dart:convert';
 import '../models/paper.dart';
 import 'paper_detail_screen.dart';
 import 'add_paper_screen.dart';
+import 'question_list_screen.dart';
 
 class PaperListScreen extends StatefulWidget {
   const PaperListScreen({super.key});
@@ -18,7 +19,7 @@ class _PaperListScreenState extends State<PaperListScreen> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -36,6 +37,7 @@ class _PaperListScreenState extends State<PaperListScreen> with SingleTickerProv
           controller: _tabController,
           isScrollable: true, // 如果标签太多，允许滚动
           tabs: const [
+            Tab(text: '全部题目'),
             Tab(text: '小学题库'),
             Tab(text: '初中题库'),
             Tab(text: '高中题库'),
@@ -46,6 +48,7 @@ class _PaperListScreenState extends State<PaperListScreen> with SingleTickerProv
       body: TabBarView(
         controller: _tabController,
         children: const [
+          QuestionListScreen(),
           PaperListTab(level: 'PRIMARY'),
           PaperListTab(level: 'JUNIOR'),
           PaperListTab(level: 'SENIOR'),
@@ -54,16 +57,25 @@ class _PaperListScreenState extends State<PaperListScreen> with SingleTickerProv
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddPaperScreen(
-                initialLevel: _getLevelFromIndex(_tabController.index),
+          if (_tabController.index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AddQuestionScreen(paperId: -1),
               ),
-            ),
-          );
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AddPaperScreen(
+                  initialLevel: _getLevelFromIndex(_tabController.index - 1),
+                ),
+              ),
+            );
+          }
         },
-        child: const Icon(Icons.add),
+        child: Icon(_tabController.index == 0 ? Icons.add_circle : Icons.add),
       ),
     );
   }
@@ -129,11 +141,11 @@ class _PaperListTabState extends State<PaperListTab> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:8080/api/quiz/list?pageNo=$_currentPage&pageSize=$_pageSize&level=${widget.level}'),
+        Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/quiz/list?pageNo=$_currentPage&pageSize=$_pageSize&level=${widget.level}'),
       );
 
       if (response.statusCode == 200) {        
-        final Map<String, dynamic> data = jsonDecode(Utf8Decoder().convert(response.body.runes.toList()));
+        final Map<String, dynamic> data = jsonDecode(const Utf8Decoder().convert(response.body.runes.toList()));
         final List<dynamic> content = data['content'];
         final newPapers = content.map((json) => Paper.fromJson(json)).toList();
 
@@ -193,7 +205,7 @@ class _PaperListTabState extends State<PaperListTab> {
                 return Card(
                   child: ListTile(
                     title: Text(paper.title),
-                    subtitle: Text(
+                    subtitle: const Text(
                       ''
                     ),
                     trailing: const Icon(Icons.chevron_right),

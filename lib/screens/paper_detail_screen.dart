@@ -37,7 +37,7 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:8080/api/quiz/listquestions?quizId=${widget.paperId}'),
+        Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/quiz/listquestions?quizId=${widget.paperId}'),
       );
 
       if (response.statusCode == 200) {

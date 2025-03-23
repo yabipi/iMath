@@ -5,9 +5,11 @@ import 'screens/add_paper_screen.dart';
 import 'screens/paper_list_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/history_screen.dart';
+import 'config/api_config.dart';
 
 
 void main() {
+  ApiConfig.environment = Environment.PROD; // 或 Environment.PROD
   runApp(const MyApp());
 }
 

@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 
 import 'dart:convert';
 
+import '../config/api_config.dart';
+
 class AddPaperScreen extends StatefulWidget {
   final String initialLevel;
 
@@ -52,8 +54,9 @@ class _AddPaperScreenState extends State<AddPaperScreen> {
         };
       // 对请求参数进行urlencode
       // String encodedParams = Uri(queryParameters: params).buildQueryParameters();
+      final uri = Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/papers');
       final response = await http.post(
-        Uri.parse('http://192.168.1.100:8080/api/quiz'),
+        uri,
         headers: {
            'Content-Type': 'application/x-www-form-urlencoded'
         },
