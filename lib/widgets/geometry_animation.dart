@@ -202,7 +202,7 @@ class TrianglePainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2;
 
-      final formulaText = TextSpan(
+      const formulaText = TextSpan(
         text: 'S = (1/2) × 8 × 6 × sin(60°) = 12√3',
         style: TextStyle(
           color: Colors.purple,

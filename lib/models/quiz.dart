@@ -13,31 +13,26 @@ class Quiz {
 }
 
 class Question {
-  final int questionId;  // 修改: 将id改为questionId
-  final String title;
-  final String content;
-  // final List<String> options;
-  final String answer;  // 修改: 将correctAnswer改为answer
-  // final int score;
-  // final String type; // 题目类型：几何、函数等
+  final int id;
+  final String? title;
+  final String? content;
+  final String? answer;
 
   Question({
-    required this.questionId,  // 修改: 将id改为questionId
-    required this.title,
-    required this.content,
-    //  this.options,
-    required this.answer,  // 修改: 将correctAnswer改为answer
-    //  this.score,
-    //  this.type,
+    required this.id,
+    this.title,
+    this.content,
+    this.answer,
   });
 
-  Question.fromJson(Map<String, dynamic> json)
-      : questionId = json['questionId'],
-        title = json['title'],
-        content = json['content']??'',
-        answer = json['answer']??'' 
-       ;
-
+  factory Question.fromJson(Map<String, dynamic> json) {
+    return Question(
+      id: json['id'] ?? 0,
+      title: json['title'] as String?,
+      content: json['content'] as String?,
+      answer: json['answer'] as String?,
+    );
+  }
 }
 
 // 示例试卷数据

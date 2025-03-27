@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'screens/geometry_solution_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/add_paper_screen.dart';
 import 'screens/paper_list_screen.dart';
-import 'screens/profile_screen.dart';
 import 'screens/history_screen.dart';
 import 'config/api_config.dart';
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'dart:convert';
+import '../config/api_config.dart';
 import '../models/quiz.dart';
 
 class QuestionListScreen extends StatefulWidget {
@@ -38,13 +39,19 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
 
       if (response.statusCode == 200) {
         // final Map<String, dynamic> data = jsonDecode(response.body);
-        final Map<String, dynamic> data = jsonDecode(Utf8Decoder().convert(response.body.runes.toList()));
-        //  json.decode(const Utf8Decoder().convert(你的json字符串.runes.toList()));
-
-
-        final List<dynamic> content = data['content'];
-        final newQuestions = content.map((json) => Question.fromJson(json)).toList();
+        final Map<String, dynamic> data = jsonDecode(const Utf8Decoder().convert(response.body.runes.toList()));
+        final List<dynamic> content = data['content'] ?? [];
         
+        final newQuestions = content.map((json) {
+          try {
+            return Question.fromJson(json);
+          } catch (e) {
+            print('Error parsing question: $e');
+            print('JSON data: $json');
+            return null;
+          }
+        }).whereType<Question>().toList();
+
         setState(() {
           _questions.addAll(newQuestions);
           _currentPage++;
@@ -55,80 +62,82 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
         throw Exception('Failed to load questions');
       }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('加载失败: $e')),
-      );
+      print('Error loading questions: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('加载失败: $e')),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
-  Widget _buildQuestionCard(Question question, int index) {
-    bool isExpanded = _expandedStates[index] ?? false;
+  Widget buildMixedText(String? text) {
+    if (text == null || text.isEmpty) {
+      return const Text('');
+    }
 
-    // 处理单行文本中的混合内容（普通文本和数学公式）
-    Widget buildLineContent(String line) {
-      final List<Widget> widgets = [];
-      final RegExp latexPattern = RegExp(r'\\\((.*?)\\\)|\$(.*?)\$');
+    final List<Widget> widgets = [];
+    final RegExp latexPattern = RegExp(r'\$(.*?)\$');
+    int lastIndex = 0;
 
-      int lastIndex = 0;
-
-      // 在一行中查找所有的数学公式
-      for (final Match match in latexPattern.allMatches(line)) {
-        // 添加公式前的普通文本
+    try {
+      for (final Match match in latexPattern.allMatches(text)) {
         if (match.start > lastIndex) {
-          // String txt = Utf8Decoder().convert(line.substring(lastIndex, match.start));
           widgets.add(
             Text(
-              line.substring(lastIndex, match.start),
+              text.substring(lastIndex, match.start),
               style: const TextStyle(fontSize: 16),
             ),
           );
         }
 
-        // 添加数学公式（去掉首尾的$符号）
-        final formula = match.group(1)!;
-        widgets.add(
-          Math.tex(
-            formula,
-            textStyle: const TextStyle(fontSize: 16),
-            mathStyle: MathStyle.text,
-          ),
-        );
+        final formula = match.group(1);
+        if (formula != null) {
+          widgets.add(
+            Math.tex(
+              formula,
+              textStyle: const TextStyle(fontSize: 16),
+              mathStyle: MathStyle.text,
+            ),
+          );
+        }
 
         lastIndex = match.end;
       }
 
-      // 添加最后一段普通文本（如果有的话）
-      if (lastIndex < line.length) {
-        // String txt = Utf8Decoder().convert(line.substring(lastIndex));
+      if (lastIndex < text.length) {
         widgets.add(
           Text(
-            line.substring(lastIndex),
+            text.substring(lastIndex),
             style: const TextStyle(fontSize: 16),
           ),
         );
       }
+    } catch (e) {
+      print('Error in buildMixedText: $e');
+      return Text(text);
+    }
 
-      return Wrap(
-        children: widgets,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 4,
+    return Wrap(
+      children: widgets,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 4,
+    );
+  }
+
+  Widget _buildQuestionCard(Question question, int index) {
+    if (question.title == null) {
+      return const Card(
+        child: ListTile(
+          title: Text('无效的题目数据'),
+        ),
       );
     }
 
-    // 处理多行文本
-    Widget buildMixedText(String text) {
-      final lines = text.split('\n');
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: lines.map((line) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: buildLineContent(line),
-        )).toList(),
-      );
-    }
+    bool isExpanded = _expandedStates[index] ?? false;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16.0),
@@ -145,7 +154,7 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            buildMixedText(question.title),
+            buildMixedText(question.title ?? ''),
             const SizedBox(height: 8),
             TextButton(
               onPressed: () {
@@ -162,14 +171,14 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              buildMixedText(question.content),
+              buildMixedText(question.content ?? ''),
               const SizedBox(height: 8),
               const Text(
                 '答案:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              buildMixedText(question.answer),
+              buildMixedText(question.answer ?? ''),
             ],
           ],
         ),

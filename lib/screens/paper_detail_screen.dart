@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../config/api_config.dart';
 import '../models/quiz.dart';
 import 'add_question_screen.dart';
 
@@ -42,7 +43,7 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
 
       if (response.statusCode == 200) {
         // final Map<String, dynamic> data = jsonDecode(response.body);
-        final List<dynamic> content = jsonDecode(Utf8Decoder().convert(response.body.runes.toList()));
+        final List<dynamic> content = jsonDecode(const Utf8Decoder().convert(response.body.runes.toList()));
         // final List<dynamic> content = jsonDecode(response.body);
         // print(content);
         final newQuestions = content.map((json) => Question.fromJson(json)).toList();
@@ -68,10 +69,13 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
     }
   }
 
-  Widget buildMixedText(String text) {
-    // print(text);
+  Widget buildMixedText(String? text) {
+    if (text == null || text.isEmpty) {
+      return const Text('');
+    }
+
     final List<Widget> widgets = [];
-    final RegExp latexPattern = RegExp(r'\\\((.*?)\\\)|\$(.*?)\$');
+    final RegExp latexPattern = RegExp(r'\$(.*?)\$');
     int lastIndex = 0;
 
     for (final Match match in latexPattern.allMatches(text)) {
@@ -147,14 +151,14 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              buildMixedText(question.content??''),
+              buildMixedText(question.content),
               const SizedBox(height: 8),
               const Text(
                 '答案:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              buildMixedText(question.answer??''),
+              buildMixedText(question.answer),
             ],
           ],
         ),
