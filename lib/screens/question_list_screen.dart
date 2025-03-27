@@ -80,7 +80,8 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
     }
 
     final List<Widget> widgets = [];
-    final RegExp latexPattern = RegExp(r'\$(.*?)\$');
+    // final RegExp latexPattern = RegExp(r'\$(.*?)\$');
+    final RegExp latexPattern = RegExp(r'\\\((.*?)\\\)|\$(.*?)\$');
     int lastIndex = 0;
 
     try {

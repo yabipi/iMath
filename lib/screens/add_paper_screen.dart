@@ -53,7 +53,7 @@ class _AddPaperScreenState extends State<AddPaperScreen> {
         };
       // 对请求参数进行urlencode
       // String encodedParams = Uri(queryParameters: params).buildQueryParameters();
-      final uri = Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/papers');
+      final uri = Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/quiz');
       final response = await http.post(
         uri,
         headers: {
