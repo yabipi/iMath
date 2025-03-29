@@ -4,6 +4,7 @@ import '../services/auth_service.dart';
 import 'login_screen.dart';
 import 'camera_screen.dart';
 import 'add_paper_screen.dart';
+import 'admin_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   final User user;
@@ -142,15 +143,29 @@ class ProfileScreen extends StatelessWidget {
                 // 导航到关于页面
               },
             ),
+            // ListTile(
+            //   leading: const Icon(Icons.add_circle_outline),
+            //   title: const Text('添加试卷'),
+            //   trailing: const Icon(Icons.chevron_right),
+            //   onTap: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //         builder: (context) => const AddPaperScreen(),
+            //       ),
+            //     );
+            //   },
+            // ),
+            const Divider(),
             ListTile(
-              leading: const Icon(Icons.add_circle_outline),
-              title: const Text('添加试卷'),
+              leading: const Icon(Icons.admin_panel_settings),
+              title: const Text('管理员入口'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const AddPaperScreen(),
+                    builder: (context) => const AdminScreen(),
                   ),
                 );
               },

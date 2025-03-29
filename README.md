@@ -35,5 +35,8 @@ flutter run -d web-server --web-renderer html
 
 // release 包
 flutter build web --web-renderer html
+### web方式运行
+flutter build web
+pm2 start -n iMath python -- -m http.server 8000
 
 
