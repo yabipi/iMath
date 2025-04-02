@@ -34,23 +34,28 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
 
     try {
       final response = await http.get(
-        Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/questions?pageNo=$_currentPage&pageSize=10'),
+        Uri.parse(
+            '${ApiConfig.SERVER_BASE_URL}/api/questions?pageNo=$_currentPage&pageSize=10'),
       );
 
       if (response.statusCode == 200) {
         // final Map<String, dynamic> data = jsonDecode(response.body);
-        final Map<String, dynamic> data = jsonDecode(const Utf8Decoder().convert(response.body.runes.toList()));
+        final Map<String, dynamic> data = jsonDecode(
+            const Utf8Decoder().convert(response.body.runes.toList()));
         final List<dynamic> content = data['content'] ?? [];
-        
-        final newQuestions = content.map((json) {
-          try {
-            return Question.fromJson(json);
-          } catch (e) {
-            print('Error parsing question: $e');
-            print('JSON data: $json');
-            return null;
-          }
-        }).whereType<Question>().toList();
+
+        final newQuestions = content
+            .map((json) {
+              try {
+                return Question.fromJson(json);
+              } catch (e) {
+                print('Error parsing question: $e');
+                print('JSON data: $json');
+                return null;
+              }
+            })
+            .whereType<Question>()
+            .toList();
 
         setState(() {
           _questions.addAll(newQuestions);
@@ -123,9 +128,9 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
     }
 
     return Wrap(
-      children: widgets,
       crossAxisAlignment: WrapCrossAlignment.center,
       spacing: 4,
+      children: widgets,
     );
   }
 

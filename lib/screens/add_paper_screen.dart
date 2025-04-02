@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:imath/screens/home_screen.dart';
 
 import '../config/api_config.dart';
 
@@ -8,7 +8,7 @@ class AddPaperScreen extends StatefulWidget {
   final String initialLevel;
 
   const AddPaperScreen({
-    super.key, 
+    super.key,
     this.initialLevel = 'PRIMARY', // 设置默认值为 'PRIMARY'
   });
 
@@ -47,27 +47,30 @@ class _AddPaperScreenState extends State<AddPaperScreen> {
 
     try {
       Map<String, String> params = {
-          'title': _titleController.text,
-          'content': _contentController.text
-          // 'level': _selectedLevel,
-        };
+        'title': _titleController.text,
+        'content': _contentController.text
+        // 'level': _selectedLevel,
+      };
       // 对请求参数进行urlencode
       // String encodedParams = Uri(queryParameters: params).buildQueryParameters();
       final uri = Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/quiz');
-      final response = await http.post(
-        uri,
-        headers: {
-           'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: params
-      );
+      // print('${ApiConfig.SERVER_BASE_URL}/api/quiz');
+      final response = await http.post(uri,
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: params);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('试卷添加成功')),
           );
-          Navigator.pop(context, true); // 返回并传递成功标志
+          // Navigator.pop(context, true); // 返回并传递成功标志
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const HomeScreen(),
+            ),
+          );
         }
       } else {
         throw Exception('Failed to submit paper');
@@ -169,4 +172,4 @@ class _AddPaperScreenState extends State<AddPaperScreen> {
       ),
     );
   }
-} 
+}

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../widgets/coordinate_geometry_animation.dart';
-import 'package:flutter_math_fork/flutter_math.dart';
 
 class GeometrySolutionScreen extends StatelessWidget {
   const GeometrySolutionScreen({super.key});
@@ -100,4 +99,4 @@ class GeometrySolutionScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

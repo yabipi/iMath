@@ -38,15 +38,18 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
 
     try {
       final response = await http.get(
-        Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/quiz/listquestions?quizId=${widget.paperId}'),
+        Uri.parse(
+            '${ApiConfig.SERVER_BASE_URL}/api/quiz/listquestions?quizId=${widget.paperId}'),
       );
 
       if (response.statusCode == 200) {
         // final Map<String, dynamic> data = jsonDecode(response.body);
-        final List<dynamic> content = jsonDecode(const Utf8Decoder().convert(response.body.runes.toList()));
+        final List<dynamic> content = jsonDecode(
+            const Utf8Decoder().convert(response.body.runes.toList()));
         // final List<dynamic> content = jsonDecode(response.body);
         // print(content);
-        final newQuestions = content.map((json) => Question.fromJson(json)).toList();
+        final newQuestions =
+            content.map((json) => Question.fromJson(json)).toList();
 
         setState(() {
           _questions.addAll(newQuestions);
@@ -111,9 +114,9 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
     }
 
     return Wrap(
-      children: widgets,
       crossAxisAlignment: WrapCrossAlignment.center,
       spacing: 4,
+      children: widgets,
     );
   }
 
@@ -229,4 +232,4 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
       ),
     );
   }
-} 
+}

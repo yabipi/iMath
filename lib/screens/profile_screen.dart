@@ -3,7 +3,6 @@ import '../models/user.dart';
 import '../services/auth_service.dart';
 import 'login_screen.dart';
 import 'camera_screen.dart';
-import 'add_paper_screen.dart';
 import 'admin_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -59,9 +58,8 @@ class ProfileScreen extends StatelessWidget {
                   // 头像
                   CircleAvatar(
                     radius: 50,
-                    backgroundImage: user.avatar != null
-                        ? NetworkImage(user.avatar!)
-                        : null,
+                    backgroundImage:
+                        user.avatar != null ? NetworkImage(user.avatar!) : null,
                     child: user.avatar == null
                         ? const Icon(Icons.person, size: 50)
                         : null,
@@ -175,4 +173,4 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

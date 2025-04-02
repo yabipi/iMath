@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_math_fork/flutter_math.dart';
-import '../models/quiz.dart';
-import 'quiz_detail_screen.dart';
+// import 'quiz_detail_screen.dart';
 
 class QuizScreen extends StatelessWidget {
   const QuizScreen({super.key});
@@ -75,12 +73,12 @@ class QuizScreen extends StatelessWidget {
           '高考数学',
           Icons.school,
           () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => QuizDetailScreen(quiz: sampleQuiz),
-              ),
-            );
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => QuizDetailScreen(quiz: sampleQuiz),
+            //   ),
+            // );
           },
         ),
         _buildExamCard(
@@ -112,4 +110,4 @@ class QuizScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

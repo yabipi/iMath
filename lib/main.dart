@@ -3,11 +3,9 @@ import 'screens/home_screen.dart';
 import 'screens/add_paper_screen.dart';
 import 'screens/paper_list_screen.dart';
 import 'screens/history_screen.dart';
-import 'config/api_config.dart';
-
 
 void main() {
-  ApiConfig.environment = Environment.PROD; // 或 Environment.PROD
+  // ApiConfig.environment = Environment.DEV; // 或 Environment.PROD
   runApp(const MyApp());
 }
 
@@ -35,4 +33,4 @@ final List<Widget> _pages = [
   const PaperListScreen(),
   const HistoryScreen(),
   // const ProfileScreen(),
-]; 
+];

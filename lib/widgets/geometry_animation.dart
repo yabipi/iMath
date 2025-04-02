@@ -138,10 +138,10 @@ class TrianglePainter extends CustomPainter {
           pointA.dx + angleRadius * math.cos(math.pi / 3),
           pointA.dy - angleRadius * math.sin(math.pi / 3),
         ),
-        Radius.circular(angleRadius),
-        -math.pi / 3,
-        math.pi / 3,
-        false,
+        radius: Radius.circular(angleRadius),
+        rotation: -math.pi / 3,
+        largeArc: false,
+        clockwise: false,
       );
     canvas.drawPath(anglePath, anglePaint);
 
@@ -227,4 +227,4 @@ class TrianglePainter extends CustomPainter {
   bool shouldRepaint(TrianglePainter oldDelegate) {
     return oldDelegate.progress != progress;
   }
-} 
+}

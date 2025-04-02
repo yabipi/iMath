@@ -15,7 +15,8 @@ class PaperListScreen extends StatefulWidget {
   State<PaperListScreen> createState() => _PaperListScreenState();
 }
 
-class _PaperListScreenState extends State<PaperListScreen> with SingleTickerProviderStateMixin {
+class _PaperListScreenState extends State<PaperListScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -63,7 +64,7 @@ class _PaperListScreenState extends State<PaperListScreen> with SingleTickerProv
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => AddQuestionScreen(paperId: -1),
+                builder: (context) => const AddQuestionScreen(paperId: -1),
               ),
             );
           } else {
@@ -129,7 +130,8 @@ class _PaperListTabState extends State<PaperListTab> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
       _loadMorePapers();
     }
   }
@@ -143,11 +145,13 @@ class _PaperListTabState extends State<PaperListTab> {
 
     try {
       final response = await http.get(
-        Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/quiz/list?pageNo=$_currentPage&pageSize=$_pageSize&level=${widget.level}'),
+        Uri.parse(
+            '${ApiConfig.SERVER_BASE_URL}/api/quiz/list?pageNo=$_currentPage&pageSize=$_pageSize&level=${widget.level}'),
       );
 
-      if (response.statusCode == 200) {        
-        final Map<String, dynamic> data = jsonDecode(const Utf8Decoder().convert(response.body.runes.toList()));
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(
+            const Utf8Decoder().convert(response.body.runes.toList()));
         final List<dynamic> content = data['content'];
         final newPapers = content.map((json) => Paper.fromJson(json)).toList();
 
@@ -207,15 +211,14 @@ class _PaperListTabState extends State<PaperListTab> {
                 return Card(
                   child: ListTile(
                     title: Text(paper.title),
-                    subtitle: const Text(
-                      ''
-                    ),
+                    subtitle: const Text(''),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => PaperDetailScreen(paperId: paper.quizId),
+                          builder: (context) =>
+                              PaperDetailScreen(paperId: paper.quizId),
                         ),
                       ).then((_) => _refreshPapers());
                     },
@@ -225,4 +228,4 @@ class _PaperListTabState extends State<PaperListTab> {
             ),
     );
   }
-} 
+}

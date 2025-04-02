@@ -16,4 +16,4 @@ class ApiConfig {
         return 'http://localhost:8080';
     }
   }
-} 
+}

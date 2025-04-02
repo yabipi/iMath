@@ -10,6 +10,17 @@ class Quiz {
     required this.totalScore,
     required this.timeLimit,
   });
+
+  factory Quiz.fromJson(Map<String, dynamic> json) {
+    return Quiz(
+      title: json['title'],
+      questions: (json['questions'] as List)
+          .map((question) => Question.fromJson(question))
+          .toList(),
+      totalScore: json['totalScore'],
+      timeLimit: json['timeLimit'],
+    );
+  }
 }
 
 class Question {
@@ -114,4 +125,4 @@ class Question {
 //       score: 10,
 //     ),
 //   ],
-// ); 
+// );
