@@ -15,7 +15,8 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
-
+## 安装依赖
+flutter pub add markdown_widget
 
 ## 构建
 - flutter build apk
@@ -26,6 +27,8 @@ samples, guidance on mobile development, and a full API reference.
 - flutter pub get        # 获取依赖
 ## 运行
 - flutter run
+- flutter run --dart-define=ENV=DEV
+- flutter build apk --dart-define=ENV=production
 // debug 模式（使用 chrome 浏览器）
 flutter run -d chrome --web-renderer html
 // debug 模式（使用 edge 浏览器）

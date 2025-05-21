@@ -4,12 +4,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../config/api_config.dart';
 import '../models/quiz.dart';
+import '../utils/math_parser.dart';
 import 'add_question_screen.dart';
 
 class PaperDetailScreen extends StatefulWidget {
   final int paperId;
-
-  const PaperDetailScreen({super.key, required this.paperId});
+  final String paperTitle;
+  const PaperDetailScreen(
+      {super.key, required this.paperId, required this.paperTitle});
 
   @override
   State<PaperDetailScreen> createState() => _PaperDetailScreenState();
@@ -78,39 +80,53 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
     }
 
     final List<Widget> widgets = [];
-    // final RegExp latexPattern = RegExp(r'\$(.*?)\$');
-    final RegExp latexPattern = RegExp(r'\\\((.*?)\\\)|\$(.*?)\$');
-    int lastIndex = 0;
+    final parsedContents = MathParser.parse(text);
 
-    for (final Match match in latexPattern.allMatches(text)) {
-      if (match.start > lastIndex) {
+    for (final content in parsedContents) {
+      if (content.isMath) {
+        // 处理数学公式
+        String formula = content.content;
+        // 如果是环境公式（如 matrix），需要特殊处理
+        if (content.environment != null) {
+          // 保持完整的 LaTeX 环境
+          widgets.add(
+            Math.tex(
+              formula,
+              textStyle: const TextStyle(fontSize: 16),
+              mathStyle: MathStyle.display,
+            ),
+          );
+        } else {
+          // 处理行内公式或显示模式公式
+          widgets.add(
+            Math.tex(
+              formula,
+              textStyle: const TextStyle(fontSize: 16),
+              mathStyle:
+                  content.isDisplayMode ? MathStyle.display : MathStyle.text,
+            ),
+          );
+        }
+      } else if (content.isSpacing) {
+        // 处理间距
+        widgets.add(
+          SizedBox(
+            width: content.spacingCount * 16, // 16 是当前字体大小
+          ),
+        );
+      } else {
+        // 处理普通文本
         widgets.add(
           Text(
-            text.substring(lastIndex, match.start),
-            style: const TextStyle(fontSize: 16),
+            content.content,
+            style: TextStyle(
+              fontSize: 16,
+              decoration:
+                  content.hasUnderline ? TextDecoration.underline : null,
+            ),
           ),
         );
       }
-
-      final formula = match.group(1)!;
-      widgets.add(
-        Math.tex(
-          formula,
-          textStyle: const TextStyle(fontSize: 16),
-          mathStyle: MathStyle.text,
-        ),
-      );
-
-      lastIndex = match.end;
-    }
-
-    if (lastIndex < text.length) {
-      widgets.add(
-        Text(
-          text.substring(lastIndex),
-          style: const TextStyle(fontSize: 16),
-        ),
-      );
     }
 
     return Wrap(
@@ -174,7 +190,7 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('试卷详情'),
+        title: Text(widget.paperTitle),
       ),
       body: _questions.isEmpty && _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -191,14 +207,14 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
                       ),
                     );
                   }
-                  if (_hasMore) {
-                    return Center(
-                      child: TextButton(
-                        onPressed: _loadMoreQuestions,
-                        child: const Text('加载更多'),
-                      ),
-                    );
-                  }
+                  // if (_hasMore) {
+                  //   return Center(
+                  //     child: TextButton(
+                  //       onPressed: _loadMoreQuestions,
+                  //       child: const Text('加载更多'),
+                  //     ),
+                  //   );
+                  // }
                   return const Center(
                     child: Padding(
                       padding: EdgeInsets.all(16.0),

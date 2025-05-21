@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
@@ -35,15 +37,15 @@ class _AddKnowledgeScreenState extends State<AddKnowledgeScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/knowledge'),
+        Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/know/create'),
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
-        body: {
+        body: jsonEncode({
           'title': _titleController.text,
           'content': _contentController.text,
-          'level': _levelController.text,
-        },
+          // 'level': _levelController.text,
+        }),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:imath/screens/home_screen.dart';
+import 'dart:convert';
 
 import '../config/api_config.dart';
 
@@ -46,18 +47,24 @@ class _AddPaperScreenState extends State<AddPaperScreen> {
     });
 
     try {
-      Map<String, String> params = {
-        'title': _titleController.text,
-        'content': _contentController.text
-        // 'level': _selectedLevel,
-      };
+      // Map<String, String> params = {
+      //   'title': _titleController.text,
+      //   'content': _contentController.text,
+      //   'format': 'tex'
+      //   // 'level': _selectedLevel,
+      // };
       // 对请求参数进行urlencode
       // String encodedParams = Uri(queryParameters: params).buildQueryParameters();
-      final uri = Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/quiz');
+      final uri = Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/paper/import');
       // print('${ApiConfig.SERVER_BASE_URL}/api/quiz');
       final response = await http.post(uri,
-          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-          body: params);
+          // headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'title': _titleController.text,
+            'content': _contentController.text,
+            'format': 'tex'
+          }));
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (mounted) {

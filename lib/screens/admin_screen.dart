@@ -3,8 +3,9 @@ import 'add_paper_screen.dart';
 import 'add_question_screen.dart';
 import 'add_knowledge_screen.dart';
 import 'latex_test_screen.dart';
-import 'draggable_tree_screen.dart';
-import 'package:imath/screens/paper_screen.dart';
+import 'package:imath/demo/draggable_tree_screen.dart';
+import 'package:imath/demo/paper_screen.dart';
+import 'package:imath/pages/test_functions.dart';
 
 class AdminScreen extends StatelessWidget {
   const AdminScreen({super.key});
@@ -95,6 +96,19 @@ class AdminScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const PaperScreen(),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.assignment),
+            title: const Text('功能测试'),
+            subtitle: const Text('各种功能测试'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TestFunctionsPage(),
                 ),
               );
             },

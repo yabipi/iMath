@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_math_fork/flutter_math.dart';
+import 'package:imath/components/math_cell.dart';
 import 'dart:convert';
 import '../config/api_config.dart';
 import '../models/quiz.dart';
@@ -35,14 +36,14 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
     try {
       final response = await http.get(
         Uri.parse(
-            '${ApiConfig.SERVER_BASE_URL}/api/questions?pageNo=$_currentPage&pageSize=10'),
+            '${ApiConfig.SERVER_BASE_URL}/api/question/list?pageNo=$_currentPage&pageSize=10'),
       );
 
       if (response.statusCode == 200) {
-        // final Map<String, dynamic> data = jsonDecode(response.body);
-        final Map<String, dynamic> data = jsonDecode(
-            const Utf8Decoder().convert(response.body.runes.toList()));
-        final List<dynamic> content = data['content'] ?? [];
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        // final Map<String, dynamic> data = jsonDecode(
+        //     const Utf8Decoder().convert(response.body.runes.toList()));
+        final List<dynamic> content = data['data'] ?? [];
 
         final newQuestions = content
             .map((json) {
@@ -177,14 +178,14 @@ class _QuestionListScreenState extends State<QuestionListScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              buildMixedText(question.content ?? ''),
+              MathCell(title: question.title??'', content: question.content ?? ''),
               const SizedBox(height: 8),
               const Text(
                 '答案:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              buildMixedText(question.answer ?? ''),
+              MathCell(title: question.answer ?? '', content: ''),
             ],
           ],
         ),

@@ -217,8 +217,8 @@ class _PaperListTabState extends State<PaperListTab> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              PaperDetailScreen(paperId: paper.quizId),
+                          builder: (context) => PaperDetailScreen(
+                              paperId: paper.quizId, paperTitle: paper.title),
                         ),
                       ).then((_) => _refreshPapers());
                     },

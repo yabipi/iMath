@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../config/api_config.dart';
+import '../config/constants.dart';
+import '../core/context.dart';
 
 class AddQuestionScreen extends StatefulWidget {
   final int paperId;
@@ -17,7 +19,8 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
   final _answerController = TextEditingController();
-  String _selectedType = 'SINGLE_CHOICE'; // 默认单选
+  int _selectedBranch = 0;
+  String _selectedType = QuestionTypes[0]; // 默认单选
   final List<TextEditingController> _optionControllers = [
     TextEditingController(),
     TextEditingController(),
@@ -26,12 +29,10 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
   ];
   bool _isSubmitting = false;
 
-  final List<String> _questionTypes = [
-    'SINGLE_CHOICE',
-    'MULTIPLE_CHOICE',
-    'TRUE_FALSE',
-    'FILL_BLANK',
-  ];
+  // 获取全局 Context 实例
+  // final Context _context = Context();
+  // 使用 Context 获取全局数据
+  final categories = Context().get(CATEGORIES_KEY) as Map<int, String>?;
 
   @override
   void dispose() {
@@ -56,7 +57,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
     try {
       // 构建选项数据
       List<Map<String, String>> options = [];
-      if (_selectedType == 'SINGLE_CHOICE' || _selectedType == 'MULTIPLE_CHOICE') {
+      if (_selectedType == QuestionTypes[0] || _selectedType == QuestionTypes[1]) {
         for (int i = 0; i < _optionControllers.length; i++) {
           if (_optionControllers[i].text.isNotEmpty) {
             options.add({
@@ -66,9 +67,10 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
           }
         }
       }
-
+      print('_selectedType = ${_selectedType}');
+      print('_selectedBranch = ${_selectedBranch}, branch = ${categories?[_selectedBranch]}');
       final response = await http.post(
-        Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/papers/${widget.paperId}/questions'),
+        Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/question/create'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -76,8 +78,10 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
           'title': _titleController.text,
           'content': _contentController.text,
           'answer': _answerController.text,
+          'category': categories?[_selectedBranch],
           'type': _selectedType,
           'options': options,
+          // 'category': categories?.keys.first, // 示例：使用第一个分类的 ID
         }),
       );
 
@@ -107,7 +111,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
   }
 
   Widget _buildOptionsSection() {
-    if (_selectedType != 'SINGLE_CHOICE' && _selectedType != 'MULTIPLE_CHOICE') {
+    if (_selectedType != QuestionTypes[0] && _selectedType != QuestionTypes[1]) {
       return const SizedBox.shrink();
     }
 
@@ -128,7 +132,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
                 border: const OutlineInputBorder(),
               ),
               validator: (value) {
-                if (_selectedType == 'SINGLE_CHOICE' && value!.isEmpty) {
+                if (_selectedType == QuestionTypes[0] && value!.isEmpty) {
                   return '请输入选项内容';
                 }
                 return null;
@@ -153,13 +157,34 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              DropdownButtonFormField<int>(
+                value: categories!.keys.first,
+                decoration: const InputDecoration(
+                  labelText: '数学分支',
+                  border: OutlineInputBorder(),
+                ),
+                items: categories?.keys?.map((int id) {
+                  return DropdownMenuItem<int>(
+                    value: id,
+                    child: Text(categories![id]!),
+                  );
+                }).toList(),
+                onChanged: (int? newValue) {
+                  setState(() {
+                    print('set _selectedBranch = $newValue');
+                    _selectedBranch = newValue!;
+                    print('_selectedBranch = $_selectedBranch');
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: _selectedType,
                 decoration: const InputDecoration(
                   labelText: '题目类型',
                   border: OutlineInputBorder(),
                 ),
-                items: _questionTypes.map((String type) {
+                items: QuestionTypes.map((String type) {
                   return DropdownMenuItem<String>(
                     value: type,
                     child: Text(type),
@@ -217,9 +242,13 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 24),
+              const SizedBox(width:100, height: 24),
               ElevatedButton(
                 onPressed: _isSubmitting ? null : _submitQuestion,
+                style: ElevatedButton.styleFrom(
+                  fixedSize: const Size(100, 50), // 设置固定宽度和高度
+                  padding: EdgeInsets.zero, // 删除: padding: const EdgeInsets.symmetric(horizontal: 16),
+                ),
                 child: _isSubmitting
                     ? const SizedBox(
                         height: 20,
@@ -237,3 +266,4 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
     );
   }
 } 
+
