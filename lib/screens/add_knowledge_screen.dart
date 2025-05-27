@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:imath/config/constants.dart';
+import 'package:imath/core/context.dart';
 import '../config/api_config.dart';
 
 class AddKnowledgeScreen extends StatefulWidget {
@@ -16,8 +18,11 @@ class _AddKnowledgeScreenState extends State<AddKnowledgeScreen> {
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
   final _levelController = TextEditingController();
+  int _selectedBranch = 0;
   bool _isSubmitting = false;
 
+
+  final categories = Context().get(CATEGORIES_KEY) as Map<int, String>?;
   @override
   void dispose() {
     _titleController.dispose();
@@ -44,6 +49,7 @@ class _AddKnowledgeScreenState extends State<AddKnowledgeScreen> {
         body: jsonEncode({
           'title': _titleController.text,
           'content': _contentController.text,
+          'category': categories?[_selectedBranch],
           // 'level': _levelController.text,
         }),
       );
@@ -86,6 +92,25 @@ class _AddKnowledgeScreenState extends State<AddKnowledgeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              DropdownButtonFormField<int>(
+                value: categories!.keys.first,
+                decoration: const InputDecoration(
+                  labelText: '数学分支',
+                  border: OutlineInputBorder(),
+                ),
+                items: categories?.keys?.map((int id) {
+                  return DropdownMenuItem<int>(
+                    value: id,
+                    child: Text(categories![id]!),
+                  );
+                }).toList(),
+                onChanged: (int? newValue) {
+                  setState(() {
+                    _selectedBranch = newValue!;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(

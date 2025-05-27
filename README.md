@@ -42,4 +42,9 @@ flutter build web --web-renderer html
 flutter build web
 pm2 start -n iMath python -- -m http.server 8000
 
-
+## Math相关组件
+- https://github.com/shahxad-akram/flutter_tex: A Flutter Package to render Mathematics, Physics and Chemistry Equations based on LaTeX
+- https://github.com/simpleclub/flutter_math: Fork of flutter_math addressing compatibility problems while flutter_math is not being maintained.
+- https://github.com/xushengs/flutter_markdown_latex
+- https://gitlab.com/testapp-system/katex_flutter
+- https://github.com/djade007/latext

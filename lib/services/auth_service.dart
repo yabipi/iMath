@@ -2,6 +2,7 @@ import 'dart:async';
 import '../models/user.dart';
 
 class AuthService {
+  const AuthService();
   // 模拟用户数据
   static final Map<String, User> _users = {
     '13800138000': User(

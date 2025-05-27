@@ -1,16 +1,19 @@
 class Paper {
-  final int quizId;
+  final int id;
   final String title;
+  final String createTime;
 
   Paper({
-    required this.quizId,
-    required this.title
+    required this.id,
+    required this.title,
+    required this.createTime,
   });
 
   factory Paper.fromJson(Map<String, dynamic> json) {
     return Paper(
-      quizId: json['quizId'],
-      title: json['title']      
+      id: json['id'],
+      title: json['title'],
+      createTime: json['createTime'],
     );
   }
 } 

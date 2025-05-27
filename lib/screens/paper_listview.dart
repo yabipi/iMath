@@ -4,111 +4,20 @@ import 'dart:convert';
 import '../config/api_config.dart';
 import '../models/paper.dart';
 import 'add_paper_screen.dart';
-import 'question_list_screen.dart';
+import 'questions_screen.dart';
 import 'add_question_screen.dart';
 import 'paper_detail_screen.dart';
 
-class PaperListScreen extends StatefulWidget {
-  const PaperListScreen({super.key});
+class PaperListView extends StatefulWidget {
+  // final String level;
+
+  const PaperListView({super.key});
 
   @override
-  State<PaperListScreen> createState() => _PaperListScreenState();
+  State<PaperListView> createState() => _PaperListViewState();
 }
 
-class _PaperListScreenState extends State<PaperListScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 5, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('题库'),
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true, // 如果标签太多，允许滚动
-          tabs: const [
-            Tab(text: '全部题目'),
-            Tab(text: '小学题库'),
-            Tab(text: '初中题库'),
-            Tab(text: '高中题库'),
-            Tab(text: '大学题库'),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: const [
-          QuestionListScreen(),
-          PaperListTab(level: 'PRIMARY'),
-          PaperListTab(level: 'JUNIOR'),
-          PaperListTab(level: 'SENIOR'),
-          PaperListTab(level: 'COLLEGE'),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (_tabController.index == 0) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const AddQuestionScreen(paperId: -1),
-              ),
-            );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddPaperScreen(
-                  initialLevel: _getLevelFromIndex(_tabController.index - 1),
-                ),
-              ),
-            );
-          }
-        },
-        child: Icon(_tabController.index == 0 ? Icons.add_circle : Icons.add),
-      ),
-    );
-  }
-
-  String _getLevelFromIndex(int index) {
-    switch (index) {
-      case 0:
-        return 'PRIMARY';
-      case 1:
-        return 'JUNIOR';
-      case 2:
-        return 'SENIOR';
-      case 3:
-        return 'COLLEGE';
-      default:
-        return 'PRIMARY';
-    }
-  }
-}
-
-class PaperListTab extends StatefulWidget {
-  final String level;
-
-  const PaperListTab({super.key, required this.level});
-
-  @override
-  State<PaperListTab> createState() => _PaperListTabState();
-}
-
-class _PaperListTabState extends State<PaperListTab> {
+class _PaperListViewState extends State<PaperListView> {
   final List<Paper> _papers = [];
   bool _isLoading = false;
   bool _hasMore = true;
@@ -146,13 +55,13 @@ class _PaperListTabState extends State<PaperListTab> {
     try {
       final response = await http.get(
         Uri.parse(
-            '${ApiConfig.SERVER_BASE_URL}/api/quiz/list?pageNo=$_currentPage&pageSize=$_pageSize&level=${widget.level}'),
+            '${ApiConfig.SERVER_BASE_URL}/api/paper/list?pageNo=$_currentPage&pageSize=$_pageSize'),
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(
-            const Utf8Decoder().convert(response.body.runes.toList()));
-        final List<dynamic> content = data['content'];
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        final List<dynamic> content = data['data'] ?? [];
+
         final newPapers = content.map((json) => Paper.fromJson(json)).toList();
 
         setState(() {
@@ -211,14 +120,14 @@ class _PaperListTabState extends State<PaperListTab> {
                 return Card(
                   child: ListTile(
                     title: Text(paper.title),
-                    subtitle: const Text(''),
+                    subtitle: Text('创建时间: ${paper.createTime}'),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => PaperDetailScreen(
-                              paperId: paper.quizId, paperTitle: paper.title),
+                              paperId: paper.id, paperTitle: paper.title),
                         ),
                       ).then((_) => _refreshPapers());
                     },

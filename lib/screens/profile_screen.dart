@@ -6,12 +6,12 @@ import 'camera_screen.dart';
 import 'admin_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
-  final User user;
-  final _authService = AuthService();
+  final User? user;
+  final _authService = const AuthService();
 
-  ProfileScreen({
+  const ProfileScreen({
     super.key,
-    required this.user,
+    this.user,
   });
 
   Future<void> _logout(BuildContext context) async {
@@ -59,15 +59,15 @@ class ProfileScreen extends StatelessWidget {
                   CircleAvatar(
                     radius: 50,
                     backgroundImage:
-                        user.avatar != null ? NetworkImage(user.avatar!) : null,
-                    child: user.avatar == null
+                        user?.avatar != null ? NetworkImage((user?.avatar)!) : null,
+                    child: user?.avatar == null
                         ? const Icon(Icons.person, size: 50)
                         : null,
                   ),
                   const SizedBox(height: 16),
                   // 用户名
                   Text(
-                    user.name,
+                    (user?.name)!,
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -76,9 +76,9 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   // 手机号
-                  if (user.phone != null)
+                  if (user?.phone != null)
                     Text(
-                      user.phone!,
+                      (user?.phone)!,
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white70,

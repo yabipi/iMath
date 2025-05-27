@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:image_picker/image_picker.dart'; // 引入 image_picker 包
+import 'dart:io'; // 引入 File 类
+
 import '../config/api_config.dart';
 import '../config/constants.dart';
 import '../core/context.dart';
@@ -20,7 +23,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
   final _contentController = TextEditingController();
   final _answerController = TextEditingController();
   int _selectedBranch = 0;
-  String _selectedType = QuestionTypes[0]; // 默认单选
+  String _selectedType = QuestionTypes[0];
   final List<TextEditingController> _optionControllers = [
     TextEditingController(),
     TextEditingController(),
@@ -28,6 +31,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
     TextEditingController(),
   ];
   bool _isSubmitting = false;
+  List<String> _selectedImages = []; // 新增：存储选中的图片文件
 
   // 获取全局 Context 实例
   // final Context _context = Context();
@@ -45,6 +49,175 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
     super.dispose();
   }
 
+  // 修改：增强图片加载逻辑，支持自签署证书
+  Widget _buildImageSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: Text('上传图片：'),
+        ),
+        Wrap(
+          spacing: 8.0,
+          runSpacing: 8.0,
+          children: [
+            // 显示已上传的图片缩略图
+            for (int i = 0; i < _selectedImages.length; i++)
+              Stack(
+                children: [
+                  // 使用网络图片显示缩略图
+                  Image.network(
+                    _selectedImages[i],
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      debugPrint('图片加载失败: ${_selectedImages[i]} ${error}');
+                      // 新增：显示灰色背景及错误图标
+                      return Container(
+                        width: 100,
+                        height: 100,
+                        color: Colors.grey[200],
+                        child: const Center(child: Icon(Icons.error)),
+                      );
+                    },
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
+                        ),
+                      );
+                    },
+                    // 新增：忽略自签署证书
+                    headers: {
+                      'Accept': 'image/*',
+                    },
+
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: IconButton(
+                      icon: const Icon(Icons.close, color: Colors.red),
+                      onPressed: () => _removeImage(i),
+                    ),
+                  ),
+                ],
+              ),
+            // 如果图片数量未达到上限，显示添加图片按钮
+            if (_selectedImages.length < 5)
+              GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ListTile(
+                            leading: const Icon(Icons.photo_library),
+                            title: const Text('从相册选择'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              _pickImage(ImageSource.gallery);
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.camera_alt),
+                            title: const Text('拍照'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              _pickImage(ImageSource.camera);
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(4.0),
+                  ),
+                  child: const Icon(Icons.add),
+                ),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // 新增：全局设置忽略自签署证书
+  void _initHttpClient() {
+    final httpClient = HttpClient();
+    httpClient.badCertificateCallback = (X509Certificate cert, String host, int port) {
+      debugPrint('Ignoring self-signed certificate for $host:$port');
+      return true; // 忽略证书验证
+    };
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initHttpClient(); // 初始化时设置忽略自签署证书
+  }
+
+  // 修改：确保图片 URL 使用 HTTPS 协议
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: source);
+    if (pickedFile != null && _selectedImages.length < 5) {
+      try {
+        // 调用后台接口上传图片
+        final request = http.MultipartRequest(
+          'POST',
+          Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/picture/upload'),
+        );
+        request.files.add(await http.MultipartFile.fromPath('file', pickedFile.path));
+        final response = await request.send();
+
+        if (response.statusCode == 200) {
+          final responseBody = await response.stream.bytesToString();
+          final data = json.decode(responseBody);
+          final fileUrl = data['fileUrl']; // 获取返回的 fileId
+          // 新增：将 HTTP 替换为 HTTPS
+          final secureUrl = fileUrl.replaceFirst('http://', 'https://');
+          debugPrint('Image URL: ${secureUrl}');
+          setState(() {
+            _selectedImages.add(secureUrl); // 存储安全的图片 URL
+          });
+        } else {
+          throw Exception('图片上传失败');
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('图片上传失败: $e')),
+        );
+      }
+    } else if (_selectedImages.length >= 5) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('最多只能上传5张图片')),
+      );
+    }
+  }
+
+  // 新增：删除选中的图片
+  void _removeImage(int index) {
+    setState(() {
+      _selectedImages.removeAt(index);
+    });
+  }
+
+  // 修改：提交题目时不再上传图片，直接使用已有的 fileId 列表
   Future<void> _submitQuestion() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -61,14 +234,13 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
         for (int i = 0; i < _optionControllers.length; i++) {
           if (_optionControllers[i].text.isNotEmpty) {
             options.add({
-              'label': String.fromCharCode(65 + i), // A, B, C, D
+              'label': String.fromCharCode(65 + i),
               'content': _optionControllers[i].text,
             });
           }
         }
       }
-      print('_selectedType = ${_selectedType}');
-      print('_selectedBranch = ${_selectedBranch}, branch = ${categories?[_selectedBranch]}');
+
       final response = await http.post(
         Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/question/create'),
         headers: {
@@ -81,7 +253,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
           'category': categories?[_selectedBranch],
           'type': _selectedType,
           'options': options,
-          // 'category': categories?.keys.first, // 示例：使用第一个分类的 ID
+          'images': _selectedImages.join(','), // 直接使用 fileId 列表
         }),
       );
 
@@ -90,7 +262,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('题目添加成功')),
           );
-          Navigator.pop(context, true); // 返回并传递成功标志
+          Navigator.pop(context, true);
         }
       } else {
         throw Exception('Failed to add question');
@@ -171,9 +343,9 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
                 }).toList(),
                 onChanged: (int? newValue) {
                   setState(() {
-                    print('set _selectedBranch = $newValue');
+                    // print('set _selectedBranch = $newValue');
                     _selectedBranch = newValue!;
-                    print('_selectedBranch = $_selectedBranch');
+                    // print('_selectedBranch = $_selectedBranch');
                   });
                 },
               ),
@@ -214,6 +386,8 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
               const SizedBox(height: 16),
               _buildOptionsSection(),
               const SizedBox(height: 16),
+              _buildImageSection(), // 新增：图片上传部分
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _contentController,
                 decoration: const InputDecoration(
@@ -243,22 +417,27 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
                 },
               ),
               const SizedBox(width:100, height: 24),
-              ElevatedButton(
-                onPressed: _isSubmitting ? null : _submitQuestion,
-                style: ElevatedButton.styleFrom(
-                  fixedSize: const Size(100, 50), // 设置固定宽度和高度
-                  padding: EdgeInsets.zero, // 删除: padding: const EdgeInsets.symmetric(horizontal: 16),
+              Row(children: [
+                Spacer(),
+                ElevatedButton(
+                  onPressed: _isSubmitting ? null : _submitQuestion,
+                  style: ElevatedButton.styleFrom(
+                    fixedSize: const Size(100, 50), // 设置固定宽度和高度
+                    padding: EdgeInsets.zero, // 删除: padding: const EdgeInsets.symmetric(horizontal: 16),
+                  ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                    ),
+                  )
+                      : const Text('提交'),
                 ),
-                child: _isSubmitting
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Text('提交'),
-              ),
+                Spacer(),
+              ],),
+
             ],
           ),
         ),
@@ -266,4 +445,16 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
     );
   }
 } 
+
+
+
+
+
+
+
+
+
+
+
+
 

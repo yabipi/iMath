@@ -13,36 +13,17 @@ class KnowledgeScreen extends StatefulWidget {
   const KnowledgeScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _KnowledgeScreenState createState() => _KnowledgeScreenState();
 }
 
 class _KnowledgeScreenState extends State<KnowledgeScreen> {
-  // Future<List<dynamic>> fetchCategories() async {
-  //   final response = await http
-  //       .get(Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/category/list'));
-  //   if (response.statusCode == 200) {
-  //     return json.decode(response.body);
-  //   } else {
-  //     throw Exception('Failed to load categories');
-  //   }
-  // }
-  // 使用 Context 获取全局数据
-  //
-
-  Future<List<dynamic>> fetchKnowledgePoints(int categoryId) async {
-    final response = await http.get(Uri.parse(
-        '${ApiConfig.SERVER_BASE_URL}/api/know/list?categoryId=$categoryId'));
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to load knowledge points');
-    }
-  }
+  // 新增：当前选中的分类ID
+  int _selectedCategoryId = -1;
 
   @override
   Widget build(BuildContext context) {
     final categories = Context().get(CATEGORIES_KEY) as Map<int, String>?;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('知识点'),
@@ -53,135 +34,132 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
           ),
         ),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Text(
-                '数学知识体系',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            // if (categories != null) // 检查 categories 是否为 null
-            ...?categories?.keys.map((key) {
-                return ListTile(
-                  leading: const Icon(Icons.category),
-                  title: Text(categories![key]!),
+      body: Column(
+        children: [
+          // 分类标签区域
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Wrap(
+              spacing: 8.0, // 水平间距
+              runSpacing: 8.0, // 垂直间距
+              children: [
+                // 新增：全部分类标签
+                GestureDetector(
                   onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            KnowledgeListScreen(categoryId: key),
-                      ),
-                    );
+                    setState(() {
+                      _selectedCategoryId = -1;
+                    });
                   },
-                );
-              }).toList(),
-          ],
-        ),
-      ),
-      body: const Center(
-        child: Text('选择左侧菜单查看具体知识点'),
+                  child: Chip(
+                    label: const Text('全部'),
+                    labelStyle: TextStyle(
+                      color: _selectedCategoryId == -1 ? Colors.white : Colors.black,
+                    ),
+                    backgroundColor: _selectedCategoryId == -1 ? Colors.blue : Colors.grey[200],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                ),
+                ...categories?.keys.map((key) {
+                  final categoryId = key;
+                  final categoryName = categories![categoryId];
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedCategoryId = categoryId!;
+                      });
+                    },
+                    child: Chip(
+                      label: Text(categoryName!),
+                      labelStyle: TextStyle(
+                        color: _selectedCategoryId == categoryId ? Colors.white : Colors.black,
+                      ),
+                      backgroundColor: _selectedCategoryId == categoryId ? Colors.blue : Colors.grey[200],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  );
+                }).toList() ?? [],
+              ],
+            ),
+          ),
+          // 知识点列表区域
+          Expanded(
+            child: FutureBuilder<List<dynamic>>(
+              future: fetchKnowledgePoints(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else {
+                  return ListView(
+                    padding: const EdgeInsets.all(8.0),
+                    children: snapshot.data!.map((knowledge) {
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 4.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ListTile(
+                          title: Text(
+                            knowledge['Title'],
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue,
+                            ),
+                          ),
+                          subtitle: Text(
+                            knowledge['Content'].length > 100
+                                ? '${knowledge['Content'].substring(0, 100)}...'
+                                : knowledge['Content'],
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    KnowledgeDetailScreen(knowledge: knowledge),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }).toList(),
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
-}
 
-class KnowledgeListScreen extends StatefulWidget {
-  final int categoryId;
-
-  const KnowledgeListScreen({super.key, required this.categoryId});
-
-  @override
-  // ignore: library_private_types_in_public_api
-  _KnowledgeListScreenState createState() => _KnowledgeListScreenState();
-}
-
-class _KnowledgeListScreenState extends State<KnowledgeListScreen> {
+  // 新增：获取知识点列表的函数
   Future<List<dynamic>> fetchKnowledgePoints() async {
     final response = await http.get(Uri.parse(
-        '${ApiConfig.SERVER_BASE_URL}/api/know/list?categoryId=${widget.categoryId}'));
+        '${ApiConfig.SERVER_BASE_URL}/api/know/list?categoryId=${_selectedCategoryId}'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
       throw Exception('Failed to load knowledge points');
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('知识点列表'),
-      ),
-      body: FutureBuilder<List<dynamic>>(
-        future: fetchKnowledgePoints(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else {
-            return ListView(
-              padding: const EdgeInsets.all(8.0),
-              children: snapshot.data!.map((knowledge) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(vertical: 4.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.3),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: ListTile(
-                    title: Text(
-                      knowledge['Title'],
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
-                      ),
-                    ),
-                    subtitle: Text(
-                      knowledge['Content'].length > 100
-                          ? '${knowledge['Content'].substring(0, 100)}...'
-                          : knowledge['Content'],
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              KnowledgeDetailScreen(knowledge: knowledge),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              }).toList(),
-            );
-          }
-        },
-      ),
-    );
   }
 }
 

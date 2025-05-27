@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
+import 'package:flutter_tex/flutter_tex.dart';
+import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../config/api_config.dart';
@@ -39,16 +41,18 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
     });
 
     try {
+      debugPrint('加载题目: ${widget.paperId}');
       final response = await http.get(
         Uri.parse(
-            '${ApiConfig.SERVER_BASE_URL}/api/quiz/listquestions?quizId=${widget.paperId}'),
+            '${ApiConfig.SERVER_BASE_URL}/api/paper/questions?paperId=${widget.paperId}'),
       );
 
       if (response.statusCode == 200) {
         // final Map<String, dynamic> data = jsonDecode(response.body);
-        final List<dynamic> content = jsonDecode(
-            const Utf8Decoder().convert(response.body.runes.toList()));
-        // final List<dynamic> content = jsonDecode(response.body);
+        // final List<dynamic> content = jsonDecode(
+        //     const Utf8Decoder().convert(response.body.runes.toList()));
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        final List<dynamic> content = data['data'] ?? [];
         // print(content);
         final newQuestions =
             content.map((json) => Question.fromJson(json)).toList();
@@ -155,6 +159,14 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
             ),
             const SizedBox(height: 8),
             buildMixedText(question.title),
+            // GptMarkdown(
+            //   question.title??'',
+            //   style: const TextStyle(color: Colors.black),
+            // ),
+            // TeX2SVG(
+            //   teXInputType: TeXInputType.teX,
+            //   math: question.title??'',
+            // ),
             const SizedBox(height: 8),
             TextButton(
               onPressed: () {
@@ -172,6 +184,14 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
               ),
               const SizedBox(height: 4),
               buildMixedText(question.content),
+              // GptMarkdown(
+              //   question.content??'',
+              //   style: const TextStyle(color: Colors.black),
+              // ),
+              // TeX2SVG(
+              //   teXInputType: TeXInputType.teX,
+              //   math: question.content??'',
+              // ),
               const SizedBox(height: 8),
               const Text(
                 '答案:',

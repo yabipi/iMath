@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:imath/screens/question_list_screen.dart';
+import 'package:imath/screens/questions_screen.dart';
 // import 'package:imath/screens/quiz_screen.dart';
 import 'admin_screen.dart';
 import 'knowledge_screen.dart';
 import 'history_screen.dart';
-import 'paper_list_screen.dart';
+import 'paper_listview.dart';
 // import 'quiz_screen.dart';
 import 'profile_screen.dart';
 import 'login_screen.dart';
@@ -20,13 +20,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  User? _currentUser;
+  User? _currentUser = null;
 
   final List<Widget> _screens = [
     const KnowledgeScreen(),
     const HistoryScreen(),
-    const QuestionListScreen(),
-    const PaperListScreen(),
+    const QuestionsScreen(),
+    const ProfileScreen(),
     const AdminScreen(),
   ];
 
@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history),
-            label: '数学史',
+            label: '数学文化',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.quiz),

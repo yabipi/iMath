@@ -1,0 +1,44 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:dio/adapter.dart';
+
+class InsecureImage extends StatelessWidget {
+  final String imageUrl;
+  
+  const InsecureImage({Key? key, required this.imageUrl}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Uint8List>(
+      future: _loadInsecureImage(imageUrl),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Image.memory(snapshot.data!);
+        } else if (snapshot.hasError) {
+          return Icon(Icons.error);
+        }
+        return CircularProgressIndicator();
+      },
+    );
+  }
+
+  Future<Uint8List> _loadInsecureImage(String url) async {
+    final dio = Dio();
+    // 配置不验证证书
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = 
+        (HttpClient client) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      return client;
+    };
+    
+    final response = await dio.get<Uint8List>(
+      url,
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return response.data!;
+  }
+}
+
+// 使用方式

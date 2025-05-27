@@ -12,10 +12,10 @@ class HistoryScreen extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('数学史'),
+          title: const Text('数学文化'),
           bottom: const TabBar(
             tabs: [
-              Tab(text: '数学人物'),
+              Tab(text: '人物'),
               Tab(text: '数学故事'),
             ],
           ),

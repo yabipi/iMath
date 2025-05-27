@@ -4,7 +4,7 @@ class User {
   final String? avatar;
   final String? phone;
   final String? wechatId;
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   User({
     required this.id,
@@ -12,7 +12,7 @@ class User {
     this.avatar,
     this.phone,
     this.wechatId,
-    required this.createdAt,
+    this.createdAt,
   });
 
   // 从JSON创建用户对象
@@ -35,7 +35,7 @@ class User {
       'avatar': avatar,
       'phone': phone,
       'wechatId': wechatId,
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt': createdAt?.toIso8601String(),
     };
   }
 } 
