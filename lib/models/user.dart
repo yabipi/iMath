@@ -1,5 +1,6 @@
 class User {
-  final String id;
+  String? login;
+  String? id;
   final String name;
   final String? avatar;
   final String? phone;
@@ -7,8 +8,9 @@ class User {
   final DateTime? createdAt;
 
   User({
-    required this.id,
     required this.name,
+    this.id,
+    this.login,
     this.avatar,
     this.phone,
     this.wechatId,

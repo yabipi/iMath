@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'add_paper_screen.dart';
 import 'add_question_screen.dart';
 import 'add_knowledge_screen.dart';
-import 'latex_test_screen.dart';
+
 import 'package:imath/demo/draggable_tree_screen.dart';
 import 'package:imath/demo/paper_screen.dart';
 import 'package:imath/pages/test_functions.dart';
@@ -65,12 +65,12 @@ class AdminScreen extends StatelessWidget {
             title: const Text('LaTeX测试'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const LatexTestScreen(),
-                ),
-              );
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => const LatexTestScreen(),
+              //   ),
+              // );
             },
           ),
           const Divider(),

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:imath/widgets/bottom_navigation_bar.dart';
 import '../models/mathematician.dart';
 import 'mathematician_detail_screen.dart';
 
-class HistoryScreen extends StatelessWidget {
-  const HistoryScreen({super.key});
+class CultureScreen extends StatelessWidget {
+  const CultureScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +85,7 @@ class HistoryScreen extends StatelessWidget {
             ),
           ],
         ),
+        bottomNavigationBar: CustomBottomNavigationBar(),
       ),
     );
   }

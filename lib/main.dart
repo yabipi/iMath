@@ -1,13 +1,24 @@
-import 'dart:convert';
 import 'dart:io';
-import 'package:flutter_tex/flutter_tex.dart';
+import 'package:get/get.dart';
+
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:imath/pages/knowledge_screen.dart';
+import 'package:imath/services/auth_api_service.dart';
+
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:imath/db/provider/userinfo_db_provider.dart';
+import 'package:imath/http/index.dart';
+
 import 'package:imath/config/api_config.dart';
+import 'package:imath/pages/home_screen.dart';
+import 'package:imath/route/app_pages.dart';
 import 'package:provider/provider.dart'; // 引入 provider 包
+import 'bindings/app_binding.dart';
 import 'config/constants.dart';
+import 'controllers/auth_controller.dart';
 import 'core/context.dart';
-import 'screens/home_screen.dart';
+import 'db/Storage.dart';
+
 
 // 创建一个简单的 AppState 类来管理状态
 class AppState with ChangeNotifier {
@@ -31,33 +42,15 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
-void main() async {
-  // 判断当前运行环境
-  if (Platform.isAndroid) {
-    print('当前运行环境是 Android');
-  } else if (Platform.isIOS) {
-    print('当前运行环境是 iOS');
-  } else if (Platform.isLinux) {
-    print('当前运行环境是 Web');
-    // await TeXRenderingServer.start();
-  } else {
-    print('当前运行环境是其他平台');
-  }
-
-  // ApiConfig.environment = Environment.DEV; // 或 Environment.PROD
-  ApiConfig.environment =
-      const String.fromEnvironment('ENV', defaultValue: 'DEV');
-  WidgetsFlutterBinding.ensureInitialized();
-  HttpOverrides.global = MyHttpOverrides();
-  await init();
-  runApp(MyApp());
-}
-
-Future<void> init() async {
-  final response = await http
-      .get(Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/category/list'));
+Future<void> initializeApp() async {
+  // final dio = Dio();
+  Context().refresh();
+  // 获取分类数据
+  final response = await Request()
+      .get('${ApiConfig.SERVER_BASE_URL}/api/category/list');
   if (response.statusCode == 200) {
-    var data = json.decode(response.body);
+    // var data = json.decode(response.body);
+    var data = response.data;
     Map<int, String> categories = {};
     for (var item in data) {
       categories[item['ID']] = item['CategoryName'];
@@ -66,7 +59,42 @@ Future<void> init() async {
   } else {
     throw Exception('Failed to load categories');
   }
+  // Initialize FFI
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+  //  初始化认证服务
+  AuthApiService authApiService = Get.put(AuthApiService());
+  await authApiService.initCredentials();
+  Get.put(AuthController(authApiService), permanent: true);
+  // log('Initialize');
 }
+
+
+void main() async {
+  logger.d('Starting app...', version());
+  // 判断当前运行环境
+  if (Platform.isAndroid) {
+    logger.d('当前运行环境是 Android');
+  } else if (Platform.isIOS) {
+    logger.d('当前运行环境是 iOS');
+  } else if (Platform.isLinux) {
+    logger.d('当前运行环境是 Web');
+    // await TeXRenderingServer.start();
+  } else {
+    logger.d('当前运行环境是其他平台');
+  }
+
+  await GStorage.init();
+  Request();
+  // ApiConfig.environment = Environment.DEV; // 或 Environment.PROD
+  ApiConfig.environment =
+      const String.fromEnvironment('ENV', defaultValue: 'DEV');
+  WidgetsFlutterBinding.ensureInitialized();
+  HttpOverrides.global = MyHttpOverrides();
+  await initializeApp();
+  runApp(MyApp());
+}
+
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
@@ -75,16 +103,19 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => AppState(), // 使用 ChangeNotifierProvider 提供状态
-      child: MaterialApp(
-        title: 'iMath',
+      child: GetMaterialApp(
+        title: '数学宝典',
         theme: ThemeData(
           primarySwatch: Colors.blue,
           useMaterial3: true,
         ),
-        home: const HomeScreen(),
-        routes: {
-          // '/add_paper': (context) => const AddPaperScreen(),
-        },
+        home: const KnowledgeScreen(),
+        getPages: Routes.getPages,
+        // initialRoute: Routes.HOME,
+        initialBinding: AppBinding(),
+        // routes: {
+        //   // '/add_paper': (context) => const AddPaperScreen(),
+        // },
       ),
     );
   }

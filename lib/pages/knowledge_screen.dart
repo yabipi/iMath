@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:http/http.dart' as http;
-import 'package:imath/components/math_cell.dart';
-import 'dart:convert';
+
 
 import 'package:imath/config/api_config.dart';
 import 'package:imath/config/constants.dart';
 import 'package:imath/core/context.dart';
-import 'package:markdown_widget/widget/markdown.dart';
+import 'package:imath/widgets/bottom_navigation_bar.dart';
+
+
+import '../http/init.dart';
 
 class KnowledgeScreen extends StatefulWidget {
   const KnowledgeScreen({super.key});
@@ -97,7 +99,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                 } else {
                   return ListView(
                     padding: const EdgeInsets.all(8.0),
-                    children: snapshot.data!.map((knowledge) {
+                    children: snapshot.data!.map((_knowledge) {
                       return Container(
                         margin: const EdgeInsets.symmetric(vertical: 4.0),
                         decoration: BoxDecoration(
@@ -113,7 +115,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                         ),
                         child: ListTile(
                           title: Text(
-                            knowledge['Title'],
+                            _knowledge['Title'],
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -121,9 +123,9 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                             ),
                           ),
                           subtitle: Text(
-                            knowledge['Content'].length > 100
-                                ? '${knowledge['Content'].substring(0, 100)}...'
-                                : knowledge['Content'],
+                            _knowledge['Content'].length > 100
+                                ? '${_knowledge['Content'].substring(0, 100)}...'
+                                : _knowledge['Content'],
                             style: const TextStyle(
                               fontSize: 14,
                               color: Colors.black87,
@@ -134,7 +136,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    KnowledgeDetailScreen(knowledge: knowledge),
+                                    KnowledgeDetailScreen(knowledge: _knowledge),
                               ),
                             );
                           },
@@ -148,15 +150,17 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: CustomBottomNavigationBar(),
     );
   }
 
   // 新增：获取知识点列表的函数
   Future<List<dynamic>> fetchKnowledgePoints() async {
-    final response = await http.get(Uri.parse(
-        '${ApiConfig.SERVER_BASE_URL}/api/know/list?categoryId=${_selectedCategoryId}'));
+    final response = await Request().get(
+        '${ApiConfig.SERVER_BASE_URL}/api/know/list?categoryId=${_selectedCategoryId}');
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      // return json.decode(response.body);
+      return response.data;
     } else {
       throw Exception('Failed to load knowledge points');
     }
@@ -176,7 +180,7 @@ class KnowledgeDetailScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 16.0),
           child: GptMarkdown(
             knowledge['Content'],
             style: const TextStyle(color: Colors.black),

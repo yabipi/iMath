@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
-import 'package:flutter_tex/flutter_tex.dart';
-import 'package:gpt_markdown/gpt_markdown.dart';
+// import 'package:flutter_tex/flutter_tex.dart';
+// import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:http/http.dart' as http;
+import 'package:imath/components/math_cell.dart';
 import 'dart:convert';
 import '../config/api_config.dart';
+import '../http/init.dart';
 import '../models/quiz.dart';
 import '../utils/math_parser.dart';
 import 'add_question_screen.dart';
@@ -42,16 +44,16 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
 
     try {
       debugPrint('加载题目: ${widget.paperId}');
-      final response = await http.get(
-        Uri.parse(
-            '${ApiConfig.SERVER_BASE_URL}/api/paper/questions?paperId=${widget.paperId}'),
+      final response = await Request().get(
+          '${ApiConfig.SERVER_BASE_URL}/api/paper/questions?paperId=${widget.paperId}'
       );
 
       if (response.statusCode == 200) {
         // final Map<String, dynamic> data = jsonDecode(response.body);
         // final List<dynamic> content = jsonDecode(
         //     const Utf8Decoder().convert(response.body.runes.toList()));
-        final Map<String, dynamic> data = jsonDecode(response.body);
+        // final Map<String, dynamic> data = jsonDecode(response.body);
+        final Map<String, dynamic> data = response.data;
         final List<dynamic> content = data['data'] ?? [];
         // print(content);
         final newQuestions =
@@ -78,67 +80,6 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
     }
   }
 
-  Widget buildMixedText(String? text) {
-    if (text == null || text.isEmpty) {
-      return const Text('');
-    }
-
-    final List<Widget> widgets = [];
-    final parsedContents = MathParser.parse(text);
-
-    for (final content in parsedContents) {
-      if (content.isMath) {
-        // 处理数学公式
-        String formula = content.content;
-        // 如果是环境公式（如 matrix），需要特殊处理
-        if (content.environment != null) {
-          // 保持完整的 LaTeX 环境
-          widgets.add(
-            Math.tex(
-              formula,
-              textStyle: const TextStyle(fontSize: 16),
-              mathStyle: MathStyle.display,
-            ),
-          );
-        } else {
-          // 处理行内公式或显示模式公式
-          widgets.add(
-            Math.tex(
-              formula,
-              textStyle: const TextStyle(fontSize: 16),
-              mathStyle:
-                  content.isDisplayMode ? MathStyle.display : MathStyle.text,
-            ),
-          );
-        }
-      } else if (content.isSpacing) {
-        // 处理间距
-        widgets.add(
-          SizedBox(
-            width: content.spacingCount * 16, // 16 是当前字体大小
-          ),
-        );
-      } else {
-        // 处理普通文本
-        widgets.add(
-          Text(
-            content.content,
-            style: TextStyle(
-              fontSize: 16,
-              decoration:
-                  content.hasUnderline ? TextDecoration.underline : null,
-            ),
-          ),
-        );
-      }
-    }
-
-    return Wrap(
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 4,
-      children: widgets,
-    );
-  }
 
   Widget _buildQuestionCard(Question question, int index) {
     bool isExpanded = _expandedStates[index] ?? false;
@@ -158,7 +99,8 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            buildMixedText(question.title),
+            // buildMixedText(question.title),
+            MathCell(title: question.title ?? '', content: question.title ?? ''),
             // GptMarkdown(
             //   question.title??'',
             //   style: const TextStyle(color: Colors.black),
@@ -183,7 +125,7 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              buildMixedText(question.content),
+              MathCell(title: question.title ?? '', content: question.content ?? ''),
               // GptMarkdown(
               //   question.content??'',
               //   style: const TextStyle(color: Colors.black),
@@ -198,7 +140,8 @@ class _PaperDetailScreenState extends State<PaperDetailScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              buildMixedText(question.answer),
+              // buildMixedText(question.answer),
+              MathCell(title: '', content: question.answer ?? ''),
             ],
           ],
         ),

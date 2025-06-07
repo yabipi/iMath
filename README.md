@@ -48,3 +48,6 @@ pm2 start -n iMath python -- -m http.server 8000
 - https://github.com/xushengs/flutter_markdown_latex
 - https://gitlab.com/testapp-system/katex_flutter
 - https://github.com/djade007/latext
+
+## 认证
+- https://pub.dev/packages/dart_jsonwebtoken

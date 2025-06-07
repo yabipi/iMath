@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:imath/screens/home_screen.dart';
+import 'package:imath/pages/home_screen.dart';
 import 'dart:convert';
 
 import '../config/api_config.dart';

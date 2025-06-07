@@ -104,35 +104,40 @@ class _QuestionListviewState extends State<QuestionListview> {
       return const SizedBox.shrink();
     }
 
-    return Wrap(
-      spacing: 8.0,
-      runSpacing: 8.0,
+    return ExpansionTile(
+      title: const Text('选择分类'),
       children: [
-        ChoiceChip(
-          label: const Text('全部'),
-          selected: _selectedCategoryId == -1,
-          onSelected: (selected) {
-            if (selected) {
-              _filterQuestionsByCategory(-1); // 清空分类筛选
-            }
-          },
-        ),
-        ...categories.entries.map((entry) {
-          final categoryId = entry.key;
-          final categoryName = entry.value;
+        Wrap(
+          spacing: 8.0,
+          runSpacing: 8.0,
+          children: [
+            ChoiceChip(
+              label: const Text('全部'),
+              selected: _selectedCategoryId == -1,
+              onSelected: (selected) {
+                if (selected) {
+                  _filterQuestionsByCategory(-1); // 清空分类筛选
+                }
+              },
+            ),
+            ...categories.entries.map((entry) {
+              final categoryId = entry.key;
+              final categoryName = entry.value;
 
-          return ChoiceChip(
-            label: Text(categoryName),
-            selected: _selectedCategoryId == categoryId,
-            onSelected: (selected) {
-              if (selected) {
-                _filterQuestionsByCategory(categoryId);
-              } else {
-                _filterQuestionsByCategory(-1); // 清空筛选
-              }
-            },
-          );
-        }).toList(),
+              return ChoiceChip(
+                label: Text(categoryName),
+                selected: _selectedCategoryId == categoryId,
+                onSelected: (selected) {
+                  if (selected) {
+                    _filterQuestionsByCategory(categoryId);
+                  } else {
+                    _filterQuestionsByCategory(-1); // 清空筛选
+                  }
+                },
+              );
+            }).toList(),
+          ],
+        ),
       ],
     );
   }
@@ -325,6 +330,7 @@ class _QuestionListviewState extends State<QuestionListview> {
         Expanded(
           child: _isSlidingMode
               ? PageView.builder(
+                  scrollDirection: Axis.vertical, // 修改：将滑动方向改为垂直
                   itemCount: _questions.length,
                   itemBuilder: (context, index) {
                     return _buildSlidingQuestionCard(_questions[index]);
