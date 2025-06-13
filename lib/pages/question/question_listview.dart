@@ -252,22 +252,22 @@ class _QuestionListviewState extends State<QuestionListview> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _isSlidingMode = false;
-                      });
-                    },
-                    child: Text('列表模式', style: TextStyle(color: _isSlidingMode ? Colors.grey : Colors.blue)),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _isSlidingMode = true;
-                      });
-                    },
-                    child: Text('滑动模式', style: TextStyle(color: _isSlidingMode ? Colors.blue : Colors.grey)),
-                  ),
+                  // TextButton(
+                  //   onPressed: () {
+                  //     setState(() {
+                  //       _isSlidingMode = false;
+                  //     });
+                  //   },
+                  //   child: Text('列表模式', style: TextStyle(color: _isSlidingMode ? Colors.grey : Colors.blue)),
+                  // ),
+                  // TextButton(
+                  //   onPressed: () {
+                  //     setState(() {
+                  //       _isSlidingMode = true;
+                  //     });
+                  //   },
+                  //   child: Text('滑动模式', style: TextStyle(color: _isSlidingMode ? Colors.blue : Colors.grey)),
+                  // ),
                 ],
               ),
               Expanded(
