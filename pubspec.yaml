@@ -53,6 +53,7 @@ dependencies:
   dotted_border: ^3.0.1
   flutter_quill: ^11.4.1
   file_picker: ^10.1.9
+  flutter_native_splash: ^2.4.6
 #    git:
 ##      url: https://github.com/yabipi/flutter_math.git
 #      # 如果需要特定分支
