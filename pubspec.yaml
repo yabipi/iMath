@@ -49,6 +49,10 @@ dependencies:
   internet_connection_checker: ^3.0.1
   jwt_decoder: ^2.0.1
   dart_jsonwebtoken: ^3.2.0
+  desktop_drop: ^0.6.0
+  dotted_border: ^3.0.1
+  flutter_quill: ^11.4.1
+  file_picker: ^10.1.9
 #    git:
 ##      url: https://github.com/yabipi/flutter_math.git
 #      # 如果需要特定分支

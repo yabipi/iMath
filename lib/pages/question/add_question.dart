@@ -1,17 +1,20 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart'; // 引入 image_picker 包
 import 'dart:io'; // 引入 File 类
 
-import '../config/api_config.dart';
-import '../config/constants.dart';
-import '../core/context.dart';
+import '../../config/api_config.dart';
+import '../../config/constants.dart';
+import '../../core/context.dart';
+import '../../http/init.dart';
 
 class AddQuestionScreen extends StatefulWidget {
   final int paperId;
 
-  const AddQuestionScreen({super.key, required this.paperId});
+  AddQuestionScreen({super.key, required this.paperId});
 
   @override
   State<AddQuestionScreen> createState() => _AddQuestionScreenState();
@@ -20,6 +23,7 @@ class AddQuestionScreen extends StatefulWidget {
 class _AddQuestionScreenState extends State<AddQuestionScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
+  final _optionController = TextEditingController();
   final _contentController = TextEditingController();
   final _answerController = TextEditingController();
   int _selectedBranch = 0;
@@ -37,6 +41,15 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
   // final Context _context = Context();
   // 使用 Context 获取全局数据
   final categories = Context().get(CATEGORIES_KEY) as Map<int, String>?;
+
+  @override
+  void initState() {
+    super.initState();
+    final String? content = Get.arguments['markdownContent'] as String?;
+    _contentController.text = content ?? '';
+    // 获取全局数据
+    // categories;
+  }
 
   @override
   void dispose() {
@@ -165,11 +178,11 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
     };
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _initHttpClient(); // 初始化时设置忽略自签署证书
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _initHttpClient(); // 初始化时设置忽略自签署证书
+  // }
 
   // 修改：确保图片 URL 使用 HTTPS 协议
   Future<void> _pickImage(ImageSource source) async {
@@ -229,32 +242,31 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
 
     try {
       // 构建选项数据
-      List<Map<String, String>> options = [];
-      if (_selectedType == QuestionTypes[0] || _selectedType == QuestionTypes[1]) {
-        for (int i = 0; i < _optionControllers.length; i++) {
-          if (_optionControllers[i].text.isNotEmpty) {
-            options.add({
-              'label': String.fromCharCode(65 + i),
-              'content': _optionControllers[i].text,
-            });
-          }
-        }
-      }
+      // List<Map<String, String>> options = [];
+      // if (_selectedType == QuestionTypes[0] || _selectedType == QuestionTypes[1]) {
+      //   for (int i = 0; i < _optionControllers.length; i++) {
+      //     if (_optionControllers[i].text.isNotEmpty) {
+      //       options.add({
+      //         'label': String.fromCharCode(65 + i),
+      //         // 'content': _optionControllers[i].text,
+      //         'content': _optionController.text,
+      //       });
+      //     }
+      //   }
+      // }
 
-      final response = await http.post(
-        Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/question/create'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'title': _titleController.text,
+      final response = await Request().post(
+        '${ApiConfig.SERVER_BASE_URL}/api/question/create',
+        options: Options(contentType: Headers.jsonContentType),
+        data: {
+          // 'title': _titleController.text,
           'content': _contentController.text,
+          'options': _optionController.text,
           'answer': _answerController.text,
           'category': categories?[_selectedBranch],
           'type': _selectedType,
-          'options': options,
           'images': _selectedImages.join(','), // 直接使用 fileId 列表
-        }),
+        },
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -262,7 +274,8 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('题目添加成功')),
           );
-          Navigator.pop(context, true);
+          // Navigator.pop(context, true);
+          Get.toNamed('/questions');
         }
       } else {
         throw Exception('Failed to add question');
@@ -280,6 +293,38 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
         });
       }
     }
+  }
+
+  Widget _buildSingleOptionsSection() {
+    if (_selectedType != QuestionTypes[0] && _selectedType != QuestionTypes[1]) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // const Padding(
+        //   padding: EdgeInsets.symmetric(vertical: 8.0),
+        //   child: Text('选项：'),
+        // ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: TextFormField(
+            controller: _optionController,
+            decoration: InputDecoration(
+              labelText: '选项',
+              border: const OutlineInputBorder(),
+            ),
+            validator: (value) {
+              if (_selectedType == QuestionTypes[0] && value!.isEmpty) {
+                return '请输入选项内容';
+              }
+              return null;
+            },
+          ),
+        )
+      ],
+    );
   }
 
   Widget _buildOptionsSection() {
@@ -370,7 +415,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
               ),
               const SizedBox(height: 16),
               TextFormField(
-                controller: _titleController,
+                controller: _contentController,
                 decoration: const InputDecoration(
                   labelText: '题目内容',
                   border: OutlineInputBorder(),
@@ -384,36 +429,37 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              _buildOptionsSection(),
+              // _buildOptionsSection(),
+              _buildSingleOptionsSection(),
               const SizedBox(height: 16),
               _buildImageSection(), // 新增：图片上传部分
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _contentController,
-                decoration: const InputDecoration(
-                  labelText: '题目解析',
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: 3,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '请输入题目解析';
-                  }
-                  return null;
-                },
-              ),
+              // const SizedBox(height: 16),
+              // TextFormField(
+              //   controller: _contentController,
+              //   decoration: const InputDecoration(
+              //     labelText: '题目解析',
+              //     border: OutlineInputBorder(),
+              //   ),
+              //   maxLines: 3,
+              //   validator: (value) {
+              //     // if (value == null || value.isEmpty) {
+              //     //   return '请输入题目解析';
+              //     // }
+              //     // return null;
+              //   },
+              // ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _answerController,
                 decoration: const InputDecoration(
-                  labelText: '答案',
+                  labelText: '解析和答案',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '请输入答案';
-                  }
-                  return null;
+                  // if (value == null || value.isEmpty) {
+                  //   return '请输入答案';
+                  // }
+                  // return null;
                 },
               ),
               const SizedBox(width:100, height: 24),

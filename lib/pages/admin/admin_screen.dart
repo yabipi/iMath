@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'add_paper_screen.dart';
-import 'add_question_screen.dart';
-import 'add_knowledge_screen.dart';
+import 'package:imath/pages/admin/camera_screen.dart';
+import 'package:imath/pages/admin/pdf_uploader.dart';
+import '../paper/add_paper_screen.dart';
+import '../question/add_question.dart';
+
+import '../knowledge/add_knowledge.dart';
+import '../culture/add_mathematician.dart';  // 新增导入
 
 import 'package:imath/demo/draggable_tree_screen.dart';
 import 'package:imath/demo/paper_screen.dart';
-import 'package:imath/pages/test_functions.dart';
+import 'package:imath/pages/admin/test_functions.dart';
 
 class AdminScreen extends StatelessWidget {
   const AdminScreen({super.key});
@@ -14,7 +18,7 @@ class AdminScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('管理员入口'),
+        title: const Text('后台管理'),
       ),
       body: ListView(
         children: [
@@ -26,7 +30,7 @@ class AdminScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const AddKnowledgeScreen(),
+                  builder: (context) => const AddKnowledgeView(),
                 ),
               );
             },
@@ -54,7 +58,7 @@ class AdminScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const AddQuestionScreen(paperId: -1),
+                  builder: (context) => AddQuestionScreen(paperId: -1),
                 ),
               );
             },
@@ -109,6 +113,47 @@ class AdminScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const TestFunctionsPage(),
+                ),
+              );
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('添加数学家'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AddMathematicianScreen(),
+                ),
+              );
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.picture_as_pdf),
+            title: const Text('PDF扫描上传'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PdfUploader(),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.camera),
+            title: const Text('拍照识题'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CameraScreen(),
                 ),
               );
             },

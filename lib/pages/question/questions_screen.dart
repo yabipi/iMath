@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imath/widgets/bottom_navigation_bar.dart';
-import 'paper_listview.dart';
+import '../paper/paper_listview.dart';
 import 'question_listview.dart';
 
 class QuestionsScreen extends StatefulWidget {

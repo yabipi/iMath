@@ -1,8 +1,9 @@
 import 'dart:io';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
 import 'package:flutter/material.dart';
-import 'package:imath/pages/knowledge_screen.dart';
+import 'package:imath/pages/knowledge/knowledge_screen.dart';
 import 'package:imath/services/auth_api_service.dart';
 
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -14,10 +15,11 @@ import 'package:imath/pages/home_screen.dart';
 import 'package:imath/route/app_pages.dart';
 import 'package:provider/provider.dart'; // 引入 provider 包
 import 'bindings/app_binding.dart';
-import 'config/constants.dart';
+
 import 'controllers/auth_controller.dart';
 import 'core/context.dart';
 import 'db/Storage.dart';
+import 'http/category.dart';
 
 
 // 创建一个简单的 AppState 类来管理状态
@@ -44,21 +46,10 @@ class MyHttpOverrides extends HttpOverrides {
 
 Future<void> initializeApp() async {
   // final dio = Dio();
-  Context().refresh();
+  Context.refresh();
   // 获取分类数据
-  final response = await Request()
-      .get('${ApiConfig.SERVER_BASE_URL}/api/category/list');
-  if (response.statusCode == 200) {
-    // var data = json.decode(response.body);
-    var data = response.data;
-    Map<int, String> categories = {};
-    for (var item in data) {
-      categories[item['ID']] = item['CategoryName'];
-    }
-    Context().set(CATEGORIES_KEY, categories);
-  } else {
-    throw Exception('Failed to load categories');
-  }
+  CategoryHttp.getCategories();
+
   // Initialize FFI
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
@@ -72,6 +63,7 @@ Future<void> initializeApp() async {
 
 void main() async {
   logger.d('Starting app...', version());
+
   // 判断当前运行环境
   if (Platform.isAndroid) {
     logger.d('当前运行环境是 Android');
@@ -89,6 +81,7 @@ void main() async {
   // ApiConfig.environment = Environment.DEV; // 或 Environment.PROD
   ApiConfig.environment =
       const String.fromEnvironment('ENV', defaultValue: 'DEV');
+  logger.d('environment: ${ApiConfig.environment}');
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
   await initializeApp();

@@ -3,11 +3,11 @@ import 'package:get/get.dart';
 import 'package:imath/controllers/login_controller.dart';
 import 'package:imath/core/context.dart';
 import 'package:imath/widgets/bottom_navigation_bar.dart';
-import '../models/user.dart';
-import '../controllers/user_controller.dart';
+import '../../models/user.dart';
+import '../../controllers/user_controller.dart';
 import 'login_screen.dart';
-import 'camera_screen.dart';
-import 'admin_screen.dart';
+import '../admin/camera_screen.dart';
+import '../admin/admin_screen.dart';
 
 class ProfileScreen extends GetView<LoginController> {
   late User? user;

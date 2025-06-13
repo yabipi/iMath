@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/mathematician.dart';
+import '../../models/mathematician.dart';
 
 class MathematicianDetailScreen extends StatelessWidget {
   final Mathematician mathematician;

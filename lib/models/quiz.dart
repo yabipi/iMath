@@ -29,6 +29,7 @@ class Question {
   final String? type;
   final String? title;
   final String? content;
+  final String? options;
   final String? answer;
   final String? images;
 
@@ -38,6 +39,7 @@ class Question {
     this.type,
     this.title,
     this.content,
+    this.options,
     this.answer,
     this.images
   });
@@ -49,6 +51,7 @@ class Question {
       type: json['type'] as String?,
       title: json['title'] as String?,
       content: json['content'] as String?,
+      options: json['options'] as String?,
       answer: json['answer'] as String?,
       images: json['images'] as String?,
     );

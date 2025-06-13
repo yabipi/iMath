@@ -5,11 +5,12 @@ import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:http/http.dart' as http;
 import 'package:imath/components/math_cell.dart';
 import 'dart:convert';
-import '../config/api_config.dart';
-import '../http/init.dart';
-import '../models/quiz.dart';
-import '../utils/math_parser.dart';
-import 'add_question_screen.dart';
+import '../../config/api_config.dart';
+import '../../http/init.dart';
+import '../../models/quiz.dart';
+import '../../utils/math_parser.dart';
+import '../question/add_question.dart';
+
 
 class PaperDetailScreen extends StatefulWidget {
   final int paperId;

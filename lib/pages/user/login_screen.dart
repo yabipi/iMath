@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/login_controller.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import '../../controllers/login_controller.dart';
 // 新增：导入通用导航栏组件
-import '../widgets/bottom_navigation_bar.dart';
+import '../../widgets/bottom_navigation_bar.dart';
 
 class LoginScreen extends GetView<LoginController>  {
   late TabController tabController;
@@ -72,20 +73,13 @@ class LoginScreen extends GetView<LoginController>  {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            OutlinedButton.icon(
-                              onPressed: _isLoading ? null : controller.loginWithWechat,
-                              style: OutlinedButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
-                                side: const BorderSide(color: Colors.green),
-                              ),
-                              icon:
-                                  const Icon(Icons.wechat, color: Colors.green),
-                              label: const Text(
-                                '微信',
-                                style: TextStyle(color: Colors.green),
-                              ),
-                            ),
+                            SizedBox(
+                                width: 280, height: 280,
+                                child:QrImageView(
+                                  data: 'xxx',
+                                  backgroundColor: Colors.white,
+                                )
+                            )
                           ],
                         )),
                   ),

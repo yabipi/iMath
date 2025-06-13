@@ -28,10 +28,10 @@ class Context {
   factory Context() => _instance;
 
   final Map<String, dynamic> _data = {};
-  String? token = null;
-  User? currentUser;
+  static String? token = null;
+  static User? currentUser;
 
-  void refresh() {
+  static void refresh() {
     token = GStorage.userInfo.get('token') ?? '';
     if (token!.isNotEmpty) {
       try {

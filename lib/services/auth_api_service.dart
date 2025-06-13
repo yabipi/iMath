@@ -100,7 +100,7 @@ class AuthApiService extends ApiService {
     if (token.isNotEmpty) {
       GStorage.userInfo.put('token', token);
       // 刷新全局上下文的token
-      Context().refresh();
+      Context.refresh();
       // Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
       // final role = decodedToken['role'];
       // print('Role: $role');

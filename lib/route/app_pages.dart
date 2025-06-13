@@ -3,16 +3,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:imath/pages/culture_screen.dart';
+import 'package:imath/pages/knowledge/add_knowledge.dart';
+import 'package:imath/pages/question/add_question.dart';
+import 'package:imath/pages/culture/culture_screen.dart';
+import 'package:imath/pages/knowledge/edit_knowledge.dart';
+import 'package:imath/pages/question/edit_question.dart';
 import 'package:imath/pages/home_screen.dart';
-import 'package:imath/pages/knowledge_screen.dart';
-import 'package:imath/pages/questions_screen.dart';
+import 'package:imath/pages/knowledge/knowledge_screen.dart';
+import 'package:imath/pages/question/questions_screen.dart';
 
 import '../bindings/login_binding.dart';
 import '../db/Storage.dart';
-import '../pages/about_me.dart';
-import '../pages/login_screen.dart';
-import '../pages/profile_screen.dart';
+import '../pages/user/about_me.dart';
+import '../pages/user/login_screen.dart';
+import '../pages/user/profile_screen.dart';
 
 class Routes {
   static String HOME = '/';
@@ -37,7 +41,11 @@ class Routes {
     CustomGetPage(name: '/profile', page: () => ProfileScreen()),
     CustomGetPage(name: '/about', page: () => AboutMePage()),
 
-
+    //管理页面
+    CustomGetPage(name: '/addquestion', page: () => AddQuestionScreen(paperId: -1)),
+    CustomGetPage(name: '/editquestion', page: () => QuestionEditView()),
+    CustomGetPage(name: '/addknow', page: () => AddKnowledgeView()),
+    CustomGetPage(name: '/editknow', page: () => EditKnowledgeView()),
   ];
 }
 

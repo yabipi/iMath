@@ -3,13 +3,13 @@ import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:imath/utils/math_parser.dart';
 
 class MathCell extends StatelessWidget {
-  final String title;
-  final String content;
+  final String? title;
+  final String? content;
 
   const MathCell({
     super.key,
-    required this.title,
-    required this.content,
+    this.title,
+    this.content,
   });
 
   @override

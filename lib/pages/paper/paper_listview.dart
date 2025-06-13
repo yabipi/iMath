@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../config/api_config.dart';
-import '../models/paper.dart';
+import '../../config/api_config.dart';
+import '../../models/paper.dart';
 import 'add_paper_screen.dart';
-import 'questions_screen.dart';
-import 'add_question_screen.dart';
+import '../question/questions_screen.dart';
+import '../question/add_question.dart';
 import 'paper_detail_screen.dart';
 
 class PaperListView extends StatefulWidget {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:imath/widgets/bottom_navigation_bar.dart';
-import '../models/mathematician.dart';
+import '../../models/mathematician.dart';
 import 'mathematician_detail_screen.dart';
 
 class CultureScreen extends StatelessWidget {

@@ -13,18 +13,18 @@
         
 
         {
-            "name": "iMath",
+            "name": "数学宝典",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "iMath (profile mode)",
+            "name": "数学宝典 (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "iMath (release mode)",
+            "name": "数学宝典 (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

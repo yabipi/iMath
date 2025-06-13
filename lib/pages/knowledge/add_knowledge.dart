@@ -1,19 +1,22 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:imath/config/constants.dart';
 import 'package:imath/core/context.dart';
-import '../config/api_config.dart';
+import '../../config/api_config.dart';
+import '../../http/init.dart';
 
-class AddKnowledgeScreen extends StatefulWidget {
-  const AddKnowledgeScreen({super.key});
+class AddKnowledgeView extends StatefulWidget {
+  const AddKnowledgeView({super.key});
 
   @override
-  State<AddKnowledgeScreen> createState() => _AddKnowledgeScreenState();
+  State<AddKnowledgeView> createState() => _AddKnowledgeViewState();
 }
 
-class _AddKnowledgeScreenState extends State<AddKnowledgeScreen> {
+class _AddKnowledgeViewState extends State<AddKnowledgeView> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
@@ -21,8 +24,16 @@ class _AddKnowledgeScreenState extends State<AddKnowledgeScreen> {
   int _selectedBranch = 0;
   bool _isSubmitting = false;
 
-
   final categories = Context().get(CATEGORIES_KEY) as Map<int, String>?;
+
+  @override
+  void initState() {
+    super.initState();
+    final String? content = Get.arguments['markdownContent'] as String?;
+    _contentController.text = content ?? '';
+    // _contentController.text =
+  }
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -41,17 +52,15 @@ class _AddKnowledgeScreenState extends State<AddKnowledgeScreen> {
     });
 
     try {
-      final response = await http.post(
-        Uri.parse('${ApiConfig.SERVER_BASE_URL}/api/know/create'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
+      final response = await Request().post(
+        '${ApiConfig.SERVER_BASE_URL}/api/know/create',
+        options: Options(contentType: Headers.jsonContentType),
+        data: {
           'title': _titleController.text,
           'content': _contentController.text,
           'category': categories?[_selectedBranch],
           // 'level': _levelController.text,
-        }),
+        },
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -59,7 +68,8 @@ class _AddKnowledgeScreenState extends State<AddKnowledgeScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('知识点添加成功')),
           );
-          Navigator.pop(context, true);
+          // Navigator.pop(context, true);
+          Get.toNamed('/knowledge');
         }
       } else {
         throw Exception('Failed to add knowledge');
@@ -148,10 +158,10 @@ class _AddKnowledgeScreenState extends State<AddKnowledgeScreen> {
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '请输入适用年级';
-                  }
-                  return null;
+                  // if (value == null || value.isEmpty) {
+                  //   return '请输入适用年级';
+                  // }
+                  // return null;
                 },
               ),
               const SizedBox(height: 24),

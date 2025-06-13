@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:imath/core/context.dart';
-import 'package:imath/pages/questions_screen.dart';
+import 'package:imath/pages/question/questions_screen.dart';
 import 'package:imath/widgets/bottom_navigation_bar.dart';
 // import 'package:imath/screens/quiz_screen.dart';
-import 'admin_screen.dart';
-import 'culture_screen.dart';
-import 'knowledge_screen.dart';
+import 'admin/admin_screen.dart';
+import 'culture/culture_screen.dart';
+import 'knowledge/knowledge_screen.dart';
 // import '../screens/culture_screen.dart';
-import 'paper_listview.dart';
+import 'paper/paper_listview.dart';
 // import 'quiz_screen.dart';
-import 'profile_screen.dart';
-import 'login_screen.dart';
+import 'user/profile_screen.dart';
+import 'user/login_screen.dart';
 import '../models/user.dart';
 import 'package:imath/pages/slide_page.dart';
 
