@@ -26,9 +26,9 @@ dependencies:
   shared_preferences: ^2.5.3
   flutter_simple_treeview: ^3.0.2
   markdown_widget: ^2.3.2+8
-  #gpt_markdown: ^1.0.18
-  gpt_markdown:
-    path: /opt/flutter/packages/gpt_markdown
+  gpt_markdown: ^1.0.18
+  #gpt_markdown:
+  #  path: /opt/flutter/packages/gpt_markdown
   dio: ^5.8.0+1
   flutter_tex: ^5.0.6
   flutter_smart_dialog: ^4.9.8+8
@@ -41,8 +41,8 @@ dependencies:
   connectivity_plus: ^6.1.4
   cached_network_image: ^3.4.1
   common_utils: ^2.1.0
-  flutter_math_fork:
-    path: /opt/flutter/packages/flutter_math_fork
+  flutter_math_fork: ^0.7.4
+  #  path: /opt/flutter/packages/flutter_math_fork
   sqflite: ^2.4.2
   sqflite_common_ffi: ^2.3.5
   oauth2: ^2.0.3
