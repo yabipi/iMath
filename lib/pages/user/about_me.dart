@@ -44,7 +44,6 @@ class _AboutMePageState extends State<AboutMePage> {
           children: [
             _buildSectionTitle('公司信息'),
             _buildInfoItem('公司名称', _aboutInfo['companyName'] ?? '加载中...'),
-            _buildInfoItem('成立时间', _aboutInfo['establishedDate'] ?? '加载中...'),
             _buildInfoItem('总部地点', _aboutInfo['headquarters'] ?? '加载中...'),
             SizedBox(height: 20),
             _buildSectionTitle('软件信息'),
