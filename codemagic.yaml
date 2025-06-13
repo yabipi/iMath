@@ -1,4 +1,0 @@
-workflows:
-  my_app:
-    scripts:
-      - flutter build ipa --dart-define=API_KEY=$API_KEY  # 传递变量
