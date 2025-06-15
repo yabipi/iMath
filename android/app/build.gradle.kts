@@ -7,9 +7,17 @@ plugins {
 
 android {
     namespace = "com.icool.coolmath"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
 
+    compileSdk = flutter.compileSdkVersion
+    //ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
+
+    val systemNdkPath: String? = System.getenv("ANDROID_NDK_PATH")
+    if (systemNdkPath != null) {
+        //ndkVersion = flutter.ndkVersion
+        ndkPath = systemNdkPath
+    }
+    println("NDK version = ${ndkVersion}")
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11

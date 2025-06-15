@@ -76,13 +76,14 @@ void main() async {
     logger.d('当前运行环境是其他平台');
   }
 
+  WidgetsFlutterBinding.ensureInitialized();
   await GStorage.init();
   Request();
   // ApiConfig.environment = Environment.DEV; // 或 Environment.PROD
   ApiConfig.environment =
       const String.fromEnvironment('ENV', defaultValue: 'DEV');
   logger.d('environment: ${ApiConfig.environment}');
-  WidgetsFlutterBinding.ensureInitialized();
+
   HttpOverrides.global = MyHttpOverrides();
   await initializeApp();
   runApp(MyApp());
