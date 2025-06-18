@@ -38,7 +38,8 @@ subprojects {
             }
         }
     }
-    buildDir = "${rootProject.buildDir}/${name}"
+    //buildDir = "${rootProject.buildDir}/${name}"
+    buildDir = rootProject.buildDir.resolve(name)
 }
 
 
