@@ -2,7 +2,7 @@
 
 数学宝典app
 
-## Getting Started
+## Flutter指引
 
 This project is a starting point for a Flutter application.
 
