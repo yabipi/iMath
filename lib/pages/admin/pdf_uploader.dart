@@ -2,6 +2,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:http/http.dart' as http;
+import 'package:imath/config/api_config.dart';
 
 import 'package:imath/pages/markdown_edit.dart'; // 引入 markdown_edit 页面
 
@@ -17,7 +18,7 @@ class _PdfUploaderState extends State<PdfUploader> {
   String? _markdownText; // 用于存储返回的 Markdown 文本
 
   Future<void> _uploadFile(List<int> fileBytes, String fileName) async {
-    var request = http.MultipartRequest('POST', Uri.parse('http://192.168.1.9:9898/api/upload'));
+    var request = http.MultipartRequest('POST', Uri.parse('${ApiConfig.minerUrl}/api/upload'));
     request.files.add(http.MultipartFile.fromBytes('file', fileBytes, filename: fileName));
     var response = await request.send();
     if (response.statusCode == 200) {

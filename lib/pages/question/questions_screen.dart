@@ -24,7 +24,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('题目管理'),
+          title: const Text(''),
           bottom: const TabBar(
             tabs: [
               Tab(text: '分类'),

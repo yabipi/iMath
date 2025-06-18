@@ -29,6 +29,15 @@ subprojects {
                 }
             }
         }
+        if (plugins.hasPlugin("com.android.application") ||
+            plugins.hasPlugin("com.android.library")) {
+//            project.android {
+//                compileSdkVersion 34
+//                buildToolsVersion "34.0.0"
+//            }
+        }
+
+
     }
 }
 

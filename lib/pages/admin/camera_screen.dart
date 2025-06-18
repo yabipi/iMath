@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:imath/config/api_config.dart';
 import 'package:imath/pages/markdown_edit.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../services/camera_service.dart';
@@ -228,7 +229,7 @@ class _CameraScreenState extends State<CameraScreen> {
     try {
       final bytes = await _imageFile!.readAsBytes();
       final response = await http.post(
-        Uri.parse('http://192.168.1.9:9898/api/image/upload'),
+        Uri.parse('${ApiConfig.minerUrl}/api/image/upload'),
         body: bytes,
         headers: {'Content-Type': 'application/octet-stream'},
       );
@@ -270,7 +271,7 @@ class _CameraScreenState extends State<CameraScreen> {
     try {
       final bytes = await _imageFile!.readAsBytes();
       final response = await http.post(
-        Uri.parse('http://192.168.1.9:9898/api/image/upload'),
+        Uri.parse('${ApiConfig.minerUrl}/api/image/upload'),
         body: bytes,
         headers: {'Content-Type': 'application/octet-stream'},
       );
@@ -355,7 +356,7 @@ class _CameraScreenState extends State<CameraScreen> {
     try {
       final bytes = await _imageFile!.readAsBytes();
       final response = await http.post(
-        Uri.parse('http://192.168.1.9:9898/api/save/knowledge'),
+        Uri.parse('${ApiConfig.minerUrl}/api/save/knowledge'),
         body: bytes,
         headers: {'Content-Type': 'application/octet-stream'},
       );

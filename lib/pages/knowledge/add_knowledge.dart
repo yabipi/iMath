@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:imath/config/constants.dart';
 import 'package:imath/core/context.dart';
+import 'package:imath/http/knowledge.dart';
 import '../../config/api_config.dart';
 import '../../http/init.dart';
 
@@ -29,9 +30,8 @@ class _AddKnowledgeViewState extends State<AddKnowledgeView> {
   @override
   void initState() {
     super.initState();
-    final String? content = Get.arguments['markdownContent'] as String?;
+    final String? content = Get.arguments?['markdownContent'] as String?;
     _contentController.text = content ?? '';
-    // _contentController.text =
   }
 
   @override
@@ -52,23 +52,19 @@ class _AddKnowledgeViewState extends State<AddKnowledgeView> {
     });
 
     try {
-      final response = await Request().post(
-        '${ApiConfig.SERVER_BASE_URL}/api/know/create',
-        options: Options(contentType: Headers.jsonContentType),
-        data: {
-          'title': _titleController.text,
-          'content': _contentController.text,
-          'category': categories?[_selectedBranch],
-          // 'level': _levelController.text,
-        },
-      );
+      final data =  {
+        'title': _titleController.text,
+        'content': _contentController.text,
+        'category': categories?[_selectedBranch],
+        // 'level': _levelController.text,
+      };
+      final response = await KnowledgeHttp.addKnowledge(data);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('知识点添加成功')),
           );
-          // Navigator.pop(context, true);
           Get.toNamed('/knowledge');
         }
       } else {

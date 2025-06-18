@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:imath/config/api_config.dart';
+
 
 class MarkdownEdit extends StatefulWidget {
   final String? markdownText;
@@ -28,7 +30,7 @@ class _MarkdownEditState extends State<MarkdownEdit> {
   Future<void> _saveContent() async {
     final markdownContent = _controller!.document.toPlainText();
     final response = await http.post(
-      Uri.parse('http://192.168.1.9:9898/api/md/save'),
+      Uri.parse('${ApiConfig.minerUrl}/api/md/save'),
       body: {'content': markdownContent},
     );
 
@@ -75,7 +77,7 @@ class _MarkdownEditState extends State<MarkdownEdit> {
     try {
       final markdownContent = _controller!.document.toPlainText();
       final response = await http.post(
-        Uri.parse('http://192.168.1.9:9898/api/save/exam'),
+        Uri.parse('$ApiConfig.minerUrl/api/save/exam'),
         body: {'content': markdownContent},
       );
 

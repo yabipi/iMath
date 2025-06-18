@@ -74,7 +74,7 @@ class QuestionController extends GetxController {
         .whereType<Question>()
         .toList();
     // 更新
-    questions.value.addAll(_questions);
+    questions.addAll(_questions);
     _currentPage ++;
   }
 
@@ -116,5 +116,12 @@ class QuestionController extends GetxController {
     } finally {
 
     }
+  }
+
+  Future? onChangeCategory(int? _categoryId) async {
+    categoryId = _categoryId;
+    _currentPage = 1;
+    questions.clear();
+    await loadMoreQuestions(categoryId: _categoryId);
   }
 }

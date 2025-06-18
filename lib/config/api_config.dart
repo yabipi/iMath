@@ -26,4 +26,16 @@ class ApiConfig {
         return 'http://localhost:8080';
     }
   }
+
+  static String get minerUrl {
+    switch (environment) {
+      case 'DEV':
+        return 'http://192.168.1.9:9898';
+      case 'PROD':
+        return 'http://miner.icodelib.cn';
+      default:
+        return 'http://localhost:8080';
+    }
+
+  }
 }

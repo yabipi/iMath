@@ -4,6 +4,7 @@ class HttpString {
   static const String baseUrl = 'https://www.icodelib.cn';
   static const String apiBaseUrl = 'https://api.icodelib.cn';
 
+
   static const List<int> validateStatusCodes = [
     302,
     304,
