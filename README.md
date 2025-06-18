@@ -1,6 +1,6 @@
 # imath
 
-A new Flutter project.
+数学宝典app
 
 ## Getting Started
 
