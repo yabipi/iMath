@@ -33,8 +33,8 @@ subprojects {
             plugins.hasPlugin("com.android.library")) {
             println("设置 compileSdkVersion")
             extensions.configure<com.android.build.gradle.BaseExtension> {
-                compileSdkVersion(34)
-                buildToolsVersion("34.0.0")
+                compileSdkVersion(35)
+                buildToolsVersion("35.0.0")
             }
         }
     }
