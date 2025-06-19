@@ -31,7 +31,7 @@ subprojects {
         }
         if (plugins.hasPlugin("com.android.application") ||
             plugins.hasPlugin("com.android.library")) {
-            println("设置 compileSdkVersion")
+            //println("设置 compileSdkVersion")
             extensions.configure<com.android.build.gradle.BaseExtension> {
                 compileSdkVersion(35)
                 buildToolsVersion("35.0.0")
