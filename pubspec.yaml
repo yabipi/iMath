@@ -54,6 +54,7 @@ dependencies:
   flutter_quill: ^11.4.1
   file_picker: ^10.1.9
   flutter_native_splash: ^2.4.6
+  image_cropper: ^9.1.0
 #    git:
 ##      url: https://github.com/yabipi/flutter_math.git
 #      # 如果需要特定分支

@@ -53,6 +53,10 @@ android {
         implementation("com.google.mlkit:text-recognition-devanagari:16.0.0")
         implementation("com.google.mlkit:text-recognition-japanese:16.0.0")
         implementation("com.google.mlkit:text-recognition-korean:16.0.0")
+
+        //implementation("com.github.yalantis:ucrop:2.2.10")
+        //implementation("com.github.yalantis:ucrop:2.2.9-native")
+
     }
 }
 

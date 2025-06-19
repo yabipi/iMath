@@ -2,8 +2,10 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:imath/config/api_config.dart';
 import 'package:imath/pages/markdown_edit.dart';
+import 'package:imath/utils/image_utils.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../services/camera_service.dart';
 import 'package:http/http.dart' as http;
@@ -21,7 +23,7 @@ class CameraScreen extends StatefulWidget {
 class _CameraScreenState extends State<CameraScreen> {
   final _cameraService = CameraService();
   bool _isLoading = false;
-  File? _imageFile;
+  CroppedFile? _imageFile;
   String? _recognizedText;
   String? _latexText;
   String? _fileName;
@@ -35,10 +37,11 @@ class _CameraScreenState extends State<CameraScreen> {
     try {
       final image = await _cameraService.takePicture();
       if (image != null) {
+        final croppedImg = await ImageUtils.cropImage(image: image, width: 200, height: 200);
         setState(() {
-          _imageFile = image;
+          _imageFile = croppedImg;
         });
-        await _processImage(image);
+        // await _processImage(croppedImg);
       }
     } catch (e) {
       if (mounted) {
@@ -81,12 +84,13 @@ class _CameraScreenState extends State<CameraScreen> {
         type: FileType.any,  // 可以选择任何类型文件
         allowMultiple: false,  // 是否允许多选
       );
-
+      final croppedImg = await ImageUtils.cropImage(image: result?.files.single.path!, width: 200, height: 200);
       if (result != null) {
         setState(() {
           _fileName = result.files.single.name;
           _filePath = result.files.single.path;
-          _imageFile = File(result.files.single.path!);
+          // _imageFile = File(result.files.single.path!);
+          _imageFile = croppedImg;
         });
 
         // 上传文件
@@ -152,10 +156,11 @@ class _CameraScreenState extends State<CameraScreen> {
     try {
       final image = await _cameraService.pickImage();
       if (image != null) {
+        final croppedImg = await ImageUtils.cropImage(image: image, width: 200, height: 200);
         setState(() {
-          _imageFile = image;
+          _imageFile = croppedImg;
         });
-        await _processImage(image);
+        // await _processImage(croppedImg);
       }
     } catch (e) {
       if (mounted) {
@@ -423,7 +428,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Image.file(
-                          _imageFile!,
+                          File(_imageFile!.path!),
                           fit: BoxFit.cover,
                         ),
                       ),

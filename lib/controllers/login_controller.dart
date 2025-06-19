@@ -46,7 +46,8 @@ class LoginController extends AuthController {
     try {
       final response = await signIn(emailController.text, passwordController.text);
       // debugPrint('response: $response');
-      Get.toNamed('/profile', arguments: {'user': User(id: "0", name: response.data['exdata']['username'])});
+      String username = response.data['exdata']['username'];
+      Get.toNamed('/profile', arguments: {'user': User(id: "0", name: username)});
 
     } catch (err, _) {
       passwordController.clear();

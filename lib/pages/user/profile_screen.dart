@@ -42,7 +42,7 @@ class ProfileScreen extends GetView<LoginController> {
   Widget build(BuildContext context) {
     if (this.user == null) {
       this.user = Context().getCurrentUser();
-      // this.user = Get.arguments['user'] as User?;
+      // this.user = Get.arguments?['user'] as User?;
     }
     if(this.user == null)
       return LoginScreen();
