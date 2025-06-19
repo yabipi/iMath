@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
@@ -48,7 +49,7 @@ class _AboutMePageState extends State<AboutMePage> {
             SizedBox(height: 20),
             _buildSectionTitle('软件信息'),
             _buildInfoItem('应用名称', _aboutInfo['appName'] ?? '加载中...'),
-            _buildInfoItem('当前环境', ApiConfig.environment ?? '开发环境'),
+            _buildInfoItem('当前环境', kReleaseMode ? '生产环境' :'开发环境'),
             _buildInfoItem('版本号', _aboutInfo['version'] ?? '加载中...'),
             _buildInfoItem('开发团队', _aboutInfo['developmentTeam'] ?? '加载中...'),
             _buildInfoItem('技术支持', _aboutInfo['supportEmail'] ?? '加载中...'),

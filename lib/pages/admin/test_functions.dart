@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imath/pages/demo/simple_list_view.dart';
 import 'package:imath/pages/slide_question.dart';
 
 class TestFunctionsPage extends StatelessWidget {
@@ -37,8 +38,13 @@ class TestFunctionsPage extends StatelessWidget {
                 _buildTestButton(context, "布局管理", () {
                   // TODO: 布局管理逻辑
                 }),
-                _buildTestButton(context, "我要自测", () {
-                  // TODO: 我要自测逻辑
+                _buildTestButton(context, "ListView", () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SimpleListView(),
+                    ),
+                  );
                 }),
               ],
             ),

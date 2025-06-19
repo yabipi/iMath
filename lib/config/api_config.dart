@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 enum Environment {
   DEV,
   PROD,
@@ -17,11 +19,11 @@ class ApiConfig {
   static String environment = 'DEV';
 
   static String get SERVER_BASE_URL {
-    switch (environment) {
-      case 'DEV':
-        return 'http://192.168.1.100:8080';
-      case 'PROD':
+    switch (kReleaseMode) {
+      case true:
         return 'http://math.icodelib.cn';
+      case false:
+        return 'http://192.168.1.100:8080';
       default:
         return 'http://localhost:8080';
     }
