@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:imath/pages/home_screen.dart';
+
 import 'dart:convert';
 
 import '../../config/api_config.dart';
@@ -72,12 +72,12 @@ class _AddPaperScreenState extends State<AddPaperScreen> {
             const SnackBar(content: Text('试卷添加成功')),
           );
           // Navigator.pop(context, true); // 返回并传递成功标志
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const HomeScreen(),
-            ),
-          );
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) => const HomeScreen(),
+          //   ),
+          // );
         }
       } else {
         throw Exception('Failed to submit paper');

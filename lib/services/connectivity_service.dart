@@ -4,15 +4,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+// import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 class ConnectivityService extends GetxService {
   @override
   void onInit() async {
     super.onInit();
-    // var hasConnection = await InternetConnectionChecker().hasConnection;
-    // if (!hasConnection) {
-    //   showDialog();
-    // }
+    var hasConnection = await InternetConnectionChecker().hasConnection;
+    if (!hasConnection) {
+      showDialog();
+    }
     //
     // var listener = InternetConnectionChecker().onStatusChange.listen((status) {
     //   switch (status) {

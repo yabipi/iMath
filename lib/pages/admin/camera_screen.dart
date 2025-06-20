@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:imath/config/api_config.dart';
-import 'package:imath/pages/markdown_edit.dart';
+import 'package:imath/components/markdown_edit.dart';
 import 'package:imath/utils/image_utils.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../services/camera_service.dart';
@@ -37,7 +37,7 @@ class _CameraScreenState extends State<CameraScreen> {
     try {
       final image = await _cameraService.takePicture();
       if (image != null) {
-        final croppedImg = await ImageUtils.cropImage(image: image, width: 200, height: 200);
+        final croppedImg = await ImageUtils.cropImage(image: image);
         setState(() {
           _imageFile = croppedImg;
         });

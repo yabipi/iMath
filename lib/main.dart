@@ -11,7 +11,7 @@ import 'package:imath/db/provider/userinfo_db_provider.dart';
 import 'package:imath/http/index.dart';
 
 import 'package:imath/config/api_config.dart';
-import 'package:imath/pages/home_screen.dart';
+
 import 'package:imath/route/app_pages.dart';
 import 'package:provider/provider.dart'; // 引入 provider 包
 import 'bindings/app_binding.dart';

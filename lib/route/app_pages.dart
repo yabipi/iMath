@@ -8,7 +8,7 @@ import 'package:imath/pages/question/add_question.dart';
 import 'package:imath/pages/culture/culture_screen.dart';
 import 'package:imath/pages/knowledge/edit_knowledge.dart';
 import 'package:imath/pages/question/edit_question.dart';
-import 'package:imath/pages/home_screen.dart';
+
 import 'package:imath/pages/knowledge/knowledge_screen.dart';
 import 'package:imath/pages/question/questions_screen.dart';
 
@@ -26,7 +26,7 @@ class Routes {
 
   static final List<GetPage<dynamic>> getPages = [
     // 首页(推荐)
-    CustomGetPage(name: '/', page: () => const HomeScreen()),
+    // CustomGetPage(name: '/', page: () => const HomeScreen()),
     CustomGetPage(name: '/knowledge', page: () => KnowledgeScreen()),
     CustomGetPage(name: '/culture', page: () => CultureScreen()),
     CustomGetPage(name: '/questions', page: () => QuestionsScreen()),

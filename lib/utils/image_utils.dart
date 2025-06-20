@@ -74,8 +74,8 @@ class ImageUtils {
   ///[iOSUiSettings] ios的ui 参数
   static cropImage(
       {required image,
-        required width,
-        required height,
+        width,
+        height,
         aspectRatio,
         androidUiSettings,
         iOSUiSettings}) async {
@@ -89,25 +89,40 @@ class ImageUtils {
     }
     final croppedFile = await ImageCropper().cropImage(
       sourcePath: imagePth,
-      maxWidth: FormatUtil.num2int(width),
-      maxHeight: FormatUtil.num2int(height),
-      aspectRatio: aspectRatio ??
-          CropAspectRatio(
-              ratioX: FormatUtil.num2double(width),
-              ratioY: FormatUtil.num2double(height)),
+      aspectRatio: null,
+      // maxWidth: FormatUtil.num2int(width),
+      // maxHeight: FormatUtil.num2int(height),
+      // aspectRatio: aspectRatio ??
+      //     CropAspectRatio(
+      //         ratioX: FormatUtil.num2double(width),
+      //         ratioY: FormatUtil.num2double(height)),
       uiSettings: [
         androidUiSettings ??
             AndroidUiSettings(
                 toolbarTitle:
-                '图片裁切(${FormatUtil.num2int(width)}*${FormatUtil.num2int(height)})',
+                '图片裁切',
                 toolbarColor: Colors.blue,
                 toolbarWidgetColor: Colors.white,
                 initAspectRatio: CropAspectRatioPreset.original,
                 hideBottomControls: false,
-                lockAspectRatio: true),
+                lockAspectRatio: false,
+
+                // freeStyleCropEnabled: true,
+                // aspectRatioPresets: [
+                //   CropAspectRatioPreset.original,
+                //   CropAspectRatioPreset.square,
+                //   CropAspectRatioPresetCustom(),
+                // ],
+            ),
         iOSUiSettings ??
             IOSUiSettings(
               title: 'Cropper',
+              aspectRatioLockEnabled: false,
+              // aspectRatioPresets: [
+              //   CropAspectRatioPreset.original,
+              //   CropAspectRatioPreset.square,
+              //   CropAspectRatioPresetCustom(), // IMPORTANT: iOS supports only one custom aspect ratio in preset list
+              // ],
             ),
       ],
     );
@@ -115,3 +130,10 @@ class ImageUtils {
   }
 }
 
+class CropAspectRatioPresetCustom implements CropAspectRatioPresetData {
+  @override
+  (int, int)? get data => (2, 3);
+
+  @override
+  String get name => '2x3 (customized)';
+}

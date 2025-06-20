@@ -23,6 +23,9 @@ class GStorage {
   static late final Box<dynamic> setting;
   static late final Box<dynamic> video;
 
+  // 数学全局数据
+  static late final Box<dynamic> mathdata;
+
   static Future<void> init() async {
     final Directory dir = await getApplicationSupportDirectory();
     final String path = dir.path;
@@ -54,6 +57,8 @@ class GStorage {
     );
     // 视频设置
     video = await Hive.openBox('video');
+
+    mathdata = await Hive.openBox('math');
   }
 
   static void regAdapter() {

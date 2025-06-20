@@ -4,7 +4,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:http/http.dart' as http;
 import 'package:imath/config/api_config.dart';
 
-import 'package:imath/pages/markdown_edit.dart'; // 引入 markdown_edit 页面
+import 'package:imath/components/markdown_edit.dart'; // 引入 markdown_edit 页面
 
 class PdfUploader extends StatefulWidget {
   @override

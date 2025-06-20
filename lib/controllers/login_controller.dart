@@ -47,7 +47,8 @@ class LoginController extends AuthController {
       final response = await signIn(emailController.text, passwordController.text);
       // debugPrint('response: $response');
       String username = response.data['exdata']['username'];
-      Get.toNamed('/profile', arguments: {'user': User(id: "0", name: username)});
+      Get.toNamed('/profile', arguments: {'user': User(id: "0", name: username)}, preventDuplicates:  true);
+      // print("切换到个人中心");
 
     } catch (err, _) {
       passwordController.clear();

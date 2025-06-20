@@ -170,15 +170,21 @@ class _QuestionListviewState extends State<QuestionListview> {
             ),
 
             const SizedBox(height: 8),
-            GptMarkdown(
-              question.content ?? '',
-              style: const TextStyle(color: Colors.black),
+            MathCell(
+              content: question.content ?? '',
             ),
+            // GptMarkdown(
+            //   question.content ?? '',
+            //   style: const TextStyle(color: Colors.black),
+            // ),
             const SizedBox(height: 4),
-            GptMarkdown(
-              question.options ?? '',
-              style: const TextStyle(color: Colors.black),
+            MathCell(
+              content: question.options ?? '',
             ),
+            // GptMarkdown(
+            //   question.options ?? '',
+            //   style: const TextStyle(color: Colors.black),
+            // ),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

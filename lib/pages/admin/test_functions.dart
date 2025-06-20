@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imath/pages/demo/simple_list_view.dart';
-import 'package:imath/pages/slide_question.dart';
+import 'package:imath/pages/question/slide_question.dart';
 
 class TestFunctionsPage extends StatelessWidget {
   const TestFunctionsPage({Key? key}) : super(key: key);
