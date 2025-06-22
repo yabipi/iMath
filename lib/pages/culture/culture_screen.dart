@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:imath/widgets/bottom_navigation_bar.dart';
 import '../../models/mathematician.dart';
 import 'mathematician_detail_screen.dart';
+import 'mathematician_listview.dart';
 
-class CultureScreen extends StatelessWidget {
+class CultureScreen extends StatefulWidget {
   const CultureScreen({super.key});
 
   @override
+  _CultureScreenState createState()  => _CultureScreenState();
+
+}
+
+class _CultureScreenState extends State<CultureScreen> {
+
+  @override
   Widget build(BuildContext context) {
+    bool reload = Get.arguments?['reload'] ?? false;
+    if (reload) {
+      setState(() {});
+    }
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -24,48 +37,7 @@ class CultureScreen extends StatelessWidget {
         body: TabBarView(
           children: [
             // 数学人物标签页
-            ListView.builder(
-              itemCount: mathematicians.length,
-              itemBuilder: (context, index) {
-                final mathematician = mathematicians[index];
-                return Card(
-                  margin: const EdgeInsets.all(8.0),
-                  child: ListTile(
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(25),
-                      child: Image.asset(
-                        mathematician.imageUrl,
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return SvgPicture.asset(
-                            'assets/images/placeholder.svg',
-                            width: 50,
-                            height: 50,
-                          );
-                        },
-                      ),
-                    ),
-                    title: Text(mathematician.name),
-                    subtitle: Text(
-                      '${mathematician.nationality} · ${mathematician.period}',
-                    ),
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MathematicianDetailScreen(
-                            mathematician: mathematician,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
-            ),
+            MathematicianListview(),
             // 数学故事标签页
             ListView.builder(
               itemCount: 10, // 示例数据
@@ -89,4 +61,6 @@ class CultureScreen extends StatelessWidget {
       ),
     );
   }
-} 
+
+}
+

@@ -1,19 +1,21 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
-// import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
-class ConnectivityService extends GetxService {
-  @override
+// class ConnectivityService extends GetxService {
+class ConnectivityService {
+  // @override
   void onInit() async {
-    super.onInit();
-    var hasConnection = await InternetConnectionChecker().hasConnection;
-    if (!hasConnection) {
-      showDialog();
-    }
+    // super.onInit();
+    // var hasConnection = await InternetConnectionChecker().hasConnection;
+    // bool hasConnection = await InternetConnection().hasInternetAccess;
+    // if (!hasConnection) {
+    //   showDialog();
+    // }
     //
     // var listener = InternetConnectionChecker().onStatusChange.listen((status) {
     //   switch (status) {
@@ -34,6 +36,50 @@ class ConnectivityService extends GetxService {
     // Future.delayed(Duration(seconds: 30), () {
     //   listener.cancel();
     // });
+  }
+
+  static Future<bool> hasNetwork() async {
+    try {
+      final result = await InternetAddress.lookup('www.baidu.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
+
+  static Future<bool> isConnected() async {
+    final List<ConnectivityResult> connectivityResult =
+    await Connectivity().checkConnectivity();
+    if (connectivityResult.contains(ConnectivityResult.none)) {
+      if (await hasNetwork()) {
+        return true;
+      }
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  static Future<String> checkConnect() async {
+    final List<ConnectivityResult> connectivityResult =
+    await Connectivity().checkConnectivity();
+    if (connectivityResult.contains(ConnectivityResult.mobile)) {
+      return '正在使用移动流量';
+    } else if (connectivityResult.contains(ConnectivityResult.wifi)) {
+      return '正在使用wifi';
+    } else if (connectivityResult.contains(ConnectivityResult.ethernet)) {
+      return '正在使用局域网';
+    } else if (connectivityResult.contains(ConnectivityResult.vpn)) {
+      return '正在使用代理网络';
+    } else if (connectivityResult.contains(ConnectivityResult.bluetooth)) {
+      return '正在使用蓝牙网络';
+    } else if (connectivityResult.contains(ConnectivityResult.other)) {
+      return '正在使用其他网络';
+    } else if (connectivityResult.contains(ConnectivityResult.none)) {
+      return '未连接到任何网络';
+    } else {
+      return '';
+    }
   }
 
   void hideDialogIfOpen() {

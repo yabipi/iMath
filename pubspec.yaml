@@ -46,7 +46,8 @@ dependencies:
   sqflite: ^2.4.2
   sqflite_common_ffi: ^2.3.5
   oauth2: ^2.0.3
-  internet_connection_checker: ^3.0.1
+  #internet_connection_checker: ^3.0.1
+
   jwt_decoder: ^2.0.1
   dart_jsonwebtoken: ^3.2.0
   desktop_drop: ^0.6.0

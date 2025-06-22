@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -5,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:imath/pages/knowledge/knowledge_screen.dart';
 import 'package:imath/services/auth_api_service.dart';
+import 'package:imath/services/connectivity_service.dart';
 
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:imath/db/provider/userinfo_db_provider.dart';
@@ -16,6 +18,7 @@ import 'package:imath/route/app_pages.dart';
 import 'package:provider/provider.dart'; // 引入 provider 包
 import 'bindings/app_binding.dart';
 
+import 'config/constants.dart';
 import 'controllers/auth_controller.dart';
 import 'core/context.dart';
 import 'db/Storage.dart';
@@ -44,12 +47,32 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
+Future<void> initMathData() async {
+  // 获取分类数据
+  bool isConnected = await ConnectivityService.isConnected();
+  if (isConnected) {
+    final categories = await CategoryHttp.getCategories();
+    Map<String, String> _categories = {'-1': '全部'};
+    for (var item in categories) {
+      _categories[item['ID'].toString()] = item['CategoryName'];
+    }
+    Context.set(CATEGORIES_KEY, _categories);
+    GStorage.mathdata.put(CATEGORIES_KEY, json.encode(_categories));
+  } else {
+    String? categoriesStr = GStorage.mathdata.get(CATEGORIES_KEY);
+    if (categoriesStr != null) {
+      Map<String, dynamic> _categories = json.decode(categoriesStr?? '{}');
+      Context.set(CATEGORIES_KEY, _categories);
+      // return;
+    }
+  }
+}
+
 Future<void> initializeApp() async {
   // final dio = Dio();
   Context.refresh();
-  // 获取分类数据
-  CategoryHttp.getCategories();
 
+  await initMathData();
   // Initialize FFI
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;

@@ -49,7 +49,7 @@ class MathematicianDetailScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          mathematician.nationality,
+                          mathematician.country,
                           style: const TextStyle(
                             color: Colors.blue,
                             fontWeight: FontWeight.bold,
@@ -67,7 +67,7 @@ class MathematicianDetailScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          mathematician.period,
+                          mathematician.birth_death,
                           style: const TextStyle(
                             color: Colors.green,
                             fontWeight: FontWeight.bold,
@@ -87,7 +87,7 @@ class MathematicianDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    mathematician.biography,
+                    mathematician.introduction,
                     style: const TextStyle(
                       fontSize: 16,
                       height: 1.5,
@@ -103,7 +103,7 @@ class MathematicianDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  ...mathematician.achievements.map((achievement) => Padding(
+                  ...mathematician.contributions.map((achievement) => Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,

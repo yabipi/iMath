@@ -34,7 +34,7 @@ class QuestionController extends GetxController {
   void onInit() {
     // TODO: implement onInit
     super.onInit();
-    categories = Context().get(CATEGORIES_KEY) as Map<int, String>;
+    categories = Context.get(CATEGORIES_KEY);
   }
 
   // 加载题目数据

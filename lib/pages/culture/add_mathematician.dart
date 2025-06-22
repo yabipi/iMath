@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:imath/http/culture.dart';
 
 class AddMathematicianScreen extends StatefulWidget {
   const AddMathematicianScreen({super.key});
@@ -48,12 +50,13 @@ class _AddMathematicianScreenState extends State<AddMathematicianScreen> {
             const SizedBox(height: 32.0),
             ElevatedButton(
               onPressed: () {
-                // 这里可以添加保存逻辑
-                print('数学家名称: ${_nameController.text}');
-                print('生卒年: ${_birthDeathController.text}');
-                print('主要成就: ${_achievementsController.text}');
-                print('生平介绍: ${_biographyController.text}');
-                Navigator.pop(context);
+                CultureHttp.addMathematician({
+                  "name": _nameController.text,
+                  "birth_death": _birthDeathController.text,
+                  "contributions": _achievementsController.text,
+                  "introduction": _biographyController.text
+                });
+                Get.toNamed('/culture', arguments: {'reload': true});
               },
               child: const Text('保存'),
             ),

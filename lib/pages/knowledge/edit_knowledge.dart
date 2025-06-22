@@ -18,7 +18,7 @@ class EditKnowledgeView extends StatefulWidget {
 }
 
 class _EditKnowledgeViewState extends State<EditKnowledgeView> {
-  final categories = Context().get(CATEGORIES_KEY) as Map<int, String>?;
+  final categories = Context.get(CATEGORIES_KEY);
   int knowledgeId = 0;
 
   final _formKey = GlobalKey<FormState>();
@@ -48,7 +48,7 @@ class _EditKnowledgeViewState extends State<EditKnowledgeView> {
       _titleController.text = title;
       _contentController.text = content ?? '';
       // 修改: 使用函数式编程找到对应的分类ID
-      _selectedBranch = categories?.entries.firstWhere((entry) => entry.value == category).key ?? 0;
+      _selectedBranch = categories?.entries.firstWhere((entry) => entry.value == category).key as int ?? 0;
     });
 
     // print(_selectedBranch);
@@ -123,14 +123,14 @@ class _EditKnowledgeViewState extends State<EditKnowledgeView> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               DropdownButtonFormField<int>(
-                value: _selectedBranch == 0? categories?.keys.first : _selectedBranch,
+                value: _selectedBranch == 0? categories?.keys.first as int? : _selectedBranch,
                 decoration: const InputDecoration(
                   labelText: '数学分支',
                   border: OutlineInputBorder(),
                 ),
-                items: categories?.keys?.map((int id) {
+                items: categories?.keys?.map((String id) {
                   return DropdownMenuItem<int>(
-                    value: id,
+                    value: id as int,
                     child: Text(categories![id]!),
                   );
                 }).toList(),

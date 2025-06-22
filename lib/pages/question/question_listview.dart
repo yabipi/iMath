@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
+import 'package:imath/components/category_panel.dart';
 
 import 'package:imath/components/math_cell.dart';
 import 'package:imath/pages/question/controller.dart';
@@ -40,7 +41,7 @@ class _QuestionListviewState extends State<QuestionListview> {
   }
 
   Widget _buildCategoryChips() {
-    final categories = Context().get(CATEGORIES_KEY) as Map<int, String>?;
+    final categories = Context.get(CATEGORIES_KEY);
 
     if (categories == null || categories.isEmpty) {
       return const SizedBox.shrink();
@@ -70,7 +71,7 @@ class _QuestionListviewState extends State<QuestionListview> {
                 label: Text(categoryName),
                 selected: controller.categoryId == categoryId,
                 onSelected: (selected) {
-                  controller.onChangeCategory(categoryId);
+                  controller.onChangeCategory(categoryId as int);
                 },
               );
             }).toList(),
@@ -242,7 +243,7 @@ class _QuestionListviewState extends State<QuestionListview> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: _buildCategoryChips(),
+                child: CategoryPanel(onItemTap: (int categoryId) {onChangeCategory(categoryId);}),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -295,5 +296,9 @@ class _QuestionListviewState extends State<QuestionListview> {
           );
         });
 
+  }
+
+  void onChangeCategory(int categoryId) {
+    controller.onChangeCategory(categoryId as int);
   }
 }

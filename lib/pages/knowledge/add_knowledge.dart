@@ -25,7 +25,7 @@ class _AddKnowledgeViewState extends State<AddKnowledgeView> {
   int _selectedBranch = 0;
   bool _isSubmitting = false;
 
-  final categories = Context().get(CATEGORIES_KEY) as Map<int, String>?;
+  final categories = Context.get(CATEGORIES_KEY);
 
   @override
   void initState() {
@@ -99,14 +99,14 @@ class _AddKnowledgeViewState extends State<AddKnowledgeView> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               DropdownButtonFormField<int>(
-                value: categories!.keys.first,
+                value: categories!.keys.first as int,
                 decoration: const InputDecoration(
                   labelText: '数学分支',
                   border: OutlineInputBorder(),
                 ),
-                items: categories?.keys?.map((int id) {
+                items: categories?.keys?.map((String id) {
                   return DropdownMenuItem<int>(
-                    value: id,
+                    value: id as int,
                     child: Text(categories![id]!),
                   );
                 }).toList(),

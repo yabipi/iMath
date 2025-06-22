@@ -1,6 +1,7 @@
 
 import 'dart:developer';
 
+import 'package:imath/config/constants.dart';
 import 'package:imath/db/Storage.dart';
 import 'package:imath/models/user.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -27,7 +28,7 @@ class Context {
   // 工厂方法返回唯一的实例
   factory Context() => _instance;
 
-  final Map<String, dynamic> _data = {};
+  static final Map<String, dynamic> _data = {};
   static String? token = null;
   static User? currentUser;
 
@@ -51,12 +52,12 @@ class Context {
   }
 
   // 设置键值对
-  void set(String key, dynamic value) {
+  static void set(String key, dynamic value) {
     _data[key] = value;
   }
 
   // 获取键值对
-  dynamic get(String key) {
+  static dynamic get(String key) {
     return _data[key];
   }
 
@@ -67,6 +68,11 @@ class Context {
 
   User? getCurrentUser() {
     return currentUser;
+  }
+
+  static int getCategoryId(String category) {
+    Map<String, dynamic> categories = get(CATEGORIES_KEY);
+    return categories[category] as int;
   }
 
   bool isLoggedIn() {
