@@ -16,11 +16,17 @@ class CultureScreen extends StatefulWidget {
 
 class _CultureScreenState extends State<CultureScreen> {
 
+  void initState() {
+    super.initState();
+    // 获取分类数据
+    print('CultureScreen initState');
+  }
+
   @override
   Widget build(BuildContext context) {
     bool reload = Get.arguments?['reload'] ?? false;
     if (reload) {
-      setState(() {});
+      // setState(() {});
     }
     return DefaultTabController(
       length: 2,

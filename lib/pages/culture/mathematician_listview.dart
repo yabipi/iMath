@@ -19,7 +19,9 @@ class _MathematicianListviewState extends State<MathematicianListview> {
   @override
   void initState() {
     super.initState();
-    _future = fetchData();
+    setState(() {
+      _future = fetchData();
+    });
   }
 
   @override
