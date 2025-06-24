@@ -10,7 +10,7 @@ import '../repository/user_repository.dart';
 /// Date: 2018-08-03
 
 class SqlManager {
-  static const _VERSION = 1;
+  static const _VERSION = 2;
 
   static const _NAME = "imath.db";
 

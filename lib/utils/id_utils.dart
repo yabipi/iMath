@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
 
 import 'dart:convert';
+import 'dart:math';
 
 class IdUtils {
   static final XOR_CODE = BigInt.parse('23442827791579');
@@ -10,6 +11,14 @@ class IdUtils {
 
   static const data =
       'FcwAPNKTMug3GV5Lj7EJnHpWsx4tb8haYeviqBz6rkCy12mUSDQX9RdoZf';
+
+  /// 生成唯一ID
+  static String generateId() {
+    final random = Random();
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final randomPart = random.nextInt(10000);
+    return '${timestamp}_$randomPart';
+  }
 
   /// av转bv
   static String av2bv(int aid) {

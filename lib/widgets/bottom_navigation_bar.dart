@@ -14,8 +14,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
       _currentIndex.value = 1;
     } else if (currentRoute == '/questions') {
       _currentIndex.value = 2;
-    } else if (currentRoute == '/profile') {
+    } else if (currentRoute == '/todo') {
       _currentIndex.value = 3;
+    } else if (currentRoute == '/profile') {
+      _currentIndex.value = 4;
     }
   }
 
@@ -36,6 +38,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
           BottomNavigationBarItem(
             icon: Icon(Icons.quiz),
             label: '题库',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.task_alt),
+            label: '待办',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
@@ -62,6 +68,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
               Get.offAllNamed('/questions');
               break;
             case 3:
+              Get.offAllNamed('/todo');
+              break;
+            case 4:
               Get.offAllNamed('/profile');
               break;
           }
