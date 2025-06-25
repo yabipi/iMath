@@ -56,7 +56,8 @@ class _AddMathematicianScreenState extends State<AddMathematicianScreen> {
                   "contributions": _achievementsController.text,
                   "introduction": _biographyController.text
                 });
-                Get.toNamed('/culture', arguments: {'reload': true}, preventDuplicates: false);
+                // Get.toNamed('/culture', arguments: {'reload': true}, preventDuplicates: false);
+                // Navigator.pop(context, true);
               },
               child: const Text('保存'),
             ),

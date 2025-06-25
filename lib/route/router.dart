@@ -1,0 +1,58 @@
+import 'package:go_router/go_router.dart';
+import 'package:imath/pages/culture/culture_screen.dart';
+import 'package:imath/pages/knowledge/add_knowledge.dart';
+import 'package:imath/pages/knowledge/edit_knowledge.dart';
+import 'package:imath/pages/knowledge/knowledge_screen.dart';
+import 'package:imath/pages/question/add_question.dart';
+import 'package:imath/pages/question/edit_question.dart';
+import 'package:imath/pages/question/questions_screen.dart';
+import 'package:imath/pages/user/about_me.dart';
+import 'package:imath/pages/user/profile_screen.dart';
+
+final router = GoRouter(
+  initialLocation: '/knowledge',
+
+  routes: [
+    GoRoute(
+      path: '/knowledge',
+      builder: (context, state) => const KnowledgeScreen(),
+    ),
+    GoRoute(
+      path: '/culture',
+      builder: (context, state) => const CultureScreen(),
+    ),
+
+    GoRoute(
+      path: '/profile',
+      builder: (context, state) => ProfileScreen(),
+    ),
+
+    GoRoute(
+      path: '/about',
+      builder: (context, state) => AboutMePage(),
+    ),
+
+    GoRoute(
+      path: '/addquestion',
+      builder: (context, state) => AddQuestionScreen(paperId: -1),
+    ),
+
+    GoRoute(
+      path: '/editquestion',
+      builder: (context, state) => const QuestionEditView(),
+    ),
+
+    GoRoute(
+      path: '/addknow',
+      builder: (context, state) => const AddKnowledgeView(),
+    ),
+    GoRoute(
+      path: '/editknow',
+      builder: (context, state) => const EditKnowledgeView(),
+    ),
+    // GoRoute(
+    //   path: '/profile',
+    //   builder: (context, state) => const ProfileScreen(),
+    // ),
+  ],
+);

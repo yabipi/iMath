@@ -8,11 +8,11 @@ import 'mathematician_detail_screen.dart';
 
 class MathematicianListview extends StatefulWidget {
   @override
-  _MathematicianListviewState createState() => _MathematicianListviewState();
+  MathematicianListviewState createState() => MathematicianListviewState();
 
 }
 
-class _MathematicianListviewState extends State<MathematicianListview> {
+class MathematicianListviewState extends State<MathematicianListview> {
   List<Mathematician> _mathematicians = [...mathematicians];
   late Future _future;
 

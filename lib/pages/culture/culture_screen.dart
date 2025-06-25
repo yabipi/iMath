@@ -15,7 +15,7 @@ class CultureScreen extends StatefulWidget {
 }
 
 class _CultureScreenState extends State<CultureScreen> {
-  final GlobalKey<_MathematicianListviewState> _mathematicianListKey = GlobalKey<_MathematicianListviewState>();
+  final GlobalKey<MathematicianListviewState> _mathematicianListKey = GlobalKey<MathematicianListviewState>();
 
   void initState() {
     super.initState();
@@ -44,7 +44,7 @@ class _CultureScreenState extends State<CultureScreen> {
         body: TabBarView(
           children: [
             // 数学人物标签页
-            MathematicianListview(key: _mathematicianListKey),
+            MathematicianListview(),
             // 数学故事标签页
             ListView.builder(
               itemCount: 10, // 示例数据
