@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:get/get.dart';
+
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:imath/components/category_panel.dart';
 
 import 'package:imath/config/api_config.dart';
-import 'package:imath/config/constants.dart';
-import 'package:imath/core/context.dart';
-import 'package:imath/pages/knowledge/edit_knowledge.dart';
 import 'package:imath/widgets/bottom_navigation_bar.dart';
 
 import '../../http/init.dart';
@@ -41,7 +38,6 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
         children: [
           // 分类标签区域
           CategoryPanel(onItemTap: (int categoryId) {onChangeCategory(categoryId);}),
-
           Expanded(
             child: FutureBuilder<Map<String, dynamic>>(
               future: fetchKnowledgePoints(),
@@ -120,7 +116,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
               child: IconButton(
                 icon: const Icon(Icons.edit),
                 onPressed: () {
-                  Get.toNamed('/editknow', arguments: {'knowledgeId': _knowledge['ID']});
+                  // Get.toNamed('/editknow', arguments: {'knowledgeId': _knowledge['ID']});
                 },
               ),
             ),

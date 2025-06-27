@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:get/get.dart';
+
 import 'package:imath/core/context.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -99,8 +99,7 @@ class AuthApiService extends ApiService {
     String token = response.data['data'] ?? '';
     if (token.isNotEmpty) {
       GStorage.userInfo.put('token', token);
-      // 刷新全局上下文的token
-      Context.refresh();
+
       // Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
       // final role = decodedToken['role'];
       // print('Role: $role');
@@ -125,7 +124,7 @@ class AuthApiService extends ApiService {
   Future<Credentials?> loadCredentails() async {
     var exists = await _credentialsFile.exists();
     // return null;
-    log('${exists.isBlank}');
+    // log('${exists.isBlank}');
 
     return exists && oauth2.Credentials != null
         ? oauth2.Credentials.fromJson(await _credentialsFile.readAsString())
@@ -147,9 +146,9 @@ class AuthApiService extends ApiService {
         throw 'Couuld not refresh the Token!';
       }
     } catch (e) {
-      printError(
-          info:
-              'Oauth client service exception refreshToken:  ${e.toString()}');
+      // printError(
+      //     info:
+      //         'Oauth client service exception refreshToken:  ${e.toString()}');
       throw 'Oauth client service exception refreshToken:  ${e.toString()}';
     }
   }
@@ -174,9 +173,9 @@ class AuthApiService extends ApiService {
 
   bool sessionIsExpired() {
     int currentTimestamp = HelperMixin.getTimestamp();
-    printInfo(
-        info:
-            'Expired in: ${credentials != null ? (credentials!.expiration!.millisecondsSinceEpoch / 1000 - ApiConfig.sessionTimeoutThreshold - currentTimestamp) / 60 : 0} mins -- isExceeded: ${credentials!.isExpired} and Can Refresh : ${credentials!.canRefresh}');
+    // printInfo(
+    //     info:
+    //         'Expired in: ${credentials != null ? (credentials!.expiration!.millisecondsSinceEpoch / 1000 - ApiConfig.sessionTimeoutThreshold - currentTimestamp) / 60 : 0} mins -- isExceeded: ${credentials!.isExpired} and Can Refresh : ${credentials!.canRefresh}');
     if (sessionIsEmpty()) return true;
 
     return credentials!.isExpired;

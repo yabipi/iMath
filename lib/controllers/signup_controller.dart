@@ -3,10 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../config/api_config.dart';
 
-import '../controllers/auth_controller.dart';
 import '../services/auth_api_service.dart';
 
-class SignupController extends AuthController {
+class SignupController {
   final GlobalKey<FormState> signupFormKey =
       GlobalKey<FormState>(debugLabel: '__signupFormKey__');
   final usernameController = TextEditingController();
@@ -23,13 +22,13 @@ class SignupController extends AuthController {
   FocusNode passwordFocusNode = FocusNode();
   FocusNode confirmPasswordFocusNode = FocusNode();
 
-  SignupController(AuthApiService authenticationService)
-      : super(authenticationService);
+  // SignupController(AuthApiService authenticationService)
+  //     : super(authenticationService);
 
   void onInit() {
     _addListener();
     // textFieldFocusNode.hasFocus = false;
-    super.onInit();
+    // super.onInit();
   }
 
   void _addListener() {
@@ -69,7 +68,7 @@ class SignupController extends AuthController {
     confirmPasswordController.dispose();
     confirmPasswordFocusNode.dispose();
 
-    super.onClose();
+    // super.onClose();
   }
 
   String? usernameValidator(String? value) {
@@ -146,7 +145,7 @@ class SignupController extends AuthController {
         }
         // await signUp(data);
         if (ApiConfig.loginWithPassword) {
-          signIn(usernameController.text, passwordController.text);
+          // signIn(usernameController.text, passwordController.text);
         }
       } catch (err, _) {
         // message = 'There is an issue with the app during request the data, '

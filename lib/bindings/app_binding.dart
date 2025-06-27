@@ -2,16 +2,16 @@ import 'package:imath/controllers/login_controller.dart';
 
 import '../services/auth_api_service.dart';
 import '../services/connectivity_service.dart';
-import 'package:get/get.dart';
 
-class AppBinding extends Bindings {
-  @override
-  void dependencies() {
-    injectService();
-  }
 
-  void injectService() {
-    Get.put(ConnectivityService());
-    Get.put(LoginController(Get.find<AuthApiService>()));
-  }
-}
+// class AppBinding extends Bindings {
+//   @override
+//   void dependencies() {
+//     injectService();
+//   }
+//
+//   void injectService() {
+//     Get.put(ConnectivityService());
+//     Get.put(LoginController(Get.find<AuthApiService>()));
+//   }
+// }

@@ -1,18 +1,22 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
+
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../controllers/login_controller.dart';
 // 新增：导入通用导航栏组件
 import '../../widgets/bottom_navigation_bar.dart';
 
-class LoginScreen extends GetView<LoginController>  {
+// extends GetView<LoginController>
+class LoginScreen extends StatelessWidget{
+  late LoginController controller;
   late TabController tabController;
 
   LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    controller = LoginController(context);
     tabController =  TabController(length: 3, vsync: Navigator.of(context));
     final _formKey = GlobalKey<FormState>();
 
@@ -40,7 +44,7 @@ class LoginScreen extends GetView<LoginController>  {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Get.back();
+            context.go('/');
           },
         ),
       ),
@@ -169,6 +173,17 @@ class LoginScreen extends GetView<LoginController>  {
                                   child: _isLoading
                                       ? const CircularProgressIndicator()
                                       : const Text('登录'),
+                                ),
+                                const SizedBox(height: 24),
+                                ElevatedButton(
+                                  onPressed: () => context.go('/verifycode'),
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16),
+                                  ),
+                                  child: _isLoading
+                                      ? const CircularProgressIndicator()
+                                      : const Text('获取验证码'),
                                 ),
                               ],
                             )),

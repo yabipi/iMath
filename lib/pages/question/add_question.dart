@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart'; // 引入 image_picker 包
@@ -40,12 +40,13 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
   // 获取全局 Context 实例
   // final Context _context = Context();
   // 使用 Context 获取全局数据
-  final categories = Context.get(CATEGORIES_KEY);
+  late Map<String, dynamic> categories;
 
   @override
   void initState() {
     super.initState();
-    final String? content = Get.arguments['markdownContent'] as String?;
+    // final String? content = Get.arguments['markdownContent'] as String?;
+    String? content = '';
     _contentController.text = content ?? '';
     // 获取全局数据
     // categories;
@@ -275,7 +276,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
             const SnackBar(content: Text('题目添加成功')),
           );
           // Navigator.pop(context, true);
-          Get.toNamed('/questions');
+          // Get.toNamed('/questions');
         }
       } else {
         throw Exception('Failed to add question');
@@ -363,6 +364,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    categories = context.get(CATEGORIES_KEY);
     return Scaffold(
       appBar: AppBar(
         title: const Text('添加题目'),

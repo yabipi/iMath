@@ -2,13 +2,17 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
+import 'dart:developer';
+
+import 'package:imath/core/context.dart';
+import 'package:oauth2/oauth2.dart';
 
 import '../../services/auth_api_service.dart';
 import '../models/user.dart';
-import 'auth_controller.dart';
 
-class LoginController extends AuthController {
+
+class LoginController {
   final GlobalKey<FormState> loginFormKey =
       GlobalKey<FormState>(debugLabel: '__loginFormKey__');
 
@@ -18,9 +22,91 @@ class LoginController extends AuthController {
   final passwordController = TextEditingController();
   final emailController = TextEditingController();
 
+  late BuildContext context;
+  late AuthApiService _authenticationService;
 
-  LoginController(AuthApiService authenticationService)
-      : super(authenticationService);
+  LoginController(BuildContext context) {
+    this.context = context;
+    _authenticationService = AuthApiService();
+  }
+
+  Future<dynamic> signIn(String email, String password) async {
+    try {
+      log('Enter Signin');
+      // return await _authenticationService.authGrantPassword(email, password);
+      return await _authenticationService.signIn(email, password);
+      // log('is logged in : ${crednetials!.accessToken}');
+    } catch (e) {
+      // printLog(e);
+      // printError(info: e.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> signOut() async {
+    try {
+      await _authenticationService.signOut();
+      // _authenticationService.removeCredentails();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+
+  Future<void> sendVerificationCode(String phone, String verifyCode) async {
+
+  }
+
+  Future<void> loginWithPhone(String phone, String verifyCode) async {
+
+  }
+
+  Future<void> loginWithWechat() async {
+
+  }
+
+  // Future<Response?> signUp(Map<String, dynamic> data) async {
+  //   String error_m =
+  //       'An error occurred while registering, please contact the administrator.';
+  //   try {
+  //     return await _authenticationService.signUp(data);
+  //
+  //     // if (response.statusCode == 200) {
+  //     //   log('enter signup');
+  //
+  //     //   // tokenData = await signIn(data['email'], data['password']);
+  //     // } else {
+  //     //   // var message = response.body['error_description'];
+  //
+  //     //   throw Exception(error_m);
+  //     // }
+  //   } catch (e) {
+  //     // printLog(e);
+  //     printError(info: e.toString());
+  //     throw Exception(error_m);
+  //   }
+  //   // return tokenData;
+  // }
+
+  Future<Credentials?> refreshToken() async {
+    try {
+      return _authenticationService.refreshToken();
+    } catch (e) {
+      // printError(info: 'exception refreshToken:  ${e.toString()}');
+      rethrow;
+    }
+  }
+
+  Credentials? tokenCredentials() => _authenticationService.credentials;
+
+
+
+  bool isAuthenticated() {
+    return !_authenticationService.sessionIsExpired();
+  }
+
+  // LoginController(AuthApiService authenticationService)
+  //     : super(authenticationService);
 
   @override
   void onClose() {
@@ -29,7 +115,7 @@ class LoginController extends AuthController {
     codeController.dispose();
     usernameController.dispose();
     passwordController.dispose();
-    super.onClose();
+    // super.onClose();
   }
 
   String? validator(String? value) {
@@ -47,9 +133,11 @@ class LoginController extends AuthController {
       final response = await signIn(emailController.text, passwordController.text);
       // debugPrint('response: $response');
       String username = response.data['exdata']['username'];
-      Get.toNamed('/profile', arguments: {'user': User(id: "0", name: username)}, preventDuplicates:  true);
+      // Get.toNamed('/profile', arguments: {'user': User(id: "0", name: username)}, preventDuplicates:  true);
       // print("切换到个人中心");
-
+      // 刷新全局上下文的token
+      context.refreshToken();
+      context.go('/profile');
     } catch (err, _) {
       passwordController.clear();
       rethrow;
@@ -59,7 +147,7 @@ class LoginController extends AuthController {
   Future<void> logout() async {
     try {
       signOut();
-      Get.offAllNamed('/login');
+      // Get.offAllNamed('/login');
     } catch (err, _) {
       rethrow;
     }

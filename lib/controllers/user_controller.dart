@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:get/get.dart';
 
 import '../config/api_config.dart';
 import '../models/user.dart';
 
-class UserController extends GetxController{
+class UserController {
   // const UserController();
   // 模拟用户数据
   static final Map<String, User> _users = {
@@ -65,7 +64,7 @@ class UserController extends GetxController{
   @override
   void onInit() {
     // TODO: implement onInit
-    super.onInit();
+    // super.onInit();
 
     // localUserToken();
   }
@@ -93,7 +92,7 @@ class UserController extends GetxController{
       final Map<String, dynamic> data = jsonDecode(response.body);
       // final List<dynamic> content = data['data'] ?? [];
       String token = response.headers['token'] as String;
-      Get.put(token);
+      // Get.put(token);
       return data;
     }
     throw Exception('登录失败');

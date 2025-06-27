@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
+
 import 'package:imath/controllers/login_controller.dart';
 import 'package:imath/core/context.dart';
 import 'package:imath/widgets/bottom_navigation_bar.dart';
@@ -9,7 +10,9 @@ import 'login_screen.dart';
 import '../admin/camera_screen.dart';
 import '../admin/admin_screen.dart';
 
-class ProfileScreen extends GetView<LoginController> {
+// extends GetView<LoginController>
+class ProfileScreen extends StatelessWidget {
+  late LoginController controller;
   late User? user;
   // final _authService = const UserController();
 
@@ -40,8 +43,9 @@ class ProfileScreen extends GetView<LoginController> {
 
   @override
   Widget build(BuildContext context) {
+    controller = LoginController(context);
     if (this.user == null) {
-      this.user = Context().getCurrentUser();
+      this.user = context.getCurrentUser();
       // this.user = Get.arguments?['user'] as User?;
     }
     if(this.user == null)
@@ -156,7 +160,7 @@ class ProfileScreen extends GetView<LoginController> {
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
               // 导航到关于页面
-              Get.toNamed('/about');
+              // Get.toNamed('/about');
             },
           ),
           ListTile(
@@ -165,8 +169,9 @@ class ProfileScreen extends GetView<LoginController> {
             trailing: const Icon(Icons.exit_to_app),
             onTap: () {
               // 导航到关于页面
-              // Get.toNamed('/about');
+              context.go('/profile');
               _logout(context);
+              context.logout();
             },
           ),
           // ListTile(

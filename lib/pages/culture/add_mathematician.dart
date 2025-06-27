@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
+
 import 'package:imath/http/culture.dart';
 
 class AddMathematicianScreen extends StatefulWidget {
@@ -56,7 +57,7 @@ class _AddMathematicianScreenState extends State<AddMathematicianScreen> {
                   "contributions": _achievementsController.text,
                   "introduction": _biographyController.text
                 });
-                // Get.toNamed('/culture', arguments: {'reload': true}, preventDuplicates: false);
+                context.go('/culture');
                 // Navigator.pop(context, true);
               },
               child: const Text('保存'),

@@ -10,9 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_riverpod: ^2.4.9
   cupertino_icons: ^1.0.2
   flutter_svg: ^2.0.9
-  get: ^4.6.5
   camera: ^0.10.5+9
   image_picker: ^1.0.7
   path_provider: ^2.1.2

@@ -7,11 +7,13 @@ import 'package:imath/pages/question/add_question.dart';
 import 'package:imath/pages/question/edit_question.dart';
 import 'package:imath/pages/question/questions_screen.dart';
 import 'package:imath/pages/user/about_me.dart';
+import 'package:imath/pages/user/login_screen.dart';
 import 'package:imath/pages/user/profile_screen.dart';
+import 'package:imath/pages/user/phone_code_verify.dart';
 
 final router = GoRouter(
   initialLocation: '/knowledge',
-
+  redirect: (context, state) => state.uri.toString() == '/' ? '/knowledge' : null,
   routes: [
     GoRoute(
       path: '/knowledge',
@@ -21,7 +23,10 @@ final router = GoRouter(
       path: '/culture',
       builder: (context, state) => const CultureScreen(),
     ),
-
+    GoRoute(
+      path: '/questions',
+      builder: (context, state) => const QuestionsScreen(),
+    ),
     GoRoute(
       path: '/profile',
       builder: (context, state) => ProfileScreen(),
@@ -54,5 +59,14 @@ final router = GoRouter(
     //   path: '/profile',
     //   builder: (context, state) => const ProfileScreen(),
     // ),
+    // 用户登录管理相关
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => LoginScreen(),
+    ),
+    GoRoute(
+      path: '/verifycode',
+      builder: (context, state) => PhoneCodeVerifyView(),
+    ),
   ],
 );

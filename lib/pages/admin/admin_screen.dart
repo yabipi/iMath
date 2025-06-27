@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:imath/pages/admin/camera_screen.dart';
 import 'package:imath/pages/admin/pdf_uploader.dart';
 import '../paper/add_paper_screen.dart';
@@ -28,7 +28,7 @@ class AdminScreen extends StatelessWidget {
             title: const Text('添加知识点'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              Get.toNamed('/addknow');
+              // Get.toNamed('/addknow');
             },
           ),
           const Divider(),

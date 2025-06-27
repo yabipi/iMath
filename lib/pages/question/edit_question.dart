@@ -1,6 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
@@ -20,7 +19,7 @@ class QuestionEditView extends StatefulWidget {
 class _QuestionEditViewState extends State<QuestionEditView> {
   final _formKey = GlobalKey<FormState>();
 
-  final QuestionController controller = Get.find<QuestionController>();
+  late QuestionController controller; //Get.find<QuestionController>();
 
   bool _isSubmitting = false;
   List<String> _selectedImages = [];
@@ -28,7 +27,7 @@ class _QuestionEditViewState extends State<QuestionEditView> {
   @override
   void initState() {
     super.initState();
-    controller.questionId = Get.arguments['questionId'] as int;
+    controller.questionId = -1; //Get.arguments['questionId'] as int;
     controller.loadQuestionFuture = controller.loadQuestion();
   }
 
@@ -82,6 +81,7 @@ class _QuestionEditViewState extends State<QuestionEditView> {
 
   @override
   Widget build(BuildContext context) {
+    controller = QuestionController(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('编辑题目'),
@@ -97,8 +97,8 @@ class _QuestionEditViewState extends State<QuestionEditView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Obx(()=>DropdownButtonFormField<int>(
-                      value: controller.selectedBranch.value,
+                    DropdownButtonFormField<int>(
+                      value: controller.selectedBranch,
                       decoration: const InputDecoration(
                         labelText: '数学分支',
                         border: OutlineInputBorder(),
@@ -112,14 +112,14 @@ class _QuestionEditViewState extends State<QuestionEditView> {
                       }).toList(),
                       onChanged: (int? newValue) {
                         setState(() {
-                          controller.selectedBranch.value = newValue!;
+                          controller.selectedBranch = newValue!;
                         });
                       },
-                    )),
+                    ),
 
                     const SizedBox(height: 16),
-                    Obx(()=>DropdownButtonFormField<String>(
-                      value: controller.selectedType.value,
+                    DropdownButtonFormField<String>(
+                      value: controller.selectedType,
                       decoration: const InputDecoration(
                         labelText: '题目类型',
                         border: OutlineInputBorder(),
@@ -135,10 +135,10 @@ class _QuestionEditViewState extends State<QuestionEditView> {
                           // controller.selectedType = newValue!;
                         });
                       },
-                    )),
+                    ),
                     const SizedBox(height: 16),
-                    Obx(()=>TextFormField(
-                      controller: controller.contentController.value,
+                    TextFormField(
+                      controller: controller.contentController,
                       decoration: const InputDecoration(
                         labelText: '题目内容',
                         border: OutlineInputBorder(),
@@ -150,10 +150,10 @@ class _QuestionEditViewState extends State<QuestionEditView> {
                         // }
                         // return null;
                       },
-                    )),
+                    ),
                     const SizedBox(height: 16),
-                    Obx(()=>TextFormField(
-                      controller: controller.optionsController.value,
+                    TextFormField(
+                      controller: controller.optionsController,
                       decoration: const InputDecoration(
                         labelText: '题目选项',
                         border: OutlineInputBorder(),
@@ -162,10 +162,10 @@ class _QuestionEditViewState extends State<QuestionEditView> {
                       validator: (value) {
 
                       },
-                    )),
+                    ),
                     const SizedBox(height: 16),
-                    Obx(()=>TextFormField(
-                      controller: controller.answerController.value,
+                    TextFormField(
+                      controller: controller.answerController,
                       decoration: const InputDecoration(
                         labelText: '解析和答案',
                         border: OutlineInputBorder(),
@@ -177,8 +177,8 @@ class _QuestionEditViewState extends State<QuestionEditView> {
                         // }
                         // return null;
                       },
-                    )
                     ),
+
 
                     const SizedBox(height: 16),
                     _buildImageSection(),

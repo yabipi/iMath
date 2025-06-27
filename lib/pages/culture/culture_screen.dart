@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
+
 import 'package:imath/widgets/bottom_navigation_bar.dart';
 import '../../models/mathematician.dart';
 import 'mathematician_detail_screen.dart';
@@ -23,12 +23,10 @@ class _CultureScreenState extends State<CultureScreen> {
     print('CultureScreen initState');
   }
 
+
   @override
   Widget build(BuildContext context) {
-    bool reload = Get.arguments?['reload'] ?? false;
-    if (reload) {
-      // setState(() {});
-    }
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(

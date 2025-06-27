@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:imath/config/constants.dart';
 import 'package:imath/core/context.dart';
@@ -18,7 +18,7 @@ class EditKnowledgeView extends StatefulWidget {
 }
 
 class _EditKnowledgeViewState extends State<EditKnowledgeView> {
-  final categories = Context.get(CATEGORIES_KEY);
+  late Map<String, dynamic> categories;
   int knowledgeId = 0;
 
   final _formKey = GlobalKey<FormState>();
@@ -38,7 +38,7 @@ class _EditKnowledgeViewState extends State<EditKnowledgeView> {
   }
 
   Future<void> _fetchKnowledge() async {
-    knowledgeId = Get.arguments['knowledgeId'] as int;
+    // knowledgeId = Get.arguments['knowledgeId'] as int;
     final response = await Request().get('${ApiConfig.SERVER_BASE_URL}/api/know/${knowledgeId}');
     String title = response.data['know_item']['Title'];
     String content = response.data['know_item']['Content'];
@@ -89,7 +89,7 @@ class _EditKnowledgeViewState extends State<EditKnowledgeView> {
             const SnackBar(content: Text('知识点添加成功')),
           );
           // Navigator.pop(context, true);
-          Get.toNamed('/knowledge');
+          // Get.toNamed('/knowledge');
         }
       } else {
         throw Exception('Failed to edit knowledge');
@@ -111,6 +111,7 @@ class _EditKnowledgeViewState extends State<EditKnowledgeView> {
 
   @override
   Widget build(BuildContext context) {
+    categories = context.get(CATEGORIES_KEY);
     return Scaffold(
       appBar: AppBar(
         title: const Text('添加知识点'),

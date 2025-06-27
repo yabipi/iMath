@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:get/get.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:imath/config/api_config.dart';
 
@@ -53,7 +53,7 @@ class _MarkdownEditState extends State<MarkdownEdit> {
       _isLoading = true;
     });
 
-    Get.toNamed('/addknow', arguments: {'markdownContent': _controller!.document.toPlainText()});
+    // Get.toNamed('/addknow', arguments: {'markdownContent': _controller!.document.toPlainText()});
 
   }
 
@@ -64,7 +64,7 @@ class _MarkdownEditState extends State<MarkdownEdit> {
       _isLoading = true;
     });
 
-    Get.toNamed('/addquestion', arguments: {'markdownContent': _controller!.document.toPlainText()});
+    // Get.toNamed('/addquestion', arguments: {'markdownContent': _controller!.document.toPlainText()});
   }
 
   Future<void> _saveAsExam() async {

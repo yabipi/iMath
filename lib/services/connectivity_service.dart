@@ -1,9 +1,5 @@
-import 'dart:developer';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 // class ConnectivityService extends GetxService {
@@ -83,24 +79,24 @@ class ConnectivityService {
   }
 
   void hideDialogIfOpen() {
-    if (Get.isDialogOpen == true) {
-      Get.back();
-    }
+    // if (Get.isDialogOpen == true) {
+    //   Get.back();
+    // }
   }
 
   void showDialog() {
-    Get.dialog(
-      CupertinoAlertDialog(
-        title: Row(children: [
-          const Icon(Icons.signal_wifi_off_outlined),
-          Container(
-              margin: const EdgeInsets.only(left: 5),
-              child: const Text('You are currently offline')),
-        ]),
-        content: const Text(
-            'Please turn on network connection to continue using this app'),
-      ),
-      barrierDismissible: true,
-    );
+    // Get.dialog(
+    //   CupertinoAlertDialog(
+    //     title: Row(children: [
+    //       const Icon(Icons.signal_wifi_off_outlined),
+    //       Container(
+    //           margin: const EdgeInsets.only(left: 5),
+    //           child: const Text('You are currently offline')),
+    //     ]),
+    //     content: const Text(
+    //         'Please turn on network connection to continue using this app'),
+    //   ),
+    //   barrierDismissible: true,
+    // );
   }
 }

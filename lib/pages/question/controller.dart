@@ -1,13 +1,11 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:imath/config/api_config.dart';
+
 import 'package:imath/config/constants.dart';
 import 'package:imath/core/context.dart';
 import 'package:imath/http/question.dart';
 import 'package:imath/models/quiz.dart';
 
-class QuestionController extends GetxController {
+class QuestionController {
 
   late int questionId;
 
@@ -16,13 +14,13 @@ class QuestionController extends GetxController {
   int _currentPage = 1;
   final Question question  = Question(id: -1);
 
-  RxList<Question> questions = <Question>[].obs;
-  Rx<TextEditingController> contentController = TextEditingController().obs;
-  Rx<TextEditingController> optionsController = TextEditingController().obs;
-  Rx<TextEditingController> answerController = TextEditingController().obs;
+  List<Question> questions = <Question>[];
+  TextEditingController contentController = TextEditingController();
+  TextEditingController optionsController = TextEditingController();
+  TextEditingController answerController = TextEditingController();
 
-  RxInt selectedBranch = 0.obs;
-  RxString selectedType = QuestionTypes[0].obs;
+  int selectedBranch = 0;
+  String selectedType = QuestionTypes[0];
   List<String> selectedImages = [];
 
   // 获取全局 Context 实例
@@ -30,24 +28,21 @@ class QuestionController extends GetxController {
 
   Future<dynamic>? loadQuestionFuture;
 
-  @override
-  void onInit() {
-    // TODO: implement onInit
-    super.onInit();
-    categories = Context.get(CATEGORIES_KEY);
+  QuestionController(BuildContext context) {
+    categories = context.get(CATEGORIES_KEY);
   }
 
   // 加载题目数据
   Future loadQuestion() async {
     try {
       final question = await QuestionHttp.getQuestion(questionId);
-      contentController.value.text = question.content ?? '';
-      optionsController.value.text = question.options ?? '';
-      answerController.value.text = question.answer ?? '';
+      contentController.text = question.content ?? '';
+      optionsController.text = question.options ?? '';
+      answerController.text = question.answer ?? '';
       if (question.category == '') {
-        selectedBranch.value = (categories?.keys.first)!;
+        selectedBranch = (categories?.keys.first)!;
       } else {
-        selectedBranch.value = categories?.keys.firstWhere((key) => categories![key] == question.category) ;
+        selectedBranch = categories?.keys.firstWhere((key) => categories![key] == question.category) ;
       }
 
       selectedType = (question.type??'').isEmpty ? QuestionTypes[0] : question.type!;
@@ -81,20 +76,20 @@ class QuestionController extends GetxController {
   // 提交题目编辑
   Future<void> updateQuestion() async {
     try {
-      print("selected branch is ${selectedBranch.value}");
+      print("selected branch is ${selectedBranch}");
       // 构建选项数据
       // List<Map<String, String>> options = [];
 
       QuestionHttp.updateQuestion(questionId, {
-        'category': categories[selectedBranch.value],
-        'content': contentController.value.text,
-        'options': optionsController.value.text,
-        'answer': answerController.value.text,
+        'category': categories[selectedBranch],
+        'content': contentController.text,
+        'options': optionsController.text,
+        'answer': answerController.text,
       });
-      questions.value.clear();
+      questions.clear();
       _currentPage--;
       // loadMoreQuestions(pageNo: 1, pageSize: 10);
-      Get.offAllNamed('/questions');
+      // context.go('/questions');
 
       //   data: {
       //     'title': _titleController.text,

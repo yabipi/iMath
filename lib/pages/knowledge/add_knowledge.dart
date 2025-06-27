@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:imath/config/constants.dart';
 import 'package:imath/core/context.dart';
@@ -25,13 +25,13 @@ class _AddKnowledgeViewState extends State<AddKnowledgeView> {
   int _selectedBranch = 0;
   bool _isSubmitting = false;
 
-  final categories = Context.get(CATEGORIES_KEY);
+  late Map<String, dynamic> categories;
 
   @override
   void initState() {
     super.initState();
-    final String? content = Get.arguments?['markdownContent'] as String?;
-    _contentController.text = content ?? '';
+    // final String? content = Get.arguments?['markdownContent'] as String?;
+    // _contentController.text = content ?? '';
   }
 
   @override
@@ -65,7 +65,7 @@ class _AddKnowledgeViewState extends State<AddKnowledgeView> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('知识点添加成功')),
           );
-          Get.toNamed('/knowledge');
+          // Get.toNamed('/knowledge');
         }
       } else {
         throw Exception('Failed to add knowledge');
@@ -87,6 +87,7 @@ class _AddKnowledgeViewState extends State<AddKnowledgeView> {
 
   @override
   Widget build(BuildContext context) {
+    categories = context.get(CATEGORIES_KEY);
     return Scaffold(
       appBar: AppBar(
         title: const Text('添加知识点'),

@@ -12,13 +12,29 @@ class MathematicianListview extends StatefulWidget {
 
 }
 
-class MathematicianListviewState extends State<MathematicianListview> {
+class MathematicianListviewState extends State<MathematicianListview> with AutomaticKeepAliveClientMixin {
   List<Mathematician> _mathematicians = [...mathematicians];
   late Future _future;
 
   @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => false;
+
+  @override
   void initState() {
     super.initState();
+    _loadData();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Refresh data when widget becomes visible
+    _loadData();
+  }
+
+  void _loadData() {
+    _mathematicians.clear();
     setState(() {
       _future = fetchData();
     });
@@ -98,5 +114,7 @@ class MathematicianListviewState extends State<MathematicianListview> {
 
     return _mathematicians;
   }
+
+
 
  }

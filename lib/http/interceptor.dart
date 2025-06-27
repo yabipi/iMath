@@ -3,7 +3,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:get/get.dart' hide Response;
+
 import 'package:hive/hive.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 

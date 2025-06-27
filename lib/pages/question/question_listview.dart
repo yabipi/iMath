@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:imath/components/category_panel.dart';
 
@@ -31,55 +31,10 @@ class _QuestionListviewState extends State<QuestionListview> {
   @override
   void initState() {
     super.initState();
-    controller = Get.put(QuestionController());
+
     // _loadMoreQuestions(categoryId: -1);
   }
 
-  void _filterQuestionsByCategory(int categoryId) {
-    // debugPrint('categoryId === ${categoryId}');
-    controller.categoryId = categoryId;
-  }
-
-  Widget _buildCategoryChips() {
-    final categories = Context.get(CATEGORIES_KEY);
-
-    if (categories == null || categories.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return ExpansionTile(
-      title: const Text('选择分类'),
-      children: [
-        Wrap(
-          spacing: 8.0,
-          runSpacing: 8.0,
-          children: [
-            ChoiceChip(
-              label: const Text('全部'),
-              selected: controller.categoryId == -1,
-              onSelected: (selected) {
-                if (selected) {
-                  _filterQuestionsByCategory(-1); // 清空分类筛选
-                }
-              },
-            ),
-            ...categories.entries.map((entry) {
-              final categoryId = entry.key;
-              final categoryName = entry.value;
-
-              return ChoiceChip(
-                label: Text(categoryName),
-                selected: controller.categoryId == categoryId,
-                onSelected: (selected) {
-                  controller.onChangeCategory(categoryId as int);
-                },
-              );
-            }).toList(),
-          ],
-        ),
-      ],
-    );
-  }
 
   Widget _buildQuestionCard(Question question, int index) {
     if (question.title == null) {
@@ -134,7 +89,7 @@ class _QuestionListviewState extends State<QuestionListview> {
                   icon: const Icon(Icons.edit),
                   onPressed: () {
                     // 跳转到问题编辑页面
-                    Get.toNamed('/editquestion', arguments: {'questionId': question.id});
+                    // Get.toNamed('/editquestion', arguments: {'questionId': question.id});
                   },
                 ),
               ],
@@ -163,7 +118,7 @@ class _QuestionListviewState extends State<QuestionListview> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '第${controller.questions.value.indexOf(question) + 1}题',
+              '第${controller.questions.indexOf(question) + 1}题',
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -193,12 +148,12 @@ class _QuestionListviewState extends State<QuestionListview> {
                 TextButton(
                   onPressed: () {
                     setState(() {
-                      _expandedStates[controller.questions.value.indexOf(question)] =
-                          !(_expandedStates[controller.questions.value.indexOf(question)] ?? false);
+                      _expandedStates[controller.questions.indexOf(question)] =
+                          !(_expandedStates[controller.questions.indexOf(question)] ?? false);
                     });
                   },
                   child: Text(
-                    _expandedStates[controller.questions.value.indexOf(question)] ?? false
+                    _expandedStates[controller.questions.indexOf(question)] ?? false
                         ? '收起详情'
                         : '查看详情',
                   ),
@@ -206,12 +161,12 @@ class _QuestionListviewState extends State<QuestionListview> {
                 IconButton(
                   icon: const Icon(Icons.edit),
                   onPressed: () {
-                    Get.toNamed('/editquestion', arguments: {'questionId': question.id});
+                    // Get.toNamed('/editquestion', arguments: {'questionId': question.id});
                   },
                 ),
               ],
             ),
-            if (_expandedStates[controller.questions.value.indexOf(question)] ?? false) ...[
+            if (_expandedStates[controller.questions.indexOf(question)] ?? false) ...[
               const Divider(),
               const Text(
                 '解析和答案:',
@@ -235,10 +190,11 @@ class _QuestionListviewState extends State<QuestionListview> {
 
   @override
   Widget build(BuildContext context) {
+    controller = QuestionController(context);
     return FutureBuilder(
         future: controller.loadMoreQuestions(),
         builder: (context, snapshot){
-          RxList list = controller.questions;
+          List list = controller.questions;
           return Column(
             children: [
               Padding(
@@ -252,19 +208,19 @@ class _QuestionListviewState extends State<QuestionListview> {
               ),
               Expanded(
                 child: _isSlidingMode
-                    ? Obx(() =>PageView.builder(
+                    ? PageView.builder(
                         scrollDirection: Axis.vertical, // 修改：将滑动方向改为垂直
-                        itemCount: list.value.length,
+                        itemCount: list.length,
                         itemBuilder: (context, index) {
-                          return _buildSlidingQuestionCard(list.value[index]);
+                          return _buildSlidingQuestionCard(list[index]);
                         },
-                    ))
-                    : Obx(() =>
+                    )
+                    :
                       ListView.builder(
                         padding: const EdgeInsets.all(16.0),
-                        itemCount: list.value.length + 1,
+                        itemCount: list.length + 1,
                         itemBuilder: (context, index) {
-                          if (index == list.value.length) {
+                          if (index == list.length) {
                             if (_isLoading) {
                               return const Center(
                                 child: Padding(
@@ -288,10 +244,10 @@ class _QuestionListviewState extends State<QuestionListview> {
                               ),
                             );
                   }
-                  return _buildQuestionCard(list.value[index], index);
+                  return _buildQuestionCard(list[index], index);
                 },
                 )),
-              ),
+
             ],
           );
         });

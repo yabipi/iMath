@@ -4,7 +4,7 @@ import 'package:imath/config/constants.dart';
 import 'package:imath/core/context.dart';
 
 class CategoryPanel extends StatelessWidget {
-  Map<String, dynamic> categories = Context.get(CATEGORIES_KEY);
+
   Function(int)? onItemTap; // 点击 item 的回调函数
 
   int _selectedCategoryId = -1;
@@ -14,6 +14,7 @@ class CategoryPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, dynamic> categories = context.get(CATEGORIES_KEY);
     return DefaultTabController(
       length: categories.length,
       child: TabBar(
@@ -33,7 +34,7 @@ class CategoryPanel extends StatelessWidget {
     );
   }
 
-  Widget _buildNormalPanel() {
+  Widget _buildNormalPanel(Map<String, dynamic> categories) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Wrap(
