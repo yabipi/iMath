@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imath/core/context.dart';
 import 'package:imath/widgets/timer_button.dart';
@@ -83,6 +84,38 @@ class _PhoneCodeVerifyViewState extends State<PhoneCodeVerifyView> {
                                   keyboardType: TextInputType.number,
                                   textAlign: TextAlign.center,
                                   maxLength: 1,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  onChanged: (value) {
+                                    print("value 长度: ${value.length}");
+                                    // 处理输入
+                                    if (value.length == 1) {
+                                      if (index < 5) {
+                                        FocusScope.of(context).requestFocus(_focusNodes[index + 1]);
+                                      } else {
+                                        // 输入完成，提交验证码
+                                        String code = _controllers.map((c) => c.text).join();
+                                        _submitVerificationCode(code);
+                                      }
+                                    } else if (value.isEmpty) {
+                                      // 处理删除操作
+                                      if (index > 0) {
+                                        FocusScope.of(context).requestFocus(_focusNodes[index - 1]);
+                                      }
+                                    }
+                                  },
+                                  onTap: () {
+                                    // 点击时，如果当前输入框为空，找到最后一个有内容的输入框
+                                    if (_controllers[index].text.isEmpty) {
+                                      for (int i = index - 1; i >= 0; i--) {
+                                        if (_controllers[i].text.isNotEmpty) {
+                                          FocusScope.of(context).requestFocus(_focusNodes[i]);
+                                          break;
+                                        }
+                                      }
+                                    }
+                                  },
                                   decoration: InputDecoration(
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(6.0),
