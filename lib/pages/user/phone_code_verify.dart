@@ -73,10 +73,10 @@ class _PhoneCodeVerifyViewState extends State<PhoneCodeVerifyView> {
                       ...List.generate(6, (index) {
                         return
                           Padding(
-                              padding: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(4),
                               child: SizedBox(
-                                width: 80,
-                                height: 80,
+                                width: 40,
+                                height: 40,
                                 child: TextField(
                                   controller: _controllers[index],
                                   focusNode: _focusNodes[index],

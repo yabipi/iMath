@@ -97,7 +97,7 @@ void main() async {
   Request();
   // ApiConfig.environment = Environment.DEV; // 或 Environment.PROD
   ApiConfig.environment =
-      const String.fromEnvironment('ENV', defaultValue: 'DEV');
+      const String.fromEnvironment('ENV', defaultValue: 'PROD');
   logger.d('environment: ${ApiConfig.environment}, SERVER_BASE_URL: ${ApiConfig.SERVER_BASE_URL}');
 
   HttpOverrides.global = MyHttpOverrides();

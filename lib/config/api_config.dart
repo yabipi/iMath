@@ -16,13 +16,13 @@ class ApiConfig {
   //for security reason and the password generated after verification mail
   static const bool signupWithPassword = true;
 
-  static String environment = 'DEV';
+  static String environment = 'PROD';
 
   static String get SERVER_BASE_URL {
-    switch (kReleaseMode) {
-      case true:
+    switch (environment) {
+      case 'PROD':
         return 'http://math.icodelib.cn';
-      case false:
+      case 'DEV':
         return 'http://192.168.1.100:8080';
       default:
         return 'http://localhost:8080';
