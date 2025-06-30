@@ -8,6 +8,8 @@ import 'package:imath/pages/question/edit_question.dart';
 import 'package:imath/pages/question/questions_screen.dart';
 import 'package:imath/pages/user/about_me.dart';
 import 'package:imath/pages/user/login_screen.dart';
+import 'package:imath/pages/user/pincode_input.dart';
+
 import 'package:imath/pages/user/profile_screen.dart';
 import 'package:imath/pages/user/phone_code_verify.dart';
 
@@ -66,7 +68,7 @@ final router = GoRouter(
     ),
     GoRoute(
       path: '/verifycode',
-      builder: (context, state) => PhoneCodeVerifyView(),
+      builder: (context, state) => PinputScreen(),
     ),
   ],
 );
