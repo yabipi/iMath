@@ -15,7 +15,7 @@ class ApiInterceptor extends Interceptor {
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     // print("请求之前");
     // 在请求之前添加头部或认证信息
-    print(options.path);
+    // print(options.path);
     String token = GStorage.userInfo.get('token') ?? '';
 
     if (token.isNotEmpty) {

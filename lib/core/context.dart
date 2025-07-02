@@ -40,6 +40,13 @@ extension Context on BuildContext{
     );
   }
 
+  void showDlg(String msg) {
+    ScaffoldMessenger.of(this).showSnackBar(
+      SnackBar(content: Text(msg)),
+    );
+  }
+
+
   void refreshToken() {
     token = GStorage.userInfo.get('token') ?? '';
     if (token!.isNotEmpty) {

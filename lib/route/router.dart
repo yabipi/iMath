@@ -1,3 +1,4 @@
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imath/pages/culture/culture_screen.dart';
 import 'package:imath/pages/knowledge/add_knowledge.dart';
@@ -11,10 +12,11 @@ import 'package:imath/pages/user/login_screen.dart';
 import 'package:imath/pages/user/pincode_input.dart';
 
 import 'package:imath/pages/user/profile_screen.dart';
-import 'package:imath/pages/user/phone_code_verify.dart';
+
 
 final router = GoRouter(
   initialLocation: '/knowledge',
+  observers: [FlutterSmartDialog.observer],
   redirect: (context, state) => state.uri.toString() == '/' ? '/knowledge' : null,
   routes: [
     GoRoute(

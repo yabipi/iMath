@@ -95,6 +95,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GStorage.init();
   Request();
+  await Request.setCookie();
   // ApiConfig.environment = Environment.DEV; // 或 Environment.PROD
   ApiConfig.environment =
       const String.fromEnvironment('ENV', defaultValue: 'PROD');
@@ -124,6 +125,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       routerConfig: router,
+      builder: FlutterSmartDialog.init(),
     );
   }
 }
