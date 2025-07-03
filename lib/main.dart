@@ -7,7 +7,7 @@ import 'package:imath/route/router.dart';
 import 'package:imath/services/connectivity_service.dart';
 import 'package:imath/utils/device_util.dart';
 
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+// import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:imath/http/index.dart';
 
 import 'package:imath/config/api_config.dart';
@@ -69,8 +69,8 @@ Future<void> initializeApp() async {
   await initMathData();
   if (DeviceUtil.isMobile) {
     // Initialize FFI
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
+    // sqfliteFfiInit();
+    // databaseFactory = databaseFactoryFfi;
   }
 
   //  初始化认证服务

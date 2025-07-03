@@ -1,14 +1,13 @@
 import 'dart:async';
-import '../../models/user.dart';
-import '../../utils/code_utils.dart';
+import '../lib/models/user.dart';
+import '../lib/utils/code_utils.dart';
 
 import 'package:flutter/foundation.dart';
-import '../sql_provider.dart';
+import 'sql_provider.dart';
 
 import 'package:sqflite/sqflite.dart';
 
 /// 用户表
-/// Created by guoshuyu
 /// Date: 2018-08-07
 
 class UserInfoDbProvider extends BaseDbProvider {

@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:sqflite/sqflite.dart';
 
-import '../models/user.dart';
-import '../repository/user_repository.dart';
+import '../lib/models/user.dart';
+import '../lib/repository/user_repository.dart';
 
 /// 数据库管理
 /// Date: 2018-08-03
