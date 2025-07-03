@@ -1,5 +1,6 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
+import 'package:imath/models/user.dart';
 import 'package:imath/pages/culture/culture_screen.dart';
 import 'package:imath/pages/knowledge/add_knowledge.dart';
 import 'package:imath/pages/knowledge/edit_knowledge.dart';
@@ -12,6 +13,7 @@ import 'package:imath/pages/user/login_screen.dart';
 import 'package:imath/pages/user/pincode_input.dart';
 
 import 'package:imath/pages/user/profile_screen.dart';
+import 'package:imath/pages/user/register.dart';
 
 
 final router = GoRouter(
@@ -33,7 +35,10 @@ final router = GoRouter(
     ),
     GoRoute(
       path: '/profile',
-      builder: (context, state) => ProfileScreen(),
+      builder: (context, state) {
+        final user = state.extra as User?;
+        return ProfileScreen(user:  user);
+      },
     ),
 
     GoRoute(
@@ -69,8 +74,15 @@ final router = GoRouter(
       builder: (context, state) => LoginScreen(),
     ),
     GoRoute(
+      path: '/register',
+      builder: (context, state) => RegisterPage(),
+    ),
+    GoRoute(
       path: '/verifycode',
-      builder: (context, state) => PinputScreen(),
+      builder: (context, state) {
+        final String? phone = state.uri.queryParameters['phone'];
+        return PinputScreen(phone:  phone??'');
+      },
     ),
   ],
 );

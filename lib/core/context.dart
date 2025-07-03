@@ -54,8 +54,8 @@ extension Context on BuildContext{
         Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
         // final role = decodedToken['role'];
         // print('Role: $role');
-        currentUser = User(name: decodedToken['username']);
-        print(currentUser?.name);
+        currentUser = User(username: decodedToken['username']);
+        print(currentUser?.username);
         // final exp = decodedToken['exp'];
         // 格式化 exp 时间戳为可读的日期时间格式
         // final formattedExp = DateTime.fromMillisecondsSinceEpoch(exp * 1000).toString();

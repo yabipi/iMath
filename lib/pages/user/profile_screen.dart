@@ -87,7 +87,7 @@ class ProfileScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 // 用户名
                 Text(
-                  (user?.name)!,
+                  (user?.username)!,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,

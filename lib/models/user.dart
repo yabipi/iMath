@@ -1,14 +1,14 @@
 class User {
   String? login;
-  String? id;
-  final String name;
+  int? id;
+  final String username;
   final String? avatar;
   final String? phone;
   final String? wechatId;
   final DateTime? createdAt;
 
   User({
-    required this.name,
+    required this.username,
     this.id,
     this.login,
     this.avatar,
@@ -21,11 +21,11 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'],
-      name: json['name'],
-      avatar: json['avatar'],
+      username: json['username'],
+      // avatar: json['avatar'],
       phone: json['phone'],
-      wechatId: json['wechatId'],
-      createdAt: DateTime.parse(json['createdAt']),
+      // wechatId: json['wechatId'],
+      // createdAt: DateTime.parse(json['createdAt']),
     );
   }
 
@@ -33,7 +33,7 @@ class User {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'name': name,
+      'name': username,
       'avatar': avatar,
       'phone': phone,
       'wechatId': wechatId,

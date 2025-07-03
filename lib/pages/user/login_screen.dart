@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
+import 'package:imath/http/auth.dart';
 
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../controllers/login_controller.dart';
@@ -121,62 +123,17 @@ class LoginScreen extends StatelessWidget{
                                     )
                                 ),
                                 const SizedBox(height: 16),
-                                Row(
-                                  children: [
-                                      Spacer(),
-                                      SizedBox(
-                                          width: 160,
-                                          child: TextFormField(
-                                            controller: controller.codeController,
-                                            decoration: const InputDecoration(
-                                              labelText: '验证码',
-                                              prefixIcon: Icon(Icons.lock),
-                                              border: OutlineInputBorder(),
-                                            ),
-                                            keyboardType: TextInputType.number,
-                                            validator: (value) {
-                                              if (value == null ||
-                                                  value.isEmpty) {
-                                                return '请输入验证码';
-                                              }
-                                              if (value.length != 6) {
-                                                return '验证码必须是6位数字';
-                                              }
-                                              return null;
-                                            },
-                                          )
-                                      ),
-                                      const SizedBox(width: 16),
-                                      SizedBox(
-                                        width: 100,
-                                        child: ElevatedButton(
-                                          onPressed:
-                                              _countdown > 0 ? null : controller.sendCode,
-                                          child: Text(
-                                            _countdown > 0
-                                                ? '${_countdown}s'
-                                                : '获取验证码',
-                                          ),
-                                        ),
-                                      ),
-                                      Spacer(),
-                                    ],
-                                ),
-                                const SizedBox(height: 24),
                                 ElevatedButton(
-                                  onPressed:
-                                      _isLoading ? null : controller.loginWithPhoneCode,
-                                  style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16),
-                                  ),
-                                  child: _isLoading
-                                      ? const CircularProgressIndicator()
-                                      : const Text('登录'),
-                                ),
-                                const SizedBox(height: 24),
-                                ElevatedButton(
-                                  onPressed: () => context.go('/verifycode'),
+                                  onPressed: () {
+                                    String phone = controller.phoneController.text;
+                                    if (phone.isEmpty || phone.length < 11) {
+                                      SmartDialog.showToast('请输入手机号');
+                                      return;
+                                    }
+                                    AuthHttp.sendCaptcha(phone);
+                                    context.go('/verifycode?phone=${phone}');
+                                    SmartDialog.showToast('验证码已发送');
+                                  },
                                   style: ElevatedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 16),
@@ -236,18 +193,36 @@ class LoginScreen extends StatelessWidget{
                                     },
                                   )),
                               const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: _isLoading
-                                    ? null
-                                    : controller.login,
-                                style: ElevatedButton.styleFrom(
-                                  padding:
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      padding:
                                       const EdgeInsets.symmetric(vertical: 16),
-                                ),
-                                child: _isLoading
-                                    ? const CircularProgressIndicator()
-                                    : const Text('登录'),
+                                    ),
+                                    onPressed: () {
+                                      context.go('/register');
+                                    },
+                                    child: const Text('注册'),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  ElevatedButton(
+                                    onPressed: _isLoading
+                                        ? null
+                                        : controller.login,
+                                    style: ElevatedButton.styleFrom(
+                                      padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
+                                    ),
+                                    child: _isLoading
+                                        ? const CircularProgressIndicator()
+                                        : const Text('登录'),
+                                  ),
+
+                                ],
                               ),
+
                             ],
                           ),
                         ),

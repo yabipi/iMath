@@ -3,12 +3,14 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:imath/http/auth.dart';
+import 'package:imath/models/user.dart';
 import 'package:imath/widgets/timer_button.dart';
 import 'package:pinput/pinput.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class PinputScreen extends StatefulWidget {
-  const PinputScreen({Key? key}) : super(key: key);
+  final String phone;
+  const PinputScreen({Key? key, required this.phone}) : super(key: key);
 
   @override
   State<PinputScreen> createState() => _PinputScreenState();
@@ -43,16 +45,19 @@ class _PinputScreenState extends State<PinputScreen> {
     super.initState();
     timerBtn = OtpTimerButton(
       onPressed: () {
-        AuthHttp.sendCaptcha();
+        AuthHttp.sendCaptcha(widget.phone);
         SmartDialog.showToast('验证码已重新发送');
         timerBtnController?.startTimer();
       },
       text: Text('重新发送验证码'),
-      duration: 6,
+      duration: 60,
     );// 初始化控制器
     timerBtnController = timerBtn?.controller;
-    AuthHttp.sendCaptcha();
-    SmartDialog.showToast('验证码已发送');
+    // AuthHttp.sendCaptcha();
+
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   SmartDialog.showToast('验证码已发送');
+    // });
 
     timerBtn.controller?.startTimer();
   }
@@ -120,10 +125,11 @@ class _PinputScreenState extends State<PinputScreen> {
                         },
                         hapticFeedbackType: HapticFeedbackType.lightImpact,
                         onCompleted: (pin) async {
-                          final response = await AuthHttp.verifyCaptcha(pin);
+                          final response = await AuthHttp.verifyCaptcha(pin, widget.phone);
                           if (response['code'] == 1) {
                             // SmartDialog.showToast('验证码正确');
-                            context.go('/profile');
+                            final user = User.fromJson(response['data']);
+                            context.go('/profile', extra: user);
                           } else {
                             SmartDialog.showToast('验证码错误');
                             timerBtnController?.enableButton();
