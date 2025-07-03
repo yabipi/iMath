@@ -81,16 +81,16 @@ void main() async {
   logger.d('Starting app...', version());
 
   // 判断当前运行环境
-  if (Platform.isAndroid) {
-    logger.d('当前运行环境是 Android');
-  } else if (Platform.isIOS) {
-    logger.d('当前运行环境是 iOS');
-  } else if (Platform.isLinux) {
-    logger.d('当前运行环境是 Web');
-    // await TeXRenderingServer.start();
-  } else {
-    logger.d('当前运行环境是其他平台');
-  }
+  // if (Platform.isAndroid) {
+  //   logger.d('当前运行环境是 Android');
+  // } else if (Platform.isIOS) {
+  //   logger.d('当前运行环境是 iOS');
+  // } else if (Platform.isLinux) {
+  //   logger.d('当前运行环境是 Linux桌面');
+  //   // await TeXRenderingServer.start();
+  // } else {
+  //   logger.d('当前运行环境是其他平台');
+  // }
 
   WidgetsFlutterBinding.ensureInitialized();
   await GStorage.init();
