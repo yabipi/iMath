@@ -5,6 +5,12 @@
 # Run
 Android studio里设置additional run args: --dart-define-from-file=.env/dev.json
 
+# 构建
+flutter run --flavor staging --dart-define=HOST="test"
+flutter run --flavor staging --dart-define-from-file=.staging.json
+flutter build ios --release --flavor staging --dart-define-from-file=.staging.json
+flutter build apk --release --flavor staging --dart-define-from-file=.staging.json
+
 ## Flutter指引
 
 This project is a starting point for a Flutter application.

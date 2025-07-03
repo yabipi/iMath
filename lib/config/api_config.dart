@@ -23,7 +23,8 @@ class ApiConfig {
       case 'PROD':
         return 'http://math.icodelib.cn';
       case 'DEV':
-        return 'http://192.168.1.100:8080';
+        // return 'http://192.168.1.100:8080';
+        return 'http://math.icodelib.cn';
       default:
         return 'http://localhost:8080';
     }
