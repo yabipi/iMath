@@ -11,6 +11,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 // import 'package:dio_http2_adapter/dio_http2_adapter.dart';
 import 'package:hive/hive.dart';
 import 'package:imath/db/Storage.dart';
+import 'package:imath/utils/device_util.dart';
 import 'package:imath/utils/utils.dart';
 // import 'package:pilipala/utils/id_utils.dart';
 // import '../utils/storage.dart';
@@ -39,13 +40,16 @@ class Request {
   static setCookie() async {
     // Box userInfoCache = GStrorage.userInfo;
     // Box setting = GStrorage.setting;
-    final String cookiePath = await Utils.getCookiePath();
-    final PersistCookieJar cookieJar = PersistCookieJar(
-      ignoreExpires: true,
-      storage: FileStorage(cookiePath),
-    );
-    cookieManager = CookieManager(cookieJar);
-    dio.interceptors.add(cookieManager);
+    if (!DeviceUtil.isWeb) {
+      final String cookiePath = await Utils.getCookiePath();
+      final PersistCookieJar cookieJar = PersistCookieJar(
+        ignoreExpires: true,
+        storage: FileStorage(cookiePath),
+      );
+      cookieManager = CookieManager(cookieJar);
+      dio.interceptors.add(cookieManager);
+    }
+
     // final List<Cookie> cookie = await cookieManager.cookieJar
     //     .loadForRequest(Uri.parse(HttpString.baseUrl));
     // final userInfo = userInfoCache.get('userInfoCache');
@@ -164,6 +168,7 @@ class Request {
       receiveTimeout: const Duration(milliseconds: 12000),
       //Http请求头.
       headers: {},
+      // withCredentials: true, // 关键：允许携带 Cookie
     );
 
     enableSystemProxy = false;

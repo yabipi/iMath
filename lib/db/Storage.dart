@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
+import 'package:imath/utils/device_util.dart';
 import 'package:path_provider/path_provider.dart';
 
 abstract class Storage {
@@ -27,9 +28,15 @@ class GStorage {
   static late final Box<dynamic> mathdata;
 
   static Future<void> init() async {
-    final Directory dir = await getApplicationSupportDirectory();
-    final String path = dir.path;
-    await Hive.initFlutter('$path/hive');
+    if (!DeviceUtil.isWeb) {
+      final Directory dir = await getApplicationSupportDirectory();
+      final String path = dir.path;
+      await Hive.initFlutter('$path/hive');
+    } else {
+      // 初始化
+      await Hive.initFlutter(); // Web 端自动适配
+    }
+
     regAdapter();
     // 登录用户信息
     userInfo = await Hive.openBox(

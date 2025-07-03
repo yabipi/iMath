@@ -59,6 +59,7 @@ dependencies:
   pinput: ^5.0.1
   pin_code_fields: ^8.0.1
   google_fonts: ^6.2.1
+  universal_platform: ^1.1.0
 #    git:
 ##      url: https://github.com/yabipi/flutter_math.git
 #      # 如果需要特定分支
