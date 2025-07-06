@@ -132,10 +132,12 @@ class MyApp extends StatelessWidget {
     // 将初始数据挂载到context上
     context.refreshToken();
     final originalMap = GStorage.userInfo.get('user');
-    final Map<String, dynamic> userJson = Map<String, dynamic>.from(originalMap);
-    if (userJson != null) {
-      final user = User.fromJson(userJson);
-      context.currentUser = user;
+    if (originalMap != null) {
+      final Map<String, dynamic> userJson = Map<String, dynamic>.from(originalMap);
+      if (userJson != null) {
+        final user = User.fromJson(userJson);
+        context.currentUser = user;
+      }
     }
 
     String? categoriesStr = GStorage.mathdata.get(CATEGORIES_KEY);
