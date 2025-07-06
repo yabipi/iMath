@@ -43,7 +43,6 @@ class MyHttpOverrides extends HttpOverrides {
     return super.createHttpClient(context)
       ..badCertificateCallback =
       (X509Certificate cert, String host, int port) => true;
-
   }
 }
 
@@ -107,7 +106,7 @@ void main() async {
   Request();
   await Request.setCookie();
 
-  String env = String.fromEnvironment('ENV', defaultValue: 'DEV');
+  String env = const String.fromEnvironment('ENV', defaultValue: 'DEV');
   ApiConfig.environment = Environment.values.byName(env);
   if (kReleaseMode) {
     ApiConfig.environment = Environment.PROD;
