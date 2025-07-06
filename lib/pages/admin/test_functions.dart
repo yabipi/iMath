@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:imath/pages/demo/simple_list_view.dart';
 import 'package:imath/pages/question/slide_question.dart';
 
@@ -10,6 +11,12 @@ class TestFunctionsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("测试功能"),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            context.pop();
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

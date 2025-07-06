@@ -30,6 +30,9 @@ class GStorage {
   static Future<void> init() async {
     if (!DeviceUtil.isWeb) {
       final Directory dir = await getApplicationSupportDirectory();
+      // final Directory dir = await getApplicationDocumentsDirectory();
+      // final dir = await getApplicationDocumentsDirectory();
+      // Hive.defaultDirectory = dir.path;
       final String path = dir.path;
       await Hive.initFlutter('$path/hive');
     } else {

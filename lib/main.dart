@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+// import 'package:flutter_linux_webview/flutter_linux_webview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 import 'package:flutter/material.dart';
+
+import 'package:imath/models/user.dart';
 import 'package:imath/route/router.dart';
 import 'package:imath/services/connectivity_service.dart';
 import 'package:imath/utils/device_util.dart';
@@ -11,7 +15,6 @@ import 'package:imath/utils/device_util.dart';
 import 'package:imath/http/index.dart';
 
 import 'package:imath/config/api_config.dart';
-
 
 import 'config/constants.dart';
 
@@ -32,13 +35,15 @@ import 'http/category.dart';
 
 /**
  * 允许加载自签名的ssl证书
+ * 注意: X509Certificate在webview_flutter包中也有定义，所以如果引入webview_flutter会出现冲突
  */
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback = 
-          (X509Certificate cert, String host, int port) => true;
+      ..badCertificateCallback =
+      (X509Certificate cert, String host, int port) => true;
+
   }
 }
 
@@ -63,9 +68,21 @@ Future<void> initMathData() async {
   }
 }
 
+void initWebView() {
+  // Run `LinuxWebViewPlugin.initialize()` first before creating a WebView.
+  // LinuxWebViewPlugin.initialize(options: <String, String?>{
+  //   'user-agent': 'UA String',
+  //   'remote-debugging-port': '8888',
+  //   'autoplay-policy': 'no-user-gesture-required',
+  // });
+
+  // Configure [WebView] to use the [LinuxWebView].
+  // WebView.platform = LinuxWebView();
+}
+
 Future<void> initializeApp() async {
   // final dio = Dio();
-  // context.refreshToken();
+
   await initMathData();
   if (DeviceUtil.isMobile) {
     // Initialize FFI
@@ -84,29 +101,26 @@ Future<void> initializeApp() async {
 void main() async {
   logger.d('Starting app...', version());
 
-  // 判断当前运行环境
-  // if (Platform.isAndroid) {
-  //   logger.d('当前运行环境是 Android');
-  // } else if (Platform.isIOS) {
-  //   logger.d('当前运行环境是 iOS');
-  // } else if (Platform.isLinux) {
-  //   logger.d('当前运行环境是 Linux桌面');
-  //   // await TeXRenderingServer.start();
-  // } else {
-  //   logger.d('当前运行环境是其他平台');
-  // }
-
   WidgetsFlutterBinding.ensureInitialized();
   await GStorage.init();
+
   Request();
   await Request.setCookie();
+
+  String env = String.fromEnvironment('ENV', defaultValue: 'DEV');
+  ApiConfig.environment = Environment.values.byName(env);
+  if (kReleaseMode) {
+    ApiConfig.environment = Environment.PROD;
+  }
   // ApiConfig.environment = Environment.DEV; // 或 Environment.PROD
-  ApiConfig.environment =
-      const String.fromEnvironment('ENV', defaultValue: 'PROD');
   logger.d('environment: ${ApiConfig.environment}, SERVER_BASE_URL: ${ApiConfig.SERVER_BASE_URL}');
 
   HttpOverrides.global = MyHttpOverrides();
   await initializeApp();
+  if (DeviceUtil.isLinux) {
+    // initWebView();
+  }
+
   runApp(MyApp());
 }
 
@@ -116,7 +130,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 将初始数据挂载到context上
     context.refreshToken();
+    final originalMap = GStorage.userInfo.get('user');
+    final Map<String, dynamic> userJson = Map<String, dynamic>.from(originalMap);
+    if (userJson != null) {
+      final user = User.fromJson(userJson);
+      context.currentUser = user;
+    }
+
     String? categoriesStr = GStorage.mathdata.get(CATEGORIES_KEY);
     if (categoriesStr != null) {
       Map<String, dynamic> _categories = json.decode(categoriesStr ?? '{}');

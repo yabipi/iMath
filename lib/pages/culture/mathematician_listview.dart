@@ -13,7 +13,7 @@ class MathematicianListview extends StatefulWidget {
 }
 
 class MathematicianListviewState extends State<MathematicianListview> with AutomaticKeepAliveClientMixin {
-  List<Mathematician> _mathematicians = [...mathematicians];
+  // List<Mathematician> _mathematicians = [...mathematicians];
   late Future _future;
 
   @override
@@ -30,11 +30,10 @@ class MathematicianListviewState extends State<MathematicianListview> with Autom
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Refresh data when widget becomes visible
-    _loadData();
+    // _loadData();
   }
 
   void _loadData() {
-    _mathematicians.clear();
     setState(() {
       _future = fetchData();
     });
@@ -106,15 +105,13 @@ class MathematicianListviewState extends State<MathematicianListview> with Autom
       ;
   }
 
-  fetchData() async {
+  Future fetchData() async {
+    List<Mathematician> _mathematicians = [...mathematicians];
     final data = await CultureHttp.loadMathematicians();
     for (var item in data) {
-      _mathematicians.add(Mathematician.fromJson(item));
+      Mathematician m = Mathematician.fromJson(item);
+      _mathematicians.add(m);
     }
-
     return _mathematicians;
   }
-
-
-
  }

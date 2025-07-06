@@ -2,20 +2,20 @@ import 'package:dio/dio.dart';
 import 'package:imath/config/api_config.dart';
 import 'init.dart';
 
-class CultureHttp {
+class ArticleHttp {
 
-  static Future addMathematician(params) async {
+  static Future addArticle(params) async {
     final response = await Request().post(
-      '${ApiConfig.SERVER_BASE_URL}/api/mathematician',
+      '${ApiConfig.SERVER_BASE_URL}/api/article',
       options: Options(contentType: Headers.jsonContentType),
       data:params,
     );
     return response.data;
   }
 
-  static Future loadMathematicians() async {
+  static Future loadArticles() async {
     final response = await Request().get(
-      '${ApiConfig.SERVER_BASE_URL}/api/mathematician'
+        '${ApiConfig.SERVER_BASE_URL}/api/article'
     );
     return response.data;
   }

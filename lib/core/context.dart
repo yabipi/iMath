@@ -9,6 +9,7 @@ import 'package:imath/models/user.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:logger/logger.dart';
 
+
 var logger = Logger(
   printer: PrettyPrinter(
     methodCount: 2, // 显示的堆栈帧数
@@ -32,7 +33,7 @@ extension Context on BuildContext{
 
   static final Map<String, dynamic> _data = {};
   static String? token = null;
-  static User? currentUser;
+  static User? _currentUser;
 
   void showMsg(String msg) {
     ScaffoldMessenger.of(this).showSnackBar(
@@ -51,11 +52,11 @@ extension Context on BuildContext{
     token = GStorage.userInfo.get('token') ?? '';
     if (token!.isNotEmpty) {
       try {
-        Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
+        // Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
         // final role = decodedToken['role'];
         // print('Role: $role');
-        currentUser = User(username: decodedToken['username']);
-        print(currentUser?.username);
+        // currentUser = User(username: decodedToken['username']);
+        // print(currentUser?.username);
         // final exp = decodedToken['exp'];
         // 格式化 exp 时间戳为可读的日期时间格式
         // final formattedExp = DateTime.fromMillisecondsSinceEpoch(exp * 1000).toString();
@@ -81,8 +82,10 @@ extension Context on BuildContext{
     _data.remove(key);
   }
 
-  User? getCurrentUser() {
-    return currentUser;
+  User? get currentUser => _currentUser;
+
+  set currentUser(User? user) {
+    _currentUser = user;
   }
 
   int getCategoryId(String category) {
@@ -99,10 +102,11 @@ extension Context on BuildContext{
     }
   }
 
+
   void logout() {
     GStorage.userInfo.delete('token');
     token = null;
-    currentUser = null;
+    _currentUser = null;
   }
 }
 

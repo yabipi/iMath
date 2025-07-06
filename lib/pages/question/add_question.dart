@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -49,7 +50,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
     String? content = '';
     _contentController.text = content ?? '';
     // 获取全局数据
-    // categories;
+    categories = context.get(CATEGORIES_KEY);
   }
 
   @override
@@ -171,19 +172,14 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
   }
 
   // 新增：全局设置忽略自签署证书
-  void _initHttpClient() {
-    final httpClient = HttpClient();
-    httpClient.badCertificateCallback = (X509Certificate cert, String host, int port) {
-      debugPrint('Ignoring self-signed certificate for $host:$port');
-      return true; // 忽略证书验证
-    };
-  }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _initHttpClient(); // 初始化时设置忽略自签署证书
+  // void _initHttpClient() {
+  //   final httpClient = HttpClient();
+  //   httpClient.badCertificateCallback = (X509Certificate cert, String host, int port) {
+  //     debugPrint('Ignoring self-signed certificate for $host:$port');
+  //     return true; // 忽略证书验证
+  //   };
   // }
+
 
   // 修改：确保图片 URL 使用 HTTPS 协议
   Future<void> _pickImage(ImageSource source) async {
@@ -277,6 +273,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
           );
           // Navigator.pop(context, true);
           // Get.toNamed('/questions');
+          context.go('/questions');
         }
       } else {
         throw Exception('Failed to add question');
@@ -364,7 +361,6 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    categories = context.get(CATEGORIES_KEY);
     return Scaffold(
       appBar: AppBar(
         title: const Text('添加题目'),
@@ -376,22 +372,22 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              DropdownButtonFormField<int>(
-                value: categories!.keys.first as int?,
+              DropdownButtonFormField<String>(
+                value: categories!.keys.first as String?,
                 decoration: const InputDecoration(
                   labelText: '数学分支',
                   border: OutlineInputBorder(),
                 ),
                 items: categories?.keys?.map((String id) {
-                  return DropdownMenuItem<int>(
-                    value: id as int?,
+                  return DropdownMenuItem<String>(
+                    value: id as String?,
                     child: Text(categories![id]!),
                   );
                 }).toList(),
-                onChanged: (int? newValue) {
+                onChanged: (String? newValue) {
                   setState(() {
                     // print('set _selectedBranch = $newValue');
-                    _selectedBranch = newValue!;
+                    _selectedBranch = int.parse(newValue!);
                     // print('_selectedBranch = $_selectedBranch');
                   });
                 },

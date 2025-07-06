@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:imath/widgets/bottom_navigation_bar.dart';
 import '../../models/mathematician.dart';
+import 'article_listview.dart';
 import 'mathematician_detail_screen.dart';
 import 'mathematician_listview.dart';
 
@@ -19,23 +20,21 @@ class _CultureScreenState extends State<CultureScreen> {
 
   void initState() {
     super.initState();
-    // 获取分类数据
-    print('CultureScreen initState');
+
   }
 
 
   @override
   Widget build(BuildContext context) {
-
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('数学文化'),
+          title: const Text('数学世界'),
           bottom: const TabBar(
             tabs: [
               Tab(text: '人物'),
-              Tab(text: '数学故事'),
+              Tab(text: '文章'),
             ],
           ),
         ),
@@ -44,22 +43,7 @@ class _CultureScreenState extends State<CultureScreen> {
             // 数学人物标签页
             MathematicianListview(),
             // 数学故事标签页
-            ListView.builder(
-              itemCount: 10, // 示例数据
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: const EdgeInsets.all(8.0),
-                  child: ListTile(
-                    leading: const Icon(Icons.auto_stories),
-                    title: Text('数学故事 ${index + 1}'),
-                    subtitle: const Text('故事简介...'),
-                    onTap: () {
-                      // 导航到故事详情页
-                    },
-                  ),
-                );
-              },
-            ),
+            ArticleListView(),
           ],
         ),
         bottomNavigationBar: CustomBottomNavigationBar(),

@@ -16,15 +16,15 @@ class ApiConfig {
   //for security reason and the password generated after verification mail
   static const bool signupWithPassword = true;
 
-  static String environment = 'PROD';
+  static Environment environment = Environment.PROD;
 
   static String get SERVER_BASE_URL {
     switch (environment) {
-      case 'PROD':
+      case Environment.PROD:
         return 'http://math.icodelib.cn';
-      case 'DEV':
-        // return 'http://192.168.1.100:8080';
-        return 'http://math.icodelib.cn';
+      case Environment.DEV:
+        return 'http://192.168.1.100:8080';
+        // return 'http://math.icodelib.cn';
       default:
         return 'http://localhost:8080';
     }

@@ -1,10 +1,18 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imath/models/user.dart';
+import 'package:imath/pages/admin/admin_screen.dart';
+import 'package:imath/pages/admin/camera_screen.dart';
+import 'package:imath/pages/admin/pdf_uploader.dart';
+import 'package:imath/pages/admin/test_functions.dart';
+import 'package:imath/pages/culture/add_article.dart';
+import 'package:imath/pages/culture/add_mathematician.dart';
+import 'package:imath/pages/culture/article_viewer.dart';
 import 'package:imath/pages/culture/culture_screen.dart';
 import 'package:imath/pages/knowledge/add_knowledge.dart';
 import 'package:imath/pages/knowledge/edit_knowledge.dart';
 import 'package:imath/pages/knowledge/knowledge_screen.dart';
+import 'package:imath/pages/paper/add_paper_screen.dart';
 import 'package:imath/pages/question/add_question.dart';
 import 'package:imath/pages/question/edit_question.dart';
 import 'package:imath/pages/question/questions_screen.dart';
@@ -28,6 +36,15 @@ final router = GoRouter(
     GoRoute(
       path: '/culture',
       builder: (context, state) => const CultureScreen(),
+      routes: <RouteBase>[ // Add child routes
+        GoRoute(
+          path: 'article',
+          builder: (context, state) {
+            final article = state.extra as Map<String, dynamic>;
+            return ArticleViewer(title: article['title'], content: article['content']);
+          },
+        ),
+      ],
     ),
     GoRoute(
       path: '/questions',
@@ -41,33 +58,14 @@ final router = GoRouter(
       },
     ),
 
+
+    
     GoRoute(
       path: '/about',
       builder: (context, state) => AboutMePage(),
     ),
 
-    GoRoute(
-      path: '/addquestion',
-      builder: (context, state) => AddQuestionScreen(paperId: -1),
-    ),
 
-    GoRoute(
-      path: '/editquestion',
-      builder: (context, state) => const QuestionEditView(),
-    ),
-
-    GoRoute(
-      path: '/addknow',
-      builder: (context, state) => const AddKnowledgeView(),
-    ),
-    GoRoute(
-      path: '/editknow',
-      builder: (context, state) => const EditKnowledgeView(),
-    ),
-    // GoRoute(
-    //   path: '/profile',
-    //   builder: (context, state) => const ProfileScreen(),
-    // ),
     // 用户登录管理相关
     GoRoute(
       path: '/login',
@@ -84,5 +82,61 @@ final router = GoRouter(
         return PinputScreen(phone:  phone??'');
       },
     ),
+    // 管理员入口
+    GoRoute(
+      path: '/admin',
+      builder: (context, state) => AdminScreen(),
+      routes: <RouteBase>[ // Add child routes
+          GoRoute(
+            path: 'addmathematician',
+            builder: (context, state) => AddMathematicianScreen(),
+          ),
+          GoRoute(
+            path: 'addArticle',
+            builder: (context, state) => AddArticlePage(),
+          ),
+
+          GoRoute(
+            path: 'addpaper',
+            builder: (context, state) => AddPaperScreen(),
+          ),
+
+          GoRoute(
+            path: 'addquestion',
+            builder: (context, state) => AddQuestionScreen(paperId: -1),
+          ),
+
+          GoRoute(
+            path: 'editquestion',
+            builder: (context, state) => const QuestionEditView(),
+          ),
+
+          GoRoute(
+            path: 'addknow',
+            builder: (context, state) => const AddKnowledgeView(),
+          ),
+          GoRoute(
+            path: 'editknow',
+            builder: (context, state) => const EditKnowledgeView(),
+          ),
+
+          GoRoute(
+            path: 'addByOCR',
+            builder: (context, state) => const CameraScreen(),
+          ),
+          GoRoute(
+            path: 'addByPDF',
+            builder: (context, state) => PdfUploader(),
+          ),
+          // 测试页面
+          GoRoute(
+            path: 'test',
+            builder: (context, state) => TestFunctionsPage(),
+          ),
+        ],
+
+    ),
+
+
   ],
 );

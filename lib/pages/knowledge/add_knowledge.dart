@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:imath/config/constants.dart';
@@ -30,8 +31,11 @@ class _AddKnowledgeViewState extends State<AddKnowledgeView> {
   @override
   void initState() {
     super.initState();
-    // final String? content = Get.arguments?['markdownContent'] as String?;
-    // _contentController.text = content ?? '';
+    if (mounted) {
+
+    }
+    categories = context.get(CATEGORIES_KEY);
+    debugPrint('');
   }
 
   @override
@@ -65,7 +69,7 @@ class _AddKnowledgeViewState extends State<AddKnowledgeView> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('知识点添加成功')),
           );
-          // Get.toNamed('/knowledge');
+          context.go('/knowledge');
         }
       } else {
         throw Exception('Failed to add knowledge');
@@ -87,7 +91,6 @@ class _AddKnowledgeViewState extends State<AddKnowledgeView> {
 
   @override
   Widget build(BuildContext context) {
-    categories = context.get(CATEGORIES_KEY);
     return Scaffold(
       appBar: AppBar(
         title: const Text('添加知识点'),
@@ -99,21 +102,21 @@ class _AddKnowledgeViewState extends State<AddKnowledgeView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              DropdownButtonFormField<int>(
-                value: categories!.keys.first as int,
+              DropdownButtonFormField<String>(
+                value: categories!.keys.first as String,
                 decoration: const InputDecoration(
                   labelText: '数学分支',
                   border: OutlineInputBorder(),
                 ),
                 items: categories?.keys?.map((String id) {
-                  return DropdownMenuItem<int>(
-                    value: id as int,
+                  return DropdownMenuItem<String>(
+                    value: id as String,
                     child: Text(categories![id]!),
                   );
                 }).toList(),
-                onChanged: (int? newValue) {
+                onChanged: (String? newValue) {
                   setState(() {
-                    _selectedBranch = newValue!;
+                    _selectedBranch = int.parse(newValue!);
                   });
                 },
               ),
@@ -162,17 +165,15 @@ class _AddKnowledgeViewState extends State<AddKnowledgeView> {
                 },
               ),
               const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _isSubmitting ? null : _submitKnowledge,
-                child: _isSubmitting
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Text('提交'),
+              Row(
+                children: [
+                  Spacer(),
+                  ElevatedButton(
+                      onPressed: _isSubmitting ? null : _submitKnowledge,
+                      child: const Text('提交')
+                  ),
+                  Spacer(),
+                ]
               ),
             ],
           ),

@@ -49,23 +49,32 @@ class _AddMathematicianScreenState extends State<AddMathematicianScreen> {
               maxLines: 5,
             ),
             const SizedBox(height: 32.0),
-            ElevatedButton(
-              onPressed: () {
-                CultureHttp.addMathematician({
-                  "name": _nameController.text,
-                  "birth_death": _birthDeathController.text,
-                  "contributions": _achievementsController.text,
-                  "introduction": _biographyController.text
-                });
-                context.go('/culture');
-                // Navigator.pop(context, true);
-              },
-              child: const Text('保存'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    _submit();
+                  },
+                  child: const Text('保存'),
+                ),
+              ],
             ),
+
           ],
         ),
       ),
     );
+  }
+
+  void _submit() async {
+    await CultureHttp.addMathematician({
+      "name": _nameController.text,
+      "birth_death": _birthDeathController.text,
+      "contributions": _achievementsController.text,
+      "introduction": _biographyController.text
+    });
+    context.go('/culture');
   }
 
   @override

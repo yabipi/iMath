@@ -11,7 +11,6 @@ class CategoryPanel extends StatelessWidget {
 
   CategoryPanel({this.onItemTap});
 
-
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> categories = context.get(CATEGORIES_KEY);

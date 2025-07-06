@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.13)
 project(runner LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
+# The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
 set(BINARY_NAME "imath")
 # The unique GTK application identifier for this application. See:
@@ -126,3 +127,22 @@ if(NOT CMAKE_BUILD_TYPE MATCHES "Debug")
   install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
     COMPONENT Runtime)
 endif()
+
+
+# This include() command was automatically added by the flutter_linux_webview
+# plugin when building the app with the plugin. The app executable must be
+# linked to the CEF library for the WebView plugin to work. This command links
+# the app executable to the CEF library.
+#include(flutter/ephemeral/.plugin_symlinks/flutter_linux_webview/linux/cmake/link_to_cef_library.cmake)
+
+# This include() command was automatically added by the flutter_linux_webview
+# plugin when building the app with the plugin. The app executable must be
+# linked to the CEF library for the WebView plugin to work. This command links
+# the app executable to the CEF library.
+#include(flutter/ephemeral/.plugin_symlinks/flutter_linux_webview/linux/cmake/link_to_cef_library.cmake)
+
+# This include() command was automatically added by the flutter_linux_webview
+# plugin when building the app with the plugin. The app executable must be
+# linked to the CEF library for the WebView plugin to work. This command links
+# the app executable to the CEF library.
+#include(flutter/ephemeral/.plugin_symlinks/flutter_linux_webview/linux/cmake/link_to_cef_library.cmake)

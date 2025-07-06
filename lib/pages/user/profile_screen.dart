@@ -24,14 +24,6 @@ class ProfileScreen extends StatelessWidget {
   Future<void> _logout(BuildContext context) async {
     try {
       await controller.logout();
-      if (context.mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => LoginScreen(),
-          ),
-        );
-      }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -45,8 +37,7 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     controller = LoginController(context);
     if (this.user == null) {
-      this.user = context.getCurrentUser();
-      // this.user = Get.arguments?['user'] as User?;
+      this.user = context.currentUser;
     }
     if(this.user == null)
       return LoginScreen();
@@ -193,12 +184,7 @@ class ProfileScreen extends StatelessWidget {
             title: const Text('管理员入口'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AdminScreen(),
-                ),
-              );
+              context.go('/admin');
             },
           ),
         ],

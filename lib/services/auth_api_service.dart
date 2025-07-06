@@ -88,29 +88,6 @@ class AuthApiService extends ApiService {
         .handleAuthorizationResponse(responseUrl.queryParameters);
   }
 
-  Future<dynamic> signIn(username, password) async {
-    final response = await Request().post(signInUrl,
-        options: Options(contentType: Headers.jsonContentType),
-        data: {
-        'username': username,
-        'password': password
-      }
-    );
-    String token = response.data['data'] ?? '';
-    if (token.isNotEmpty) {
-      GStorage.userInfo.put('token', token);
-
-      // Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-      // final role = decodedToken['role'];
-      // print('Role: $role');
-    }
-    return response;
-  }
-
-  Future<dynamic> signOut() async {
-
-  }
-
   Future<Credentials?> authGrantPassword(username, password) async {
     // Make a request to the authorization endpoint that will produce the fully
     // authenticated Client.

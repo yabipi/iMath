@@ -36,7 +36,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.history),
-          label: '数学文化',
+          label: '数学世界',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.quiz),
