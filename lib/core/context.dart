@@ -50,21 +50,21 @@ extension Context on BuildContext{
 
   void refreshToken() {
     token = GStorage.userInfo.get('token') ?? '';
-    if (token!.isNotEmpty) {
-      try {
-        // Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
-        // final role = decodedToken['role'];
-        // print('Role: $role');
-        // currentUser = User(username: decodedToken['username']);
-        // print(currentUser?.username);
-        // final exp = decodedToken['exp'];
-        // 格式化 exp 时间戳为可读的日期时间格式
-        // final formattedExp = DateTime.fromMillisecondsSinceEpoch(exp * 1000).toString();
-        // print('Token Expiration Time: $formattedExp');
-      } catch (e) {
-        log('Error decoding token: $e');
-      }
-    }
+    // if (token!.isNotEmpty) {
+    //   try {
+    //     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
+    //     final role = decodedToken['role'];
+    //     print('Role: $role');
+    //     currentUser = User(username: decodedToken['username']);
+    //     print(currentUser?.username);
+    //     final exp = decodedToken['exp'];
+    //     // 格式化 exp 时间戳为可读的日期时间格式
+    //     final formattedExp = DateTime.fromMillisecondsSinceEpoch(exp * 1000).toString();
+    //     print('Token Expiration Time: $formattedExp');
+    //   } catch (e) {
+    //     log('Error decoding token: $e');
+    //   }
+    // }
   }
 
   // 设置键值对
