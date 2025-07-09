@@ -9,6 +9,7 @@ import 'package:imath/pages/culture/add_article.dart';
 import 'package:imath/pages/culture/add_mathematician.dart';
 import 'package:imath/pages/culture/article_viewer.dart';
 import 'package:imath/pages/culture/culture_screen.dart';
+import 'package:imath/pages/culture/edit_article.dart';
 import 'package:imath/pages/knowledge/add_knowledge.dart';
 import 'package:imath/pages/knowledge/edit_knowledge.dart';
 import 'package:imath/pages/knowledge/knowledge_screen.dart';
@@ -25,7 +26,7 @@ import 'package:imath/pages/user/register.dart';
 
 
 final router = GoRouter(
-  initialLocation: '/knowledge',
+  initialLocation: '/culture',
   observers: [FlutterSmartDialog.observer],
   redirect: (context, state) => state.uri.toString() == '/' ? '/knowledge' : null,
   routes: [
@@ -35,13 +36,17 @@ final router = GoRouter(
     ),
     GoRoute(
       path: '/culture',
-      builder: (context, state) => const CultureScreen(),
+      builder: (context, state) {
+        final String index = state.uri.queryParameters['tab']?? '0';
+        return CultureScreen(initialIndex: int.parse(index));
+      },
+
       routes: <RouteBase>[ // Add child routes
         GoRoute(
           path: 'article',
           builder: (context, state) {
             final article = state.extra as Map<String, dynamic>;
-            return ArticleViewer(title: article['title'], content: article['content']);
+            return ArticleViewer(title: article['title'], articleId: article['id']);
           },
         ),
       ],
@@ -95,7 +100,13 @@ final router = GoRouter(
             path: 'addArticle',
             builder: (context, state) => AddArticlePage(),
           ),
-
+        GoRoute(
+            path: 'editArticle/:articleId',
+            builder: (context, state) {
+              final articleId = state.pathParameters['articleId'];
+              return EditArticlePage(articleId: int.parse(articleId!));
+            },
+          ),
           GoRoute(
             path: 'addpaper',
             builder: (context, state) => AddPaperScreen(),

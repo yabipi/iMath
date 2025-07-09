@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 // import 'package:flutter_linux_webview/flutter_linux_webview.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 import 'package:flutter/material.dart';
@@ -153,6 +155,12 @@ class MyApp extends StatelessWidget {
       ),
       routerConfig: router,
       builder: FlutterSmartDialog.init(),
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        FlutterQuillLocalizations.delegate,
+      ],
     );
   }
 }

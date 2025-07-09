@@ -37,7 +37,7 @@ class NewsTile extends StatelessWidget {
         ClipRRect(
             borderRadius: BorderRadius.circular(6),
             child: Image.network(
-              imgUrl??'https://www.icodelib.cn/news.png',
+              imgUrl??'https://images.icodelib.cn/news.png',
               width: 32,
               height: 32,
               // width: MediaQuery.of(context).size.width,
@@ -73,7 +73,7 @@ class NewsTile extends StatelessWidget {
         ClipRRect(
             borderRadius: BorderRadius.circular(6),
             child: Image.network(
-              imgUrl??'https://www.icodelib.cn/news.png',
+              imgUrl??'https://images.icodelib.cn/news.png',
               width: 32,
               height: 32,
               // width: MediaQuery.of(context).size.width,

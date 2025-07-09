@@ -13,6 +13,22 @@ class ArticleHttp {
     return response.data;
   }
 
+  static Future loadArticle(int? articleId) async {
+    final response = await Request().get(
+      '${ApiConfig.SERVER_BASE_URL}/api/article/${articleId}',
+    );
+    return response.data;
+  }
+
+  static Future updateArticle(int? articleId, params) async {
+    final response = await Request().put(
+      '${ApiConfig.SERVER_BASE_URL}/api/article/${articleId}',
+      options: Options(contentType: Headers.jsonContentType),
+      data:params,
+    );
+    return response.data;
+  }
+
   static Future loadArticles() async {
     final response = await Request().get(
         '${ApiConfig.SERVER_BASE_URL}/api/article'

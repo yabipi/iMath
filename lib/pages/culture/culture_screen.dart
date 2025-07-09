@@ -8,34 +8,41 @@ import 'mathematician_detail_screen.dart';
 import 'mathematician_listview.dart';
 
 class CultureScreen extends StatefulWidget {
-  const CultureScreen({super.key});
+  int initialIndex;
+  CultureScreen({super.key, this.initialIndex = 0});
 
   @override
-  _CultureScreenState createState()  => _CultureScreenState();
-
+  _CultureScreenState createState() => _CultureScreenState();
 }
 
 class _CultureScreenState extends State<CultureScreen> {
   final GlobalKey<MathematicianListviewState> _mathematicianListKey = GlobalKey<MathematicianListviewState>();
+  late int currentIndex;
 
+  @override
   void initState() {
     super.initState();
-
+    currentIndex = widget.initialIndex;
   }
-
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
+      initialIndex: currentIndex,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('数学世界'),
-          bottom: const TabBar(
+          bottom: TabBar(
             tabs: [
               Tab(text: '人物'),
               Tab(text: '文章'),
             ],
+            onTap: (index) {
+              setState(() {
+                currentIndex = index;
+              });
+            },
           ),
         ),
         body: TabBarView(
@@ -50,6 +57,4 @@ class _CultureScreenState extends State<CultureScreen> {
       ),
     );
   }
-
 }
-

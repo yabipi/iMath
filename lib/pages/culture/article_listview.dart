@@ -37,13 +37,27 @@ class _ArticleListViewState extends State<ArticleListView> {
                     physics: ClampingScrollPhysics(),
                     itemBuilder: (context, index) {
                       final item = snapshot.data![index];
-                      return NewsTile(
+                      return Stack(
+                        children: [
+                          NewsTile(
                             title: item['title'],
                             onTap: () {
                               // context.go("/article/${item['id']}");
                               context.go("/culture/article", extra: item);
                             },
-                          );
+                          ),
+                          Positioned(
+                            right: 16,
+                            top: 16,
+                            child: IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () {
+                                context.go("/admin/editArticle/${item['id']}");
+                              },
+                            ),
+                          )
+                        ],
+                      );
                     }),
               ),
             ),

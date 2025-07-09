@@ -26,6 +26,9 @@ samples, guidance on mobile development, and a full API reference.
 
 ## 安装依赖
 flutter pub add markdown_widget
+flutter_screenutil: ^5.9.3
+cached_network_image
+cupertino_icons
 
 ## 构建
 - flutter build apk

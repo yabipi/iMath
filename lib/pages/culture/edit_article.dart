@@ -6,18 +6,24 @@ import 'package:delta_to_html/delta_to_html.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill_delta_from_html/parser/html_to_delta.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:imath/http/article.dart';
 import 'package:path/path.dart' as path;
 
-class AddArticlePage extends StatefulWidget {
+class EditArticlePage extends StatefulWidget {
+  final int? articleId;
+  final String? content;
+
+  EditArticlePage({super.key, this.articleId, this.content});
   @override
-  _AddArticlePageState createState() => _AddArticlePageState();
+  _EditArticlePageState createState() => _EditArticlePageState();
 }
 
-class _AddArticlePageState extends State<AddArticlePage> {
+class _EditArticlePageState extends State<EditArticlePage> {
+  late Future _future;
   final TextEditingController _titleController = TextEditingController();
   // final FleatherController _contentController = FleatherController();
   final QuillController _controller = () {
@@ -49,33 +55,54 @@ class _AddArticlePageState extends State<AddArticlePage> {
   final FocusNode _editorFocusNode = FocusNode();
   final ScrollController _editorScrollController = ScrollController();
 
+  Future<void> _fetchArticle() async {
+    // 假设延迟2秒模拟网络请求
+    // await Future.delayed(Duration(seconds: 2));
+    final article = await ArticleHttp.loadArticle(widget.articleId);
+    var delta = HtmlToDelta().convert(article['content']??'', transformTableAsEmbed: false);
+    _titleController.text = article['title'];
+    // Load document
+    _controller.document = Document.fromDelta(delta);
+    // return article;
+  }
+
   void _submitArticle() async {
-    // TODO: 实现文章提交逻辑
     final title = _titleController.text;
     List deltaJson = _controller.document.toDelta().toJson();
     String html = DeltaToHTML.encodeJson(deltaJson);
     // 可以在这里调用API或进行其他处理
-    await ArticleHttp.addArticle({"title": title, "content": html});
-    SmartDialog.showToast('创建成功');
-    context.go('/culture');
+    await ArticleHttp.updateArticle(widget.articleId, {"title": title, "content": html});
+    SmartDialog.showToast('修改成功');
+    context.go('/culture?tab=1');
   }
 
   @override
   void initState() {
     super.initState();
-    // Load document
-    // _controller.document = Document.fromJson([
-    //   {'insert': '内容'},
-    // ]);
+    _future = _fetchArticle();
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('添加文章'),
+        title: Text('文章编辑'),
       ),
-      body: _buildQuillEditor(),
+      body: FutureBuilder(
+        future: _future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            // final article = snapshot.data;
+            return  _buildQuillEditor();
+          }
+        }
+      )
+
     );
   }
 
@@ -91,55 +118,6 @@ class _AddArticlePageState extends State<AddArticlePage> {
             ),
           ),
           SizedBox(height: 4),
-          // QuillSimpleToolbar(
-          //   controller: _controller,
-          //   // config: QuillSimpleToolbarConfig(
-          //   //   // embedButtons: FlutterQuillEmbeds.toolbarButtons(),
-          //   //   // showClipboardPaste: true,
-          //   //   customButtons: [
-          //   //     // QuillToolbarCustomButtonOptions(
-          //   //     //   icon: const Icon(Icons.add_alarm_rounded),
-          //   //     //   onPressed: () {
-          //   //     //     _controller.document.insert(
-          //   //     //       _controller.selection.extentOffset,
-          //   //     //       TimeStampEmbed(
-          //   //     //         DateTime.now().toString(),
-          //   //     //       ),
-          //   //     //     );
-          //   //     //
-          //   //     //     _controller.updateSelection(
-          //   //     //       TextSelection.collapsed(
-          //   //     //         offset: _controller.selection.extentOffset + 1,
-          //   //     //       ),
-          //   //     //       ChangeSource.local,
-          //   //     //     );
-          //   //     //   },
-          //   //     // ),
-          //   //   ],
-          //   //   buttonOptions: QuillSimpleToolbarButtonOptions(
-          //   //     base: QuillToolbarBaseButtonOptions(
-          //   //       afterButtonPressed: () {
-          //   //         final isDesktop = {
-          //   //           TargetPlatform.linux,
-          //   //           TargetPlatform.windows,
-          //   //           TargetPlatform.macOS
-          //   //         }.contains(defaultTargetPlatform);
-          //   //         if (isDesktop) {
-          //   //           _editorFocusNode.requestFocus();
-          //   //         }
-          //   //       },
-          //   //     ),
-          //   //     linkStyle: QuillToolbarLinkStyleButtonOptions(
-          //   //       validateLink: (link) {
-          //   //         // Treats all links as valid. When launching the URL,
-          //   //         // `https://` is prefixed if the link is incomplete (e.g., `google.com` → `https://google.com`)
-          //   //         // however this happens only within the editor.
-          //   //         return true;
-          //   //       },
-          //   //     ),
-          //   //   ),
-          //   // ),
-          // ),
           QuillSimpleToolbar(controller: _controller),
           Expanded(
             child: QuillEditor(
