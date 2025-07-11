@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'package:imath/widgets/bottom_navigation_bar.dart';
+import 'package:imath/pages/common/bottom_navigation_bar.dart';
 import '../../models/mathematician.dart';
 import 'article_listview.dart';
 import 'mathematician_detail_screen.dart';

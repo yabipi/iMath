@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:imath/components/category_panel.dart';
 
 import 'package:imath/components/math_cell.dart';
-import 'package:imath/pages/question/controller.dart';
+import 'package:imath/http/question.dart';
 
 import '../../config/constants.dart';
 import '../../core/context.dart';
@@ -12,29 +13,69 @@ import '../../models/quiz.dart';
 
 
 class QuestionListview extends StatefulWidget {
-  const QuestionListview({super.key});
+  int? categoryId = ALL_CATEGORY;
+  QuestionListview({super.key, this.categoryId});
 
   @override
   State<QuestionListview> createState() => _QuestionListviewState();
 }
 
 class _QuestionListviewState extends State<QuestionListview> {
-  // final List<Question> controller.questions = [];
+  List<Question> questions = <Question>[];
   final Map<int, bool> _expandedStates = {};
-  late final QuestionController controller;
-  bool _isLoading = false;
 
-  bool _hasMore = true;
-  // int? _selectedCategoryId = -1;
-  bool _isSlidingMode = true; // 新增：滑动模式开关
+  late PageController _pageController; // 新增：用于监听 PageView 滑动事件
+  int? _categoryId;
+  int _currentPage = 1;
 
   @override
   void initState() {
     super.initState();
+    _categoryId = widget.categoryId;
+    _pageController = PageController(); // 初始化 PageController
 
-    // _loadMoreQuestions(categoryId: -1);
+    // 监听 PageView 滑动事件
+    _pageController.addListener(() {
+      if (_pageController.position.pixels == _pageController.position.maxScrollExtent) {
+        // 滑动到最底部，加载更多题目
+        _loadMoreQuestions();
+      }
+    });
   }
 
+  // 新增：加载更多题目的方法
+  Future<void> _loadMoreQuestions() async {
+    await loadMoreQuestions();
+  }
+
+  Future? loadMoreQuestions({int? categoryId, int? pageNo, int? pageSize}) async {
+    // 更新
+    if(categoryId != _categoryId) {
+      questions.clear();
+      setState(() {
+        _categoryId = categoryId;
+      });
+    }
+    if(pageNo != null && pageNo > 0) {
+      _currentPage = pageNo;
+    }
+
+    final response = await QuestionHttp.loadQuestions(categoryId: categoryId??-1, pageNo: _currentPage, pageSize:  pageSize??10);
+    final content = response['data'] ?? [];
+
+    final _questions = content.map<Question?>((json) {
+      try {
+        return Question.fromJson(json);
+      } catch (e) {
+        return null;
+      }
+    })
+        .whereType<Question>()
+        .toList();
+
+    questions.addAll(_questions);
+    _currentPage ++;
+  }
 
   Widget _buildQuestionCard(Question question, int index) {
     if (question.title == null) {
@@ -47,8 +88,8 @@ class _QuestionListviewState extends State<QuestionListview> {
 
     bool isExpanded = _expandedStates[index] ?? false;
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16.0),
+    return SingleChildScrollView(
+      // margin: const EdgeInsets.only(bottom: 16.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -83,13 +124,12 @@ class _QuestionListviewState extends State<QuestionListview> {
                       _expandedStates[index] = !isExpanded;
                     });
                   },
-                  child: Text(isExpanded ? '收起详情' : '查看详情'),
+                  child: Text(isExpanded ? '收起解答' : '查看解答'),
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit),
                   onPressed: () {
-                    // 跳转到问题编辑页面
-                    // Get.toNamed('/editquestion', arguments: {'questionId': question.id});
+                    context.go('/admin/editQuestion?questionId=${question.id}');
                   },
                 ),
               ],
@@ -118,7 +158,7 @@ class _QuestionListviewState extends State<QuestionListview> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '第${controller.questions.indexOf(question) + 1}题',
+              '第${questions.indexOf(question) + 1}题',
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -148,25 +188,26 @@ class _QuestionListviewState extends State<QuestionListview> {
                 TextButton(
                   onPressed: () {
                     setState(() {
-                      _expandedStates[controller.questions.indexOf(question)] =
-                          !(_expandedStates[controller.questions.indexOf(question)] ?? false);
+                      _expandedStates[questions.indexOf(question)] =
+                          !(_expandedStates[questions.indexOf(question)] ?? false);
                     });
                   },
                   child: Text(
-                    _expandedStates[controller.questions.indexOf(question)] ?? false
-                        ? '收起详情'
-                        : '查看详情',
+                    _expandedStates[questions.indexOf(question)] ?? false
+                        ? '收起解答'
+                        : '查看解答',
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit),
                   onPressed: () {
-                    // Get.toNamed('/editquestion', arguments: {'questionId': question.id});
-                  },
-                ),
+                      context.go('/admin/editQuestion?questionId=${question.id}');
+                  }
+                  ),
+
               ],
             ),
-            if (_expandedStates[controller.questions.indexOf(question)] ?? false) ...[
+            if (_expandedStates[questions.indexOf(question)] ?? false) ...[
               const Divider(),
               const Text(
                 '解析和答案:',
@@ -188,73 +229,97 @@ class _QuestionListviewState extends State<QuestionListview> {
     );
   }
 
+  Widget _buildQuestionsPageView() {
+    return PageView.builder(
+          controller: _pageController, // 使用自定义的 PageController
+          physics: const ClampingScrollPhysics(),
+          scrollDirection: Axis.vertical,
+          itemCount: questions.length,
+          itemBuilder: (context, index) {
+            return _buildQuestionCard(questions[index], index);
+          },
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
-    controller = QuestionController(context);
     return FutureBuilder(
-        future: controller.loadMoreQuestions(),
+        future: loadMoreQuestions(categoryId: widget.categoryId, pageNo: 1, pageSize: 10),
         builder: (context, snapshot){
-          List list = controller.questions;
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: CategoryPanel(onItemTap: (int categoryId) {onChangeCategory(categoryId);}),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                ],
-              ),
-              Expanded(
-                child: _isSlidingMode
-                    ? PageView.builder(
-                        scrollDirection: Axis.vertical, // 修改：将滑动方向改为垂直
-                        itemCount: list.length,
-                        itemBuilder: (context, index) {
-                          return _buildSlidingQuestionCard(list[index]);
-                        },
-                    )
-                    :
-                      ListView.builder(
-                        padding: const EdgeInsets.all(16.0),
-                        itemCount: list.length + 1,
-                        itemBuilder: (context, index) {
-                          if (index == list.length) {
-                            if (_isLoading) {
-                              return const Center(
-                                child: Padding(
-                                  padding: EdgeInsets.all(16.0),
-                                  child: CircularProgressIndicator(),
-                                ),
-                              );
-                            }
-                            if (_hasMore) {
-                              return Center(
-                                child: TextButton(
-                                  onPressed: () => controller.loadMoreQuestions(),
-                                  child: const Text('加载更多'),
-                                ),
-                              );
-                            }
-                            return const Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: Text('没有更多题目了'),
-                              ),
-                            );
-                  }
-                  return _buildQuestionCard(list[index], index);
-                },
-                )),
+          List list = questions;
+          return Scaffold(
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                context.go('/admin/addQuestion');
+              },
+              child: const Icon(Icons.add),
+            ),
+            body: Stack(
+              children: [
+                // Padding(
+                //   padding: const EdgeInsets.all(16.0),
+                //   child: CategoryPanel(onItemTap: (int categoryId) {onChangeCategory(categoryId);}),
+                // ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                  ],
+                ),
+                _buildQuestionsPageView()
+                // Expanded(
+                //   child:
+                // )
+                  // _isSlidingMode
+                  //     ? PageView.builder(
+                  //         scrollDirection: Axis.vertical, // 修改：将滑动方向改为垂直
+                  //         itemCount: list.length,
+                  //         itemBuilder: (context, index) {
+                  //           return _buildSlidingQuestionCard(list[index]);
+                  //         },
+                  //     )
+                  //     :
+                  //       ListView.builder(
+                  //         padding: const EdgeInsets.all(16.0),
+                  //         itemCount: list.length + 1,
+                  //         itemBuilder: (context, index) {
+                  //           if (index == list.length) {
+                  //             if (_isLoading) {
+                  //               return const Center(
+                  //                 child: Padding(
+                  //                   padding: EdgeInsets.all(16.0),
+                  //                   child: CircularProgressIndicator(),
+                  //                 ),
+                  //               );
+                  //             }
+                  //             if (_hasMore) {
+                  //               return Center(
+                  //                 child: TextButton(
+                  //                   onPressed: () => controller.loadMoreQuestions(),
+                  //                   child: const Text('加载更多'),
+                  //                 ),
+                  //               );
+                  //             }
+                  //             return const Center(
+                  //               child: Padding(
+                  //                 padding: EdgeInsets.all(16.0),
+                  //                 child: Text('没有更多题目了'),
+                  //               ),
+                  //             );
+                  //   }
+                  //   return _buildQuestionCard(list[index], index);
+                  // },
+                  // )),
 
-            ],
+              ],
+            ),
           );
         });
 
   }
 
-  void onChangeCategory(int categoryId) {
-    controller.onChangeCategory(categoryId as int);
+  Future? onChangeCategory(int? _categoryId) async {
+    _currentPage = 1;
+    questions.clear();
+    await loadMoreQuestions(categoryId: _categoryId);
   }
 }

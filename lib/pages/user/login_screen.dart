@@ -7,7 +7,7 @@ import 'package:imath/http/auth.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../controllers/login_controller.dart';
 // 新增：导入通用导航栏组件
-import '../../widgets/bottom_navigation_bar.dart';
+import '../common/bottom_navigation_bar.dart';
 
 // extends GetView<LoginController>
 class LoginScreen extends StatelessWidget{

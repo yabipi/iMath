@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'package:imath/config/constants.dart';
+import 'package:imath/http/question.dart';
 
 import '../../config/api_config.dart';
+import 'package:imath/core/context.dart';
 
-import 'controller.dart';
 
 class QuestionEditView extends StatefulWidget {
-  const QuestionEditView({super.key});
+  final int questionId;
+  const QuestionEditView({super.key, required this.questionId});
 
   @override
   State<QuestionEditView> createState() => _QuestionEditViewState();
@@ -18,8 +21,17 @@ class QuestionEditView extends StatefulWidget {
 
 class _QuestionEditViewState extends State<QuestionEditView> {
   final _formKey = GlobalKey<FormState>();
+  TextEditingController contentController = TextEditingController();
+  TextEditingController optionsController = TextEditingController();
+  TextEditingController answerController = TextEditingController();
 
-  late QuestionController controller; //Get.find<QuestionController>();
+  late int _questionId;
+  int selectedBranch = ALL_CATEGORY;
+  String selectedType = QuestionTypes[0];
+  List<String> selectedImages = [];
+
+  // 获取全局 Context 实例
+  late final categories;
 
   bool _isSubmitting = false;
   List<String> _selectedImages = [];
@@ -27,8 +39,7 @@ class _QuestionEditViewState extends State<QuestionEditView> {
   @override
   void initState() {
     super.initState();
-    controller.questionId = -1; //Get.arguments['questionId'] as int;
-    controller.loadQuestionFuture = controller.loadQuestion();
+    _questionId = widget.questionId;
   }
 
   @override
@@ -36,6 +47,46 @@ class _QuestionEditViewState extends State<QuestionEditView> {
     super.dispose();
   }
 
+  // 加载题目数据
+  Future loadQuestion() async {
+    try {
+      final question = await QuestionHttp.getQuestion(_questionId);
+      contentController.text = question.content ?? '';
+      optionsController.text = question.options ?? '';
+      answerController.text = question.answer ?? '';
+      selectedBranch = question.categoryId ?? ALL_CATEGORY;
+
+      selectedType = (question.type??'').isEmpty ? QuestionTypes[0] : question.type!;
+      selectedImages = question.images?.split(',') ?? [];
+
+      return question;
+
+    } catch (e) {
+      return null;
+    }
+  }
+  // 提交题目编辑
+  Future<void> updateQuestion() async {
+    try {
+      QuestionHttp.updateQuestion(widget.questionId, {
+        'categoryId': selectedBranch,
+        'content': contentController.text,
+        'options': optionsController.text,
+        'answer': answerController.text,
+        'type': selectedType,
+        // 'images': _selectedImages.join(','),
+      });
+      context.go('/questions');
+
+    } catch (e) {
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('更新失败: $e')),
+      // );
+      rethrow;
+    } finally {
+
+    }
+  }
   // 图片上传逻辑
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -81,13 +132,13 @@ class _QuestionEditViewState extends State<QuestionEditView> {
 
   @override
   Widget build(BuildContext context) {
-    controller = QuestionController(context);
+    final categories = context.get(CATEGORIES_KEY);
     return Scaffold(
       appBar: AppBar(
         title: const Text('编辑题目'),
       ),
       body: FutureBuilder(
-        future: controller.loadQuestionFuture,
+        future: loadQuestion(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done){
             return Form(
@@ -97,29 +148,27 @@ class _QuestionEditViewState extends State<QuestionEditView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    DropdownButtonFormField<int>(
-                      value: controller.selectedBranch,
+                    DropdownButtonFormField<String>(
+                      value: selectedBranch.toString(),
                       decoration: const InputDecoration(
                         labelText: '数学分支',
                         border: OutlineInputBorder(),
                       ),
-                      items: controller.categories?.keys.map<DropdownMenuItem<int>>((int id) {
+                      items: categories?.keys.map<DropdownMenuItem<String>>((String id) {
                         // print(controller.categories![id]);
-                        return DropdownMenuItem<int>(
+                        return DropdownMenuItem<String>(
                           value: id,
-                          child: Text(controller.categories![id]!),
+                          child: Text(categories![id]!),
                         );
                       }).toList(),
-                      onChanged: (int? newValue) {
-                        setState(() {
-                          controller.selectedBranch = newValue!;
-                        });
+                      onChanged: (String? newValue) {
+                        selectedBranch = int.parse(newValue!);
                       },
                     ),
 
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      value: controller.selectedType,
+                      value: selectedType,
                       decoration: const InputDecoration(
                         labelText: '题目类型',
                         border: OutlineInputBorder(),
@@ -131,14 +180,12 @@ class _QuestionEditViewState extends State<QuestionEditView> {
                         );
                       }).toList(),
                       onChanged: (String? newValue) {
-                        setState(() {
-                          // controller.selectedType = newValue!;
-                        });
+                        selectedType = newValue!;
                       },
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
-                      controller: controller.contentController,
+                      controller: contentController,
                       decoration: const InputDecoration(
                         labelText: '题目内容',
                         border: OutlineInputBorder(),
@@ -148,45 +195,38 @@ class _QuestionEditViewState extends State<QuestionEditView> {
                         // if (value == null || value.isEmpty) {
                         //   return '请输入题目内容';
                         // }
-                        // return null;
+
                       },
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
-                      controller: controller.optionsController,
+                      controller: optionsController,
                       decoration: const InputDecoration(
                         labelText: '题目选项',
                         border: OutlineInputBorder(),
                       ),
-                      maxLines: 3,
+                      maxLines: 4,
                       validator: (value) {
 
                       },
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
-                      controller: controller.answerController,
+                      controller: answerController,
                       decoration: const InputDecoration(
                         labelText: '解析和答案',
                         border: OutlineInputBorder(),
                       ),
-                      maxLines: 3,
+                      maxLines: 8,
                       validator: (value) {
-                        // if (value == null || value.isEmpty) {
-                        //   return '请输入题目内容';
-                        // }
-                        // return null;
                       },
                     ),
-
-
                     const SizedBox(height: 16),
                     _buildImageSection(),
                     Row(children: [
                       Spacer(),
                       ElevatedButton(
-                        onPressed: _isSubmitting ? null : controller
-                            .updateQuestion,
+                        onPressed: _isSubmitting ? null : updateQuestion,
                         child: _isSubmitting
                             ? const SizedBox(
                           height: 20,
@@ -205,7 +245,6 @@ class _QuestionEditViewState extends State<QuestionEditView> {
             return _buildLoading();
           }
         }),
-
     );
 
   }

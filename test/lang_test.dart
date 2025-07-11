@@ -14,8 +14,10 @@ void main() {
   });
 
   group('test2', () {
+    // key值不能是String以外类型
     Map<int, String> _categories = {1:'1', 2:'2'};
-    final result = json.encode(_categories);
+    final result = jsonEncode(_categories);
+    final jsonData = jsonDecode(result);
     print(result);
   });
 }

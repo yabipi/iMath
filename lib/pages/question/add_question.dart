@@ -260,7 +260,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
           'content': _contentController.text,
           'options': _optionController.text,
           'answer': _answerController.text,
-          'category': categories?[_selectedBranch],
+          'categoryId': _selectedBranch,
           'type': _selectedType,
           'images': _selectedImages.join(','), // 直接使用 fileId 列表
         },
@@ -309,6 +309,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
           padding: const EdgeInsets.only(bottom: 8.0),
           child: TextFormField(
             controller: _optionController,
+            maxLines: 4,
             decoration: InputDecoration(
               labelText: '选项',
               border: const OutlineInputBorder(),
@@ -342,6 +343,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
             padding: const EdgeInsets.only(bottom: 8.0),
             child: TextFormField(
               controller: _optionControllers[index],
+              maxLines: 4,
               decoration: InputDecoration(
                 labelText: '选项 ${String.fromCharCode(65 + index)}',
                 border: const OutlineInputBorder(),
@@ -386,9 +388,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
                 }).toList(),
                 onChanged: (String? newValue) {
                   setState(() {
-                    // print('set _selectedBranch = $newValue');
                     _selectedBranch = int.parse(newValue!);
-                    // print('_selectedBranch = $_selectedBranch');
                   });
                 },
               ),
@@ -449,6 +449,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _answerController,
+                maxLines: 4,
                 decoration: const InputDecoration(
                   labelText: '解析和答案',
                   border: OutlineInputBorder(),

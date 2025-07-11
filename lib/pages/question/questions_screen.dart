@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:imath/widgets/bottom_navigation_bar.dart';
+import 'package:imath/config/constants.dart';
+import 'package:imath/pages/common/bottom_navigation_bar.dart';
+import 'package:imath/pages/common/knowledge_tree.dart';
 import '../paper/paper_listview.dart';
 import 'question_listview.dart';
 
@@ -12,11 +14,11 @@ class QuestionsScreen extends StatefulWidget {
 
 class _QuestionsScreenState extends State<QuestionsScreen> {
 
+
   @override
   void initState() {
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +27,12 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text(''),
+          leading: Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
+          ),
           bottom: const TabBar(
             tabs: [
               Tab(text: '分类'),
@@ -38,13 +46,30 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
             QuestionListview(),
             // 试卷Tab：显示试卷列表
             PaperListView()
-            // _isPapersLoading
-            //     ? const Center(child: CircularProgressIndicator())
-            //     : PaperListView()
-
           ],
         ),
         bottomNavigationBar: CustomBottomNavigationBar(),
+        // 新增：侧边栏 Drawer
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              const DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                ),
+                child: Text(
+                  '知识树',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                  ),
+                ),
+              ),
+              KnowledgeTree(level: MATH_LEVEL.Primary)
+            ],
+          ),
+        ),
       ),
     );
   }

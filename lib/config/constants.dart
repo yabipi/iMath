@@ -59,10 +59,29 @@ class Constants {
       'https://www.mcbbs.net/template/mcbbs/image/special_photo_bg.png';
 }
 
+const int ALL_CATEGORY = 0;
 const String CATEGORIES_KEY = 'categories';
+const String CATEGORY_PRIMARY = 'primary';
+const String CATEGORY_ADVANCED = 'advanced';
 
 const QuestionTypes = ['单选题', '多选题', '填空题', '解答题'];
 
+enum MATH_LEVEL {
+  Primary,
+  Advanced,
+}
+extension MATH_LEVEL_Extension on MATH_LEVEL {
+  String get value {
+    switch (this) {
+      case MATH_LEVEL.Primary:
+        return '初等数学';
+      case MATH_LEVEL.Advanced:
+        return '高等数学';
+      default:
+        return '';
+    }
+  }
+}
 enum PaperViewMode {
   // 默认
   DefaultMode,

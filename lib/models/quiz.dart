@@ -26,6 +26,7 @@ class Quiz {
 class Question {
   final int id;
   final String? category;
+  final int? categoryId;
   final String? type;
   final String? title;
   final String? content;
@@ -36,6 +37,7 @@ class Question {
   Question({
     required this.id,
     this.category,
+    this.categoryId,
     this.type,
     this.title,
     this.content,
@@ -48,6 +50,7 @@ class Question {
     return Question(
       id: json['id'] ?? 0,
       category: json['category'] as String?,
+      categoryId: json['categoryId'] as int?,
       type: json['type'] as String?,
       title: json['title'] as String?,
       content: json['content'] as String?,

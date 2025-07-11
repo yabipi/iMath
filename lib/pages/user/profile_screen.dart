@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:imath/controllers/login_controller.dart';
 import 'package:imath/core/context.dart';
-import 'package:imath/widgets/bottom_navigation_bar.dart';
+import 'package:imath/pages/common/bottom_navigation_bar.dart';
 import '../../models/user.dart';
 import '../../controllers/user_controller.dart';
 import 'login_screen.dart';

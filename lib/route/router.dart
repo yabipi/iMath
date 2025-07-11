@@ -16,6 +16,7 @@ import 'package:imath/pages/knowledge/knowledge_screen.dart';
 import 'package:imath/pages/paper/add_paper_screen.dart';
 import 'package:imath/pages/question/add_question.dart';
 import 'package:imath/pages/question/edit_question.dart';
+import 'package:imath/pages/question/questions_main.dart';
 import 'package:imath/pages/question/questions_screen.dart';
 import 'package:imath/pages/user/about_me.dart';
 import 'package:imath/pages/user/login_screen.dart';
@@ -53,7 +54,7 @@ final router = GoRouter(
     ),
     GoRoute(
       path: '/questions',
-      builder: (context, state) => const QuestionsScreen(),
+      builder: (context, state) => const QuestionsMain(),
     ),
     GoRoute(
       path: '/profile',
@@ -118,8 +119,11 @@ final router = GoRouter(
           ),
 
           GoRoute(
-            path: 'editquestion',
-            builder: (context, state) => const QuestionEditView(),
+            path: 'editQuestion',
+            builder: (context, state) {
+              final questionId = state.uri.queryParameters['questionId'];
+              return QuestionEditView(questionId: int.parse(questionId!));
+            },
           ),
 
           GoRoute(

@@ -5,7 +5,8 @@ import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:imath/components/category_panel.dart';
 
 import 'package:imath/config/api_config.dart';
-import 'package:imath/widgets/bottom_navigation_bar.dart';
+import 'package:imath/config/constants.dart';
+import 'package:imath/pages/common/bottom_navigation_bar.dart';
 
 import '../../http/init.dart';
 
@@ -18,7 +19,7 @@ class KnowledgeScreen extends StatefulWidget {
 
 class _KnowledgeScreenState extends State<KnowledgeScreen> {
   // 新增：当前选中的分类ID
-  int _selectedCategoryId = -1;
+  int _selectedCategoryId = ALL_CATEGORY;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,29 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
     // SmartDialog.showToast('账号未登录');
     return Scaffold(
       appBar: AppBar(
-        title: const Text('知识点'),
+        title: const Text(''),
+        centerTitle: true, // 确保标题居中
+        flexibleSpace: Padding(
+          padding: const EdgeInsets.symmetric(
+              horizontal: 260.0,
+              vertical: 8.0),
+          child: SizedBox(
+              width: 240,
+              child:TextField(
+                decoration: InputDecoration(
+                  hintText: '搜索...',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24.0),
+                  ),
+                ),
+                onChanged: (value) {
+                  // 在这里处理搜索逻辑
+                },
+              )
+          )
+
+        ),
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu),

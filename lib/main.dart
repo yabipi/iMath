@@ -21,6 +21,7 @@ import 'package:imath/config/api_config.dart';
 import 'config/constants.dart';
 
 import 'core/context.dart';
+import 'core/global.dart';
 import 'db/Storage.dart';
 import 'http/category.dart';
 
@@ -53,12 +54,23 @@ Future<void> initMathData() async {
   bool isConnected = await ConnectivityService.isConnected();
   if (isConnected) {
     final categories = await CategoryHttp.getCategories();
-    Map<String, String> _categories = {'-1': '全部'};
+    Map<String, String> _categories = {ALL_CATEGORY.toString(): '全部'};
+    // 单独存放初等数学和高等数学分类
+    Map<String, String> primary_categories = {};
+    Map<String, String> advanced_categories = {};
     for (var item in categories) {
       _categories[item['ID'].toString()] = item['CategoryName'];
+      if (item['level'] == MATH_LEVEL.Primary.value) {
+        primary_categories[item['ID'].toString()] = item['CategoryName'];
+      }
+      if (item['level'] == MATH_LEVEL.Advanced.value) {
+        advanced_categories[item['ID'].toString()] = item['CategoryName'];
+      }
     }
-    // context.set(CATEGORIES_KEY, _categories);
+    Global.set(MATH_LEVEL.Primary.value, primary_categories);
+    Global.set(MATH_LEVEL.Advanced.value, advanced_categories);
     GStorage.mathdata.put(CATEGORIES_KEY, json.encode(_categories));
+
   } else {
     // String? categoriesStr = GStorage.mathdata.get(CATEGORIES_KEY);
     // if (categoriesStr != null) {

@@ -4,6 +4,7 @@ class MathContent {
   final String? environment;
   final bool hasUnderline;
   final bool isDisplayMode;
+  final bool isLineBreak;
   final bool isSpacing;
   final int spacingCount;
 
@@ -13,6 +14,7 @@ class MathContent {
     this.environment,
     this.hasUnderline = false,
     this.isDisplayMode = false,
+    this.isLineBreak = false,
     this.isSpacing = false,
     this.spacingCount = 0,
   });
@@ -36,6 +38,7 @@ class MathParser {
       // 找到最近的开始标记
       int nextStart = -1;
       String startMarker = '';
+
       if (nextMathStart != -1 &&
           (nextStart == -1 || nextMathStart < nextStart)) {
         nextStart = nextMathStart;
@@ -281,6 +284,56 @@ class MathParser {
       }
     }
 
+    return handleLineBreaks(result);
+  }
+
+  static List<MathContent> handleLineBreaks(List<MathContent> items) {
+    List<MathContent> result = [];
+    for (int i = 0; i < items.length; i++) {
+      MathContent item = items[i];
+      
+      // 如果不包含换行符，直接添加
+      if (!item.content.contains('\n')) {
+        result.add(item);
+        continue;
+      }
+      
+      // 拆分换行符
+      List<String> lines = item.content.split('\n');
+      
+      // 将每个拆分项添加到结果中
+      for (int j = 0; j < lines.length; j++) {
+        String line = lines[j];
+        
+        // 如果是空行，添加一个换行标记
+        if (line.isEmpty) {
+          result.add(MathContent(
+            content: '',
+            isMath: false,
+            isLineBreak: true,
+          ));
+          continue;
+        }
+        
+        // 添加普通文本或数学公式
+        result.add(MathContent(
+          content: line,
+          isMath: item.isMath,
+          environment: item.environment,
+          hasUnderline: item.hasUnderline,
+          isDisplayMode: item.isDisplayMode,
+        ));
+        
+        // 如果不是最后一行，在行末添加换行标记
+        if (j < lines.length - 1) {
+          result.add(MathContent(
+            content: '',
+            isMath: false,
+            isLineBreak: true,
+          ));
+        }
+      }
+    }
     return result;
   }
 }

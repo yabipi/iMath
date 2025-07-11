@@ -57,6 +57,14 @@ class MathCell extends StatelessWidget {
             width: content.spacingCount * 16, // 16 是当前字体大小
           ),
         );
+      } else if (content.isLineBreak) {
+        // 添加换行组件
+        widgets.add(
+          SizedBox(
+            height: 16, // 可根据需要调整高度
+            width: double.infinity, // 宽度填满父容器以实现换行效果
+          ),
+        );
       } else {
         // 处理普通文本
         widgets.add(
