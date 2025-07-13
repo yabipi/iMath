@@ -83,13 +83,19 @@ class _AddArticlePageState extends State<AddArticlePage> {
     return SafeArea(
       child: Column(
         children: [
-          TextField(
-            controller: _titleController,
-            decoration: InputDecoration(
-              labelText: '标题',
-              border: OutlineInputBorder(),
+          Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 10.0,
+                  vertical: 2.0),
+              child: TextField(
+              controller: _titleController,
+              decoration: InputDecoration(
+                labelText: '标题',
+                border: OutlineInputBorder(),
+              ),
             ),
           ),
+
           SizedBox(height: 4),
           // QuillSimpleToolbar(
           //   controller: _controller,
@@ -140,7 +146,29 @@ class _AddArticlePageState extends State<AddArticlePage> {
           //   //   ),
           //   // ),
           // ),
-          QuillSimpleToolbar(controller: _controller),
+          QuillSimpleToolbar(
+              controller: _controller,
+              config: QuillSimpleToolbarConfig(
+                showUndo: false,
+                showRedo: false,
+                showSearchButton: false,
+                showSubscript: false,
+                showSuperscript: false,
+                buttonOptions: QuillSimpleToolbarButtonOptions(
+                  fontSize: QuillToolbarFontSizeButtonOptions(
+                    items: {
+                      '12pt': '12',
+                      '14pt': '14',
+                      '16pt': '16',
+                      '24pt': '24',
+                      '28pt': '28',
+                      '32pt': '32'
+                    },
+                  ),
+                ),
+              ),
+          ),
+
           Expanded(
             child: QuillEditor(
               focusNode: _editorFocusNode,

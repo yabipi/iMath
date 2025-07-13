@@ -24,6 +24,7 @@ import 'package:imath/pages/user/pincode_input.dart';
 
 import 'package:imath/pages/user/profile_screen.dart';
 import 'package:imath/pages/user/register.dart';
+import 'package:imath/pages/user/settings.dart';
 
 
 final router = GoRouter(
@@ -62,14 +63,19 @@ final router = GoRouter(
         final user = state.extra as User?;
         return ProfileScreen(user:  user);
       },
+      routes: <RouteBase>[ // Add child routes
+        GoRoute(
+          path: 'settings',
+          builder: (context, state) => SettingsPage(),
+        ),
+        GoRoute(
+          path: 'about',
+          builder: (context, state) => AboutMePage(),
+        ),
+      ]
     ),
 
 
-    
-    GoRoute(
-      path: '/about',
-      builder: (context, state) => AboutMePage(),
-    ),
 
 
     // 用户登录管理相关
@@ -117,7 +123,13 @@ final router = GoRouter(
             path: 'addquestion',
             builder: (context, state) => AddQuestionScreen(paperId: -1),
           ),
-
+        GoRoute(
+          path: 'editknow',
+          builder: (context, state) {
+            final knowledgeId = state.uri.queryParameters['knowledgeId'];
+            return EditKnowledgeView(knowledgeId: int.parse(knowledgeId!));
+          },
+        ),
           GoRoute(
             path: 'editQuestion',
             builder: (context, state) {
@@ -129,10 +141,6 @@ final router = GoRouter(
           GoRoute(
             path: 'addknow',
             builder: (context, state) => const AddKnowledgeView(),
-          ),
-          GoRoute(
-            path: 'editknow',
-            builder: (context, state) => const EditKnowledgeView(),
           ),
 
           GoRoute(

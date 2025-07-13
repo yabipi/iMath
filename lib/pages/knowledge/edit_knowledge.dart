@@ -2,44 +2,43 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:imath/config/constants.dart';
 import 'package:imath/core/context.dart';
+import 'package:imath/mixins/category_mixin.dart';
 import '../../config/api_config.dart';
 import '../../http/init.dart';
 
-class EditKnowledgeView extends StatefulWidget {
-  // final int knowledgeId;
-  const EditKnowledgeView({super.key});
+class EditKnowledgeView extends ConsumerStatefulWidget {
+  final int knowledgeId;
+  const EditKnowledgeView({super.key, required this.knowledgeId});
 
   @override
-  State<EditKnowledgeView> createState() => _EditKnowledgeViewState();
+  ConsumerState<EditKnowledgeView> createState() => _EditKnowledgeViewState();
 }
 
-class _EditKnowledgeViewState extends State<EditKnowledgeView> {
-  late Map<String, dynamic> categories;
+class _EditKnowledgeViewState extends ConsumerState<EditKnowledgeView> with CategoryMixin {
   int knowledgeId = 0;
-
+  late Map<String, String> categories;
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
   final _levelController = TextEditingController();
-  int _selectedBranch = 0;
+  String? _selectedCategory;
   bool _isSubmitting = false;
-
-
 
   @override
   void initState(){
     super.initState();
     _fetchKnowledge();
-    // _contentController.text =
   }
 
   Future<void> _fetchKnowledge() async {
     // knowledgeId = Get.arguments['knowledgeId'] as int;
-    final response = await Request().get('${ApiConfig.SERVER_BASE_URL}/api/know/${knowledgeId}');
+    final response = await Request().get('${ApiConfig.SERVER_BASE_URL}/api/know/${widget.knowledgeId}');
     String title = response.data['know_item']['Title'];
     String content = response.data['know_item']['Content'];
     String category = response.data['know_item']['category'];
@@ -48,10 +47,9 @@ class _EditKnowledgeViewState extends State<EditKnowledgeView> {
       _titleController.text = title;
       _contentController.text = content ?? '';
       // 修改: 使用函数式编程找到对应的分类ID
-      _selectedBranch = categories?.entries.firstWhere((entry) => entry.value == category).key as int ?? 0;
+      _selectedCategory = category;
+      // _selectedCategory = categories?.entries.firstWhere((entry) => entry.value == category).key as int ?? 0;
     });
-
-    // print(_selectedBranch);
   }
 
   @override
@@ -62,23 +60,19 @@ class _EditKnowledgeViewState extends State<EditKnowledgeView> {
     super.dispose();
   }
 
-  Future<void> _submitKnowledge() async {
+  Future<void> _updateKnowledge() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    setState(() {
-      _isSubmitting = true;
-    });
-
     try {
       final response = await Request().put(
-        '${ApiConfig.SERVER_BASE_URL}/api/know/${knowledgeId}',
+        '${ApiConfig.SERVER_BASE_URL}/api/know/${widget.knowledgeId}',
         options: Options(contentType: Headers.jsonContentType),
         data: {
           'title': _titleController.text,
           'content': _contentController.text,
-          'category': categories?[_selectedBranch],
+          'category': categories?[_selectedCategory],
           // 'level': _levelController.text,
         },
       );
@@ -86,10 +80,9 @@ class _EditKnowledgeViewState extends State<EditKnowledgeView> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('知识点添加成功')),
+            const SnackBar(content: Text('知识点修改成功')),
           );
-          // Navigator.pop(context, true);
-          // Get.toNamed('/knowledge');
+          context.go('/knowledge');
         }
       } else {
         throw Exception('Failed to edit knowledge');
@@ -111,10 +104,10 @@ class _EditKnowledgeViewState extends State<EditKnowledgeView> {
 
   @override
   Widget build(BuildContext context) {
-    categories = context.get(CATEGORIES_KEY);
+    categories = getCategories(ref);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('添加知识点'),
+        title: const Text('编辑知识点'),
       ),
       body: Form(
         key: _formKey,
@@ -123,21 +116,21 @@ class _EditKnowledgeViewState extends State<EditKnowledgeView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              DropdownButtonFormField<int>(
-                value: _selectedBranch == 0? categories?.keys.first as int? : _selectedBranch,
+              DropdownButtonFormField<String>(
+                value: _selectedCategory,
                 decoration: const InputDecoration(
                   labelText: '数学分支',
                   border: OutlineInputBorder(),
                 ),
-                items: categories?.keys?.map((String id) {
-                  return DropdownMenuItem<int>(
-                    value: id as int,
-                    child: Text(categories![id]!),
+                items: categories?.values?.map((String category) {
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Text(category),
                   );
                 }).toList(),
-                onChanged: (int? newValue) {
+                onChanged: (String? newValue) {
                   setState(() {
-                    _selectedBranch = newValue!;
+                    _selectedCategory = newValue!;
                   });
                 },
               ),
@@ -172,25 +165,12 @@ class _EditKnowledgeViewState extends State<EditKnowledgeView> {
                 },
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _levelController,
-                decoration: const InputDecoration(
-                  labelText: '适用年级',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  // if (value == null || value.isEmpty) {
-                  //   return '请输入适用年级';
-                  // }
-                  // return null;
-                },
-              ),
-              const SizedBox(height: 24),
+
               Row(
                 children: [
                   Spacer(),
                   ElevatedButton(
-                    onPressed: _isSubmitting ? null : _submitKnowledge,
+                    onPressed: _isSubmitting ? null : _updateKnowledge,
                     child: _isSubmitting
                         ? const SizedBox(
                           height: 20,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:gpt_markdown/gpt_markdown.dart';
-import 'package:imath/components/category_panel.dart';
+import 'package:imath/pages/common/category_panel.dart';
 
 import 'package:imath/components/math_cell.dart';
 import 'package:imath/http/question.dart';
@@ -246,7 +246,7 @@ class _QuestionListviewState extends State<QuestionListview> {
     return FutureBuilder(
         future: loadMoreQuestions(categoryId: widget.categoryId, pageNo: 1, pageSize: 10),
         builder: (context, snapshot){
-          List list = questions;
+          // List list = questions;
           return Scaffold(
             floatingActionButton: FloatingActionButton(
               onPressed: () {

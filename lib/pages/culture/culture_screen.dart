@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:imath/pages/common/bottom_navigation_bar.dart';
 import '../../models/mathematician.dart';
@@ -44,6 +45,12 @@ class _CultureScreenState extends State<CultureScreen> {
               });
             },
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            context.go('/admin/addArticle');
+          },
+          child: const Icon(Icons.add),
         ),
         body: TabBarView(
           children: [

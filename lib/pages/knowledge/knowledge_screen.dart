@@ -1,28 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:gpt_markdown/gpt_markdown.dart';
-import 'package:imath/components/category_panel.dart';
+import 'package:imath/mixins/category_mixin.dart';
+import 'package:imath/pages/common/category_panel.dart';
 
 import 'package:imath/config/api_config.dart';
 import 'package:imath/config/constants.dart';
 import 'package:imath/pages/common/bottom_navigation_bar.dart';
+import 'package:imath/providers/settings_provider.dart';
 
 import '../../http/init.dart';
 
-class KnowledgeScreen extends StatefulWidget {
+class KnowledgeScreen extends ConsumerStatefulWidget {
   const KnowledgeScreen({super.key});
 
   @override
   _KnowledgeScreenState createState() => _KnowledgeScreenState();
 }
 
-class _KnowledgeScreenState extends State<KnowledgeScreen> {
+class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> with CategoryMixin {
   // 新增：当前选中的分类ID
-  int _selectedCategoryId = ALL_CATEGORY;
+  String? _selectedCategory;
+  late Map<String, String> categories;
+
+  @override
+  void initState(){
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    categories = getCategories(ref);
     // final categories = Context().get(CATEGORIES_KEY);
     // SmartDialog.showToast('账号未登录');
     return Scaffold(
@@ -56,6 +67,12 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          context.go('/admin/addknow');
+        },
+        child: const Icon(Icons.add),
       ),
       body: Column(
         children: [
@@ -139,7 +156,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
               child: IconButton(
                 icon: const Icon(Icons.edit),
                 onPressed: () {
-                  // Get.toNamed('/editknow', arguments: {'knowledgeId': _knowledge['ID']});
+                  context.go('/admin/editknow?knowledgeId=${_knowledge['ID']}');
                 },
               ),
             ),
@@ -152,13 +169,23 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
 
   void onChangeCategory(int categoryId) {
     setState(() {
-      _selectedCategoryId = categoryId;
+      if (categoryId == ALL_CATEGORY) {
+        _selectedCategory = null;
+      } else {
+        _selectedCategory = categories[categoryId.toString()];
+      }
     });
   }
   // 新增：获取知识点列表的函数
   Future<Map<String, dynamic>> fetchKnowledgePoints() async {
-    final response = await Request().get(
-        '${ApiConfig.SERVER_BASE_URL}/api/know/list?categoryId=${_selectedCategoryId}');
+    final MATH_LEVEL level = ref.watch(mathLevelProvider);
+    String url;
+    if (_selectedCategory != null) {
+      url = '${ApiConfig.SERVER_BASE_URL}/api/know/list?level=${level.value}&category=${_selectedCategory}';
+    } else {
+      url = '${ApiConfig.SERVER_BASE_URL}/api/know/list?level=${level.value}';
+    }
+    final response = await Request().get(url);
     if (response.statusCode == 200) {
       // return json.decode(response.body);
       return response.data;

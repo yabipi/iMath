@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 // import 'package:flutter_linux_webview/flutter_linux_webview.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -134,7 +135,9 @@ void main() async {
     // initWebView();
   }
 
-  runApp(MyApp());
+  runApp(ProviderScope(
+      child: MyApp()
+  ));
 }
 
 

@@ -135,6 +135,7 @@ class ProfileScreen extends StatelessWidget {
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
               // 导航到设置页面
+              context.go('/profile/settings');
             },
           ),
           ListTile(
@@ -151,7 +152,7 @@ class ProfileScreen extends StatelessWidget {
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
               // 导航到关于页面
-              // Get.toNamed('/about');
+              context.go('/profile/about');
             },
           ),
           ListTile(

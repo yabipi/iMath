@@ -1,9 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imath/config/constants.dart';
-import 'package:imath/core/context.dart';
 
-class CategoryPanel extends StatelessWidget {
+import 'package:imath/core/global.dart';
+import 'package:imath/mixins/category_mixin.dart';
+
+import '../../providers/settings_provider.dart';
+
+class CategoryPanel extends ConsumerWidget with CategoryMixin {
 
   Function(int)? onItemTap; // 点击 item 的回调函数
 
@@ -12,22 +17,30 @@ class CategoryPanel extends StatelessWidget {
   CategoryPanel({this.onItemTap});
 
   @override
-  Widget build(BuildContext context) {
-    Map<String, dynamic> categories = context.get(CATEGORIES_KEY);
+  Widget build(BuildContext context, WidgetRef ref) {
+    Map<String, dynamic> categories = getCategories(ref);
+
     return DefaultTabController(
-      length: categories.length,
+      length: categories.length + 1,
       child: TabBar(
         isScrollable: true,
-        tabs: categories.entries.map((entry) {
+        tabs: [Tab(
+          text: '全部',
+          // onTap: () => onItemTap(entry.key), // Tab 可以直接绑定 onTap
+          ), ...categories.entries.map((entry) {
           return Tab(
             text: entry.value,
             // onTap: () => onItemTap(entry.key), // Tab 可以直接绑定 onTap
           );
-        }).toList(),
-        onTap: (int index){
-          String categoryId = categories.keys.toList()[index];
-          // print('点击${categories[categoryId.toString()]}');
-          onItemTap!(int.parse(categoryId));
+        }).toList()],
+        onTap: (int index) {
+          if (index == 0) {
+            onItemTap!(ALL_CATEGORY);
+          } else {
+            String categoryId = categories.keys.toList()[index - 1];
+            // print('点击${categories[categoryId.toString()]}');
+            onItemTap!(int.parse(categoryId));
+          }
         }, // 当前 tab 被点击时触发回调
       ),
     );

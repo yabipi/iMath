@@ -2,40 +2,40 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:imath/config/constants.dart';
 import 'package:imath/core/context.dart';
 import 'package:imath/http/knowledge.dart';
+import 'package:imath/mixins/category_mixin.dart';
+import 'package:imath/providers/settings_provider.dart';
 import '../../config/api_config.dart';
 import '../../http/init.dart';
 
-class AddKnowledgeView extends StatefulWidget {
+class AddKnowledgeView extends ConsumerStatefulWidget {
   const AddKnowledgeView({super.key});
 
   @override
-  State<AddKnowledgeView> createState() => _AddKnowledgeViewState();
+  _AddKnowledgeViewState createState() => _AddKnowledgeViewState();
 }
 
-class _AddKnowledgeViewState extends State<AddKnowledgeView> {
+class _AddKnowledgeViewState extends ConsumerState<AddKnowledgeView> with CategoryMixin {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
   final _levelController = TextEditingController();
-  int _selectedBranch = 0;
+  String? _selectedCategory;
   bool _isSubmitting = false;
 
-  late Map<String, dynamic> categories;
+  late Map<String, String> categories;
 
   @override
   void initState() {
     super.initState();
-    if (mounted) {
-
-    }
-    categories = context.get(CATEGORIES_KEY);
-    debugPrint('');
+    // categories = context.get(CATEGORIES_KEY);
+    // debugPrint('');
   }
 
   @override
@@ -59,8 +59,8 @@ class _AddKnowledgeViewState extends State<AddKnowledgeView> {
       final data =  {
         'title': _titleController.text,
         'content': _contentController.text,
-        'category': categories?[_selectedBranch],
-        // 'level': _levelController.text,
+        'category': _selectedCategory,
+        'level': ref.read(mathLevelProvider).value,
       };
       final response = await KnowledgeHttp.addKnowledge(data);
 
@@ -91,6 +91,7 @@ class _AddKnowledgeViewState extends State<AddKnowledgeView> {
 
   @override
   Widget build(BuildContext context) {
+    categories = getCategories(ref);
     return Scaffold(
       appBar: AppBar(
         title: const Text('添加知识点'),
@@ -103,20 +104,20 @@ class _AddKnowledgeViewState extends State<AddKnowledgeView> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               DropdownButtonFormField<String>(
-                value: categories!.keys.first as String,
+                value: _selectedCategory,
                 decoration: const InputDecoration(
                   labelText: '数学分支',
                   border: OutlineInputBorder(),
                 ),
-                items: categories?.keys?.map((String id) {
+                items: categories?.values?.map((String category) {
                   return DropdownMenuItem<String>(
-                    value: id as String,
-                    child: Text(categories![id]!),
+                    value: category,
+                    child: Text(category),
                   );
                 }).toList(),
                 onChanged: (String? newValue) {
                   setState(() {
-                    _selectedBranch = int.parse(newValue!);
+                    _selectedCategory = newValue!;
                   });
                 },
               ),
@@ -151,20 +152,7 @@ class _AddKnowledgeViewState extends State<AddKnowledgeView> {
                 },
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _levelController,
-                decoration: const InputDecoration(
-                  labelText: '适用年级',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  // if (value == null || value.isEmpty) {
-                  //   return '请输入适用年级';
-                  // }
-                  // return null;
-                },
-              ),
-              const SizedBox(height: 24),
+
               Row(
                 children: [
                   Spacer(),
