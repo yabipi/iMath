@@ -12,14 +12,16 @@ class CustomBottomNavigationBar extends StatelessWidget {
     final currentRoute = GoRouterState.of(context);
     String? path = currentRoute.path;
     int _currentIndex = 0;
-    if (path == '/culture') {
+    if (path == '/home') {
       _currentIndex = 0;
-    } else if (path == '/knowledge') {
+    } else if (path == '/culture') {
       _currentIndex = 1;
-    } else if (path == '/questions') {
+    } else if (path == '/knowledge') {
       _currentIndex = 2;
-    } else if (path == '/profile') {
+    } else if (path == '/questions') {
       _currentIndex = 3;
+    } else if (path == '/profile') {
+      _currentIndex = 4;
     }
 
     return _currentIndex;
@@ -30,6 +32,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed, // 明确设置为 fixed 类型
       items: const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: '首页',
+        ),
         BottomNavigationBarItem(
           icon: Icon(Icons.history),
           label: '数学世界',
@@ -57,15 +63,18 @@ class CustomBottomNavigationBar extends StatelessWidget {
         // 根据索引跳转到不同的页面
         switch (index) {
           case 0:
-            context.go('/culture'); // 使用 offAllNamed 替换 toNamed
+            context.go('/home'); // 使用 offAllNamed 替换 toNamed
             break;
           case 1:
-            context.go('/knowledge');
+            context.go('/culture'); // 使用 offAllNamed 替换 toNamed
             break;
           case 2:
-            context.go('/questions');
+            context.go('/knowledge');
             break;
           case 3:
+            context.go('/questions');
+            break;
+          case 4:
             context.go('/profile');
             break;
 

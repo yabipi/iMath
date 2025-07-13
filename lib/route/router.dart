@@ -10,6 +10,9 @@ import 'package:imath/pages/culture/add_mathematician.dart';
 import 'package:imath/pages/culture/article_viewer.dart';
 import 'package:imath/pages/culture/culture_screen.dart';
 import 'package:imath/pages/culture/edit_article.dart';
+import 'package:imath/pages/home/book_listview.dart';
+import 'package:imath/pages/home/home_screen.dart';
+import 'package:imath/pages/home/news_detail.dart';
 import 'package:imath/pages/knowledge/add_knowledge.dart';
 import 'package:imath/pages/knowledge/edit_knowledge.dart';
 import 'package:imath/pages/knowledge/knowledge_screen.dart';
@@ -28,10 +31,14 @@ import 'package:imath/pages/user/settings.dart';
 
 
 final router = GoRouter(
-  initialLocation: '/culture',
+  initialLocation: '/home',
   observers: [FlutterSmartDialog.observer],
   redirect: (context, state) => state.uri.toString() == '/' ? '/knowledge' : null,
   routes: [
+    GoRoute(
+      path: '/home',
+      builder: (context, state) => HomeScreen(),
+    ),
     GoRoute(
       path: '/knowledge',
       builder: (context, state) => const KnowledgeScreen(),
@@ -53,6 +60,15 @@ final router = GoRouter(
         ),
       ],
     ),
+    GoRoute(
+      path: '/booklist',
+      builder: (context, state) => BookListView(),
+    ),
+    GoRoute(
+      path: '/newsdetail',
+      builder: (context, state) => NewsDetailPage(),
+    ),
+
     GoRoute(
       path: '/questions',
       builder: (context, state) => const QuestionsMain(),

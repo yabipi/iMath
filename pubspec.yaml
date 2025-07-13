@@ -66,6 +66,9 @@ dependencies:
   flutter_html: ^3.0.0
   flutter_quill_delta_from_html: ^1.5.2
   animated_tree_view: ^2.3.0
+  carousel_slider: ^5.1.1
+  pull_to_refresh: ^2.0.0
+
 #    git:
 ##      url: https://github.com/yabipi/flutter_math.git
 #      # 如果需要特定分支
