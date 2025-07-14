@@ -6,7 +6,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imath/http/article.dart';
 import 'package:imath/utils/device_util.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+// import 'package:webview_flutter/webview_flutter.dart';
 // import 'package:flutter_linux_webview/flutter_linux_webview.dart';
 // Import for Android features.
 // import 'package:webview_flutter_android/webview_flutter_android.dart';
@@ -28,7 +28,7 @@ class ArticleViewerState extends State<ArticleViewer> {
   String title = '';
   late Future _future;
   late String content;
-  late final WebViewController _controller;
+  // late final WebViewController _controller;
 
   @override
   void initState() {
@@ -92,29 +92,29 @@ class ArticleViewerState extends State<ArticleViewer> {
     );
   }
 
-  void initWebView()  {
-    if (DeviceUtil.isLinux) {
-      print("object");
-    }
-    if (DeviceUtil.isMobile || DeviceUtil.isWeb) {
-      final WebViewController controller = WebViewController()
-        ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..setNavigationDelegate(
-          NavigationDelegate(
-            onProgress: (int progress) {
-              // Update loading bar.
-            },
-            onPageStarted: (String url) {},
-            onPageFinished: (String url) {},
-            onHttpError: (HttpResponseError error) {},
-            onWebResourceError: (WebResourceError error) {},
-            onNavigationRequest: (NavigationRequest request) {
-              return NavigationDecision.navigate;
-            },
-          ),
-        );
-      _controller = controller;
-      _controller.loadHtmlString(content);
-    }
-  }
+  // void initWebView()  {
+  //   if (DeviceUtil.isLinux) {
+  //     print("object");
+  //   }
+  //   if (DeviceUtil.isMobile || DeviceUtil.isWeb) {
+  //     final WebViewController controller = WebViewController()
+  //       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+  //       ..setNavigationDelegate(
+  //         NavigationDelegate(
+  //           onProgress: (int progress) {
+  //             // Update loading bar.
+  //           },
+  //           onPageStarted: (String url) {},
+  //           onPageFinished: (String url) {},
+  //           onHttpError: (HttpResponseError error) {},
+  //           onWebResourceError: (WebResourceError error) {},
+  //           onNavigationRequest: (NavigationRequest request) {
+  //             return NavigationDecision.navigate;
+  //           },
+  //         ),
+  //       );
+  //     _controller = controller;
+  //     _controller.loadHtmlString(content);
+  //   }
+  // }
 }

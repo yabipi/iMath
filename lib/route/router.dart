@@ -22,6 +22,7 @@ import 'package:imath/pages/question/edit_question.dart';
 import 'package:imath/pages/question/questions_main.dart';
 import 'package:imath/pages/question/questions_screen.dart';
 import 'package:imath/pages/user/about_me.dart';
+import 'package:imath/pages/user/avatar_edit.dart';
 import 'package:imath/pages/user/login_screen.dart';
 import 'package:imath/pages/user/pincode_input.dart';
 
@@ -88,11 +89,13 @@ final router = GoRouter(
           path: 'about',
           builder: (context, state) => AboutMePage(),
         ),
+        GoRoute(
+          path: 'avatarEdit',
+          builder: (context, state) => AvatarEditScreen(),
+        ),
+        
       ]
     ),
-
-
-
 
     // 用户登录管理相关
     GoRoute(
