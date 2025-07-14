@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:universal_platform/universal_platform.dart';
 
 class AvatarEditScreen extends StatefulWidget {
   final String? currentAvatarPath;
@@ -172,6 +173,12 @@ class _AvatarEditScreenState extends State<AvatarEditScreen> {
   }
 
   void _showImageSourceDialog() {
+    // 在macOS桌面端，直接选择图片，不显示底部弹窗
+    if (UniversalPlatform.isMacOS) {
+      _pickImage(ImageSource.gallery);
+      return;
+    }
+    
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -262,8 +269,15 @@ class _AvatarEditScreenState extends State<AvatarEditScreen> {
       });
 
       final ImagePicker picker = ImagePicker();
+      
+      // 在macOS桌面端，强制使用gallery源
+      ImageSource actualSource = source;
+      if (UniversalPlatform.isMacOS) {
+        actualSource = ImageSource.gallery;
+      }
+      
       final XFile? image = await picker.pickImage(
-        source: source,
+        source: actualSource,
         maxWidth: 1024,
         maxHeight: 1024,
         imageQuality: 85,
@@ -289,6 +303,11 @@ class _AvatarEditScreenState extends State<AvatarEditScreen> {
 
   Future<File?> _cropImage(File imageFile) async {
     try {
+      // 在macOS桌面端，暂时跳过裁剪步骤
+      if (UniversalPlatform.isMacOS) {
+        return imageFile;
+      }
+      
       final CroppedFile? croppedFile = await ImageCropper().cropImage(
         sourcePath: imageFile.path,
         aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
