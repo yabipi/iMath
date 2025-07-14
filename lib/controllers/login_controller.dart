@@ -33,16 +33,6 @@ class LoginController {
 
 
 
-  // Future<void> signOut() async {
-  //   try {
-  //     await _authenticationService.signOut();
-  //     // _authenticationService.removeCredentails();
-  //   } catch (e) {
-  //     rethrow;
-  //   }
-  // }
-
-
   Future<void> sendVerificationCode(String phone, String verifyCode) async {
 
   }
@@ -54,29 +44,6 @@ class LoginController {
   Future<void> loginWithWechat() async {
 
   }
-
-  // Future<Response?> signUp(Map<String, dynamic> data) async {
-  //   String error_m =
-  //       'An error occurred while registering, please contact the administrator.';
-  //   try {
-  //     return await _authenticationService.signUp(data);
-  //
-  //     // if (response.statusCode == 200) {
-  //     //   log('enter signup');
-  //
-  //     //   // tokenData = await signIn(data['email'], data['password']);
-  //     // } else {
-  //     //   // var message = response.body['error_description'];
-  //
-  //     //   throw Exception(error_m);
-  //     // }
-  //   } catch (e) {
-  //     // printLog(e);
-  //     printError(info: e.toString());
-  //     throw Exception(error_m);
-  //   }
-  //   // return tokenData;
-  // }
 
   Future<Credentials?> refreshToken() async {
     try {
@@ -95,8 +62,6 @@ class LoginController {
     return !_authenticationService.sessionIsExpired();
   }
 
-  // LoginController(AuthApiService authenticationService)
-  //     : super(authenticationService);
 
   @override
   void onClose() {
@@ -109,8 +74,6 @@ class LoginController {
   }
 
   String? validator(String? value) {
-    log('validatoooor');
-
     if (value != null && value.isEmpty) {
       return 'Please this field must be filled';
     }

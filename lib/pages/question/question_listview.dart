@@ -88,6 +88,7 @@ class _QuestionListviewState extends State<QuestionListview> {
     }
 
     bool isExpanded = _expandedStates[index] ?? false;
+    List<String> imageUrls = _parseImageUrls(question.images);
 
     return SingleChildScrollView(
       // margin: const EdgeInsets.only(bottom: 16.0),
@@ -104,17 +105,64 @@ class _QuestionListviewState extends State<QuestionListview> {
               ),
             ),
             const SizedBox(height: 8),
-            MathCell(
-              content: question.content ?? '',
+            // 题目内容和图片的布局
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // 根据屏幕宽度决定布局方式
+                if (constraints.maxWidth < 600) {
+                  // 小屏幕：垂直布局
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      MathCell(
+                        content: question.content ?? '',
+                      ),
+                      const SizedBox(height: 4),
+                      MathCell(
+                        content: question.options ?? '',
+                      ),
+                      if (imageUrls.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        _buildQuestionImages(imageUrls),
+                      ],
+                    ],
+                  );
+                } else {
+                  // 大屏幕：水平布局
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 左侧：题目内容
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            MathCell(
+                              content: question.content ?? '',
+                            ),
+                            const SizedBox(height: 4),
+                            MathCell(
+                              content: question.options ?? '',
+                            ),
+                          ],
+                        ),
+                      ),
+                      // 右侧：图片显示
+                      if (imageUrls.isNotEmpty) ...[
+                        const SizedBox(width: 16),
+                        Expanded(
+                          flex: 1,
+                          child: _buildQuestionImages(imageUrls),
+                        ),
+                      ],
+                    ],
+                  );
+                }
+              },
             ),
-            const SizedBox(height: 4),
-            MathCell(
-              content: question.options ?? '',
-            ),
-            // GptMarkdown(
-            //   question.options??'',
-            //   style: const TextStyle(color: Colors.black),
-            // ),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -151,6 +199,8 @@ class _QuestionListviewState extends State<QuestionListview> {
   }
 
   Widget _buildSlidingQuestionCard(Question question) {
+    List<String> imageUrls = _parseImageUrls(question.images);
+    
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 16.0),
       child: Padding(
@@ -167,21 +217,64 @@ class _QuestionListviewState extends State<QuestionListview> {
             ),
 
             const SizedBox(height: 8),
-            MathCell(
-              content: question.content ?? '',
+            // 题目内容和图片的布局
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // 根据屏幕宽度决定布局方式
+                if (constraints.maxWidth < 600) {
+                  // 小屏幕：垂直布局
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      MathCell(
+                        content: question.content ?? '',
+                      ),
+                      const SizedBox(height: 4),
+                      MathCell(
+                        content: question.options ?? '',
+                      ),
+                      if (imageUrls.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        _buildQuestionImages(imageUrls),
+                      ],
+                    ],
+                  );
+                } else {
+                  // 大屏幕：水平布局
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 左侧：题目内容
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            MathCell(
+                              content: question.content ?? '',
+                            ),
+                            const SizedBox(height: 4),
+                            MathCell(
+                              content: question.options ?? '',
+                            ),
+                          ],
+                        ),
+                      ),
+                      // 右侧：图片显示
+                      if (imageUrls.isNotEmpty) ...[
+                        const SizedBox(width: 16),
+                        Expanded(
+                          flex: 1,
+                          child: _buildQuestionImages(imageUrls),
+                        ),
+                      ],
+                    ],
+                  );
+                }
+              },
             ),
-            // GptMarkdown(
-            //   question.content ?? '',
-            //   style: const TextStyle(color: Colors.black),
-            // ),
-            const SizedBox(height: 4),
-            MathCell(
-              content: question.options ?? '',
-            ),
-            // GptMarkdown(
-            //   question.options ?? '',
-            //   style: const TextStyle(color: Colors.black),
-            // ),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -214,13 +307,6 @@ class _QuestionListviewState extends State<QuestionListview> {
                 '解析和答案:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              // const SizedBox(height: 4),
-              // MathCell(title: question.title ?? '', content: question.content ?? ''),
-              // const SizedBox(height: 8),
-              // const Text(
-              //   '答案:',
-              //   style: TextStyle(fontWeight: FontWeight.bold),
-              // ),
               const SizedBox(height: 4),
               MathCell(title: '', content: question.answer ??''),
             ],
@@ -335,5 +421,260 @@ class _QuestionListviewState extends State<QuestionListview> {
     _currentPage = 1;
     questions.clear();
     await loadMoreQuestions(categoryId: _categoryId);
+  }
+
+  // 解析图片URL字符串，返回URL列表
+  List<String> _parseImageUrls(String? imagesString) {
+    if (imagesString == null || imagesString.trim().isEmpty) {
+      return [];
+    }
+    
+    // 按逗号分割，并去除空白字符
+    return imagesString
+        .split(',')
+        .map((url) => url.trim())
+        .where((url) => url.isNotEmpty)
+        .toList();
+  }
+
+  // 构建题目图片显示组件
+  Widget _buildQuestionImages(List<String> imageUrls) {
+    if (imageUrls.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          children: [
+            const Icon(
+              Icons.image,
+              size: 16,
+              color: Colors.grey,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              '题目图片 (${imageUrls.length})',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        if (imageUrls.length == 1)
+          SizedBox(
+            height: 120,
+            child: _buildImageItem(imageUrls.first),
+          )
+        else
+          // 多张图片时使用网格布局
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: (120 * ((imageUrls.length + 1) ~/ 2)).toDouble(), // 计算网格高度
+            ),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 1.2,
+              ),
+              itemCount: imageUrls.length,
+              itemBuilder: (context, index) {
+                return _buildImageItem(imageUrls[index]);
+              },
+            ),
+          ),
+      ],
+    );
+  }
+
+  // 构建单个图片项
+  Widget _buildImageItem(String imageUrl) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: GestureDetector(
+          onTap: () => _showImageDialog(imageUrl),
+          child: Stack(
+            children: [
+              Image.network(
+                imageUrl,
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: Colors.grey[200],
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: Icon(
+                        Icons.broken_image,
+                        color: Colors.grey,
+                        size: 40,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              // 添加点击提示
+              Positioned(
+                top: 4,
+                right: 4,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Icon(
+                    Icons.zoom_in,
+                    size: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 显示图片放大对话框
+  void _showImageDialog(String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Stack(
+            children: [
+              // 背景遮罩
+              GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(
+                  color: Colors.black.withOpacity(0.8),
+                ),
+              ),
+              // 图片内容
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.contain,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          width: 300,
+                          height: 300,
+                          color: Colors.white,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 300,
+                          height: 300,
+                          color: Colors.white,
+                          child: const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.broken_image,
+                                  color: Colors.grey,
+                                  size: 60,
+                                ),
+                                SizedBox(height: 16),
+                                Text(
+                                  '图片加载失败',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              // 关闭按钮
+              Positioned(
+                top: 40,
+                right: 20,
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

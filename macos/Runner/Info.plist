@@ -32,5 +32,26 @@
 	<string>This app needs access to photo library to select avatar images.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs access to camera to take avatar photos.</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>This app needs access to documents folder to select avatar images.</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>This app needs access to desktop folder to select avatar images.</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>This app needs access to downloads folder to select avatar images.</string>
+	<key>NSFileProviderDomainUsageDescription</key>
+	<string>This app needs access to files to select avatar images.</string>
+
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>This app needs access to desktop folder to select avatar images.</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>This app needs access to documents folder to select avatar images.</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>This app needs access to downloads folder to select avatar images.</string>
+	<key>NSPicturesFolderUsageDescription</key>
+	<string>This app needs access to pictures folder to select avatar images.</string>
+	<key>NSAppleEventsUsageDescription</key>
+    <string>此应用需要访问您的文件以供选择。</string>
+    <key>com.apple.security.files.user-selected.read-only</key>
+    <true/>
 </dict>
 </plist>

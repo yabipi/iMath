@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 enum Environment {
   DEV,
   PROD,
+  LOCAL,
 }
 
 
@@ -25,6 +26,8 @@ class ApiConfig {
       case Environment.DEV:
         return 'http://192.168.1.100:8080';
         // return 'http://math.icodelib.cn';
+      case Environment.LOCAL:
+        return 'http://localhost:8080';
       default:
         return 'http://localhost:8080';
     }

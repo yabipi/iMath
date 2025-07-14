@@ -91,7 +91,12 @@ final router = GoRouter(
         ),
         GoRoute(
           path: 'avatarEdit',
-          builder: (context, state) => AvatarEditScreen(),
+          builder: (context, state) {
+            final user = state.extra as User?;
+            return AvatarEditScreen(
+              currentAvatarBase64: user?.avatar,
+            );
+          },
         ),
         
       ]

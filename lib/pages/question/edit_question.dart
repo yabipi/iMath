@@ -74,7 +74,7 @@ class _QuestionEditViewState extends State<QuestionEditView> {
         'options': optionsController.text,
         'answer': answerController.text,
         'type': selectedType,
-        // 'images': _selectedImages.join(','),
+        'images': _selectedImages.join(','),
       });
       context.go('/questions');
 

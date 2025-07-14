@@ -122,7 +122,7 @@ void main() async {
   await Request.setCookie();
 
   String env = const String.fromEnvironment('ENV', defaultValue: 'DEV');
-  ApiConfig.environment = Environment.values.byName(env);
+  ApiConfig.environment = Environment.values.byName(env.toUpperCase());
   if (kReleaseMode) {
     ApiConfig.environment = Environment.PROD;
   }

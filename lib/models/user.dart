@@ -2,7 +2,7 @@ class User {
   String? login;
   int? id;
   final String username;
-  final String? avatar;
+  String? avatar;
   final String? phone;
   final String? wechatId;
   final DateTime? createdAt;
@@ -22,7 +22,7 @@ class User {
     return User(
       id: json['id'],
       username: json['username'],
-      // avatar: json['avatar'],
+      avatar: json['avatar'],
       phone: json['phone'],
       // wechatId: json['wechatId'],
       // createdAt: DateTime.parse(json['createdAt']),

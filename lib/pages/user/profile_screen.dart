@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:imath/controllers/login_controller.dart';
@@ -11,7 +13,7 @@ import '../admin/camera_screen.dart';
 import '../admin/admin_screen.dart';
 
 // extends GetView<LoginController>
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   late LoginController controller;
   late User? user;
   // final _authService = const UserController();
@@ -34,7 +36,7 @@ class ProfileScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     controller = LoginController(context);
     if (this.user == null) {
       this.user = context.currentUser;
@@ -62,39 +64,73 @@ class ProfileScreen extends StatelessWidget {
         children: [
           // 用户信息卡片
           Container(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(20.0),
             color: Theme.of(context).primaryColor,
-            child: Column(
+            child: Row(
               children: [
                 // 头像
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage:
-                  user?.avatar != null ? NetworkImage((user?.avatar)!) : null,
-                  child: user?.avatar == null
-                      ? const Icon(Icons.person, size: 50)
-                      : null,
-                ),
-                const SizedBox(height: 16),
-                // 用户名
-                Text(
-                  (user?.username)!,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                GestureDetector(
+                  onTap: () {
+                    // 导航到头像编辑页面
+                    context.push('/profile/avatarEdit', extra: user);
+                  },
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundImage: user?.avatar != null 
+                            ? MemoryImage(base64Decode(user!.avatar!))
+                            : null,
+                        child: user?.avatar == null
+                            ? const Icon(Icons.person, size: 40)
+                            : null,
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.edit,
+                            size: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
-                // 手机号
-                if (user?.phone != null)
-                  Text(
-                    (user?.phone)!,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white70,
-                    ),
+                const SizedBox(width: 16),
+                // 用户信息
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 昵称
+                      Text(
+                        (user?.username)!,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      // ID号
+                      Text(
+                        'ID号: ${user?.id ?? 'N/A'}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
                   ),
+                ),
               ],
             ),
           ),
