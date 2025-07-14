@@ -52,15 +52,16 @@ class _QuestionListviewState extends State<QuestionListview> {
     // 更新
     if(categoryId != _categoryId) {
       questions.clear();
-      setState(() {
-        _categoryId = categoryId;
-      });
+      _categoryId = categoryId;
+      // setState(() {
+      //   _categoryId = categoryId;
+      // });
     }
     if(pageNo != null && pageNo > 0) {
       _currentPage = pageNo;
     }
 
-    final response = await QuestionHttp.loadQuestions(categoryId: categoryId??-1, pageNo: _currentPage, pageSize:  pageSize??10);
+    final response = await QuestionHttp.loadQuestions(categoryId: categoryId?? ALL_CATEGORY, pageNo: _currentPage, pageSize:  pageSize??10);
     final content = response['data'] ?? [];
 
     final _questions = content.map<Question?>((json) {
@@ -243,32 +244,34 @@ class _QuestionListviewState extends State<QuestionListview> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: loadMoreQuestions(categoryId: widget.categoryId, pageNo: 1, pageSize: 10),
-        builder: (context, snapshot){
-          // List list = questions;
-          return Scaffold(
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                context.go('/admin/addQuestion');
-              },
-              child: const Icon(Icons.add),
-            ),
-            body: Stack(
-              children: [
-                // Padding(
-                //   padding: const EdgeInsets.all(16.0),
-                //   child: CategoryPanel(onItemTap: (int categoryId) {onChangeCategory(categoryId);}),
-                // ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                  ],
-                ),
-                _buildQuestionsPageView()
-                // Expanded(
-                //   child:
-                // )
+    return RefreshIndicator(
+      onRefresh: _onRefresh,
+      child: FutureBuilder(
+          future: loadMoreQuestions(categoryId: widget.categoryId, pageNo: 1, pageSize: 10),
+          builder: (context, snapshot){
+            // List list = questions;
+            return Scaffold(
+              floatingActionButton: FloatingActionButton(
+                onPressed: () {
+                  context.go('/admin/addQuestion');
+                },
+                child: const Icon(Icons.add),
+              ),
+              body: Stack(
+                children: [
+                  // Padding(
+                  //   padding: const EdgeInsets.all(16.0),
+                  //   child: CategoryPanel(onItemTap: (int categoryId) {onChangeCategory(categoryId);}),
+                  // ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                    ],
+                  ),
+                  _buildQuestionsPageView()
+                  // Expanded(
+                  //   child:
+                  // )
                   // _isSlidingMode
                   //     ? PageView.builder(
                   //         scrollDirection: Axis.vertical, // 修改：将滑动方向改为垂直
@@ -310,12 +313,23 @@ class _QuestionListviewState extends State<QuestionListview> {
                   // },
                   // )),
 
-              ],
-            ),
-          );
-        });
-
+                ],
+              ),
+            );
+          })
+    );
   }
+
+  /**
+   * 下拉刷新方法,为list重新赋值
+   */
+  Future<Null> _onRefresh() async {
+    await Future.delayed(Duration(seconds: 1), () {
+      print('refresh');
+      setState(() {});
+    });
+  }
+
 
   Future? onChangeCategory(int? _categoryId) async {
     _currentPage = 1;

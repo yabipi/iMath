@@ -277,9 +277,9 @@ class _HomeScreenState extends State<HomeScreen> {
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
+              crossAxisCount: 4,
+              crossAxisSpacing: 6,
+              mainAxisSpacing: 6,
               childAspectRatio: 1.2,
             ),
             itemCount: functionItems.length,
@@ -305,12 +305,13 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
       child: Container(
+        height: 32,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(6),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.grey.withValues(alpha: 0.2),
               spreadRadius: 1,
               blurRadius: 4,
               offset: Offset(0, 2),
@@ -321,18 +322,18 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: item['color'].withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 item['icon'],
-                size: 32,
+                size: 16,
                 color: item['color'],
               ),
             ),
-            SizedBox(height: 12),
+            SizedBox(height: 6),
             Text(
               item['title'],
               style: TextStyle(

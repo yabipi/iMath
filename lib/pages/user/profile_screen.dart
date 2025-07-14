@@ -99,19 +99,19 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
           // 功能列表
-          ListTile(
-            leading: const Icon(Icons.camera_alt),
-            title: const Text('拍照识别'),
-            trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const CameraScreen(),
-                ),
-              );
-            },
-          ),
+          // ListTile(
+          //   leading: const Icon(Icons.camera_alt),
+          //   title: const Text('拍照识别'),
+          //   trailing: const Icon(Icons.arrow_forward_ios),
+          //   onTap: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => const CameraScreen(),
+          //       ),
+          //     );
+          //   },
+          // ),
           ListTile(
             leading: const Icon(Icons.history),
             title: const Text('学习历史'),

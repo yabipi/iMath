@@ -165,7 +165,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       title: '数学宝典',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,
       ),
       routerConfig: router,
