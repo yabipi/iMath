@@ -1,6 +1,7 @@
 
 import 'package:dio/dio.dart';
 import 'package:imath/config/api_config.dart';
+import 'package:imath/config/constants.dart';
 import 'package:imath/models/quiz.dart';
 
 import 'init.dart';
@@ -10,7 +11,7 @@ class QuestionHttp {
 
   }
 
-  static Future loadQuestions({int? categoryId=-1, int? pageNo=1, int? pageSize=10}) async {
+  static Future loadQuestions({int? categoryId=ALL_CATEGORY, int? pageNo=1, int? pageSize=10}) async {
     final url = '${ApiConfig.SERVER_BASE_URL}/api/question/list?categoryId=${categoryId}&pageNo=$pageNo&pageSize=$pageSize';
     final response = await Request().get(url);
     return response.data;

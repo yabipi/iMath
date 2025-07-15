@@ -45,6 +45,10 @@ class TestFunctionsPage extends StatelessWidget {
                 _buildTestButton(context, "布局管理", () {
                   // TODO: 布局管理逻辑
                 }),
+                _buildTestButton(context, "PageView无限下拉", () {
+                  // TODO: 布局管理逻辑
+                  context.go('/pageview');
+                }),
                 _buildTestButton(context, "ListView", () {
                   Navigator.push(
                     context,

@@ -21,61 +21,112 @@ class QuestionListview extends StatefulWidget {
 }
 
 class _QuestionListviewState extends State<QuestionListview> {
-  List<Question> questions = <Question>[];
+  List<Question> _questions = <Question>[];
   final Map<int, bool> _expandedStates = {};
+  late Future _future;
 
   late PageController _pageController; // 新增：用于监听 PageView 滑动事件
   int? _categoryId;
   int _currentPage = 1;
+  bool _isLoading = false;
+  bool _hasMore = true;
+  bool _isLoadingMore = false; // 防止重复加载的标志
 
   @override
   void initState() {
     super.initState();
     _categoryId = widget.categoryId;
-    _pageController = PageController(); // 初始化 PageController
-
+    _pageController = PageController();
+    _loadInitialData();
     // 监听 PageView 滑动事件
-    _pageController.addListener(() {
-      if (_pageController.position.pixels == _pageController.position.maxScrollExtent) {
-        // 滑动到最底部，加载更多题目
-        _loadMoreQuestions();
-      }
+    _pageController.addListener(() async {
+      // 只有当滑动到最后一个页面时才加载更多
+      // if (_pageController.page != null &&
+      //     _pageController.page! >= questions.length - 1 &&
+      //     _pageController.position.pixels == _pageController.position.maxScrollExtent) {
+      //   // 滑动到最底部，加载更多题目
+      //   print("load more");
+      //   // List<Question> newQuestions = await loadMoreQuestions(categoryId: widget.categoryId, pageNo: _currentPage, pageSize: 10);
+      //   setState(() {
+      //     // questions.addAll(newQuestions);
+      //     _future = loadMoreQuestions(categoryId: widget.categoryId, pageNo: _currentPage, pageSize: 10);
+      //   });
+      //   _currentPage++;
+      // }
     });
   }
 
-  // 新增：加载更多题目的方法
-  Future<void> _loadMoreQuestions() async {
-    await loadMoreQuestions();
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
-  Future? loadMoreQuestions({int? categoryId, int? pageNo, int? pageSize}) async {
-    // 更新
-    if(categoryId != _categoryId) {
-      questions.clear();
-      _categoryId = categoryId;
-      // setState(() {
-      //   _categoryId = categoryId;
-      // });
+  Future<void> _loadInitialData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await QuestionHttp.loadQuestions(categoryId: _categoryId?? ALL_CATEGORY, pageNo: _currentPage, pageSize: 10);
+      final content = response['data'] ?? [];
+      final _newQuestions = content.map<Question?>((json) {
+        try {
+          return Question.fromJson(json);
+        } catch (e) {
+          return null;
+        }
+      }).whereType<Question>().toList();
+
+      setState(() {
+        _questions.addAll(_newQuestions);
+        _currentPage++;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      // _showErrorSnackBar('加载数据失败: $e');
     }
+  }
+
+  Future _loadMoreQuestions({int? categoryId, int? pageNo, int? pageSize}) async {
+    // 更新
+    if (_isLoading || !_hasMore) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
     if(pageNo != null && pageNo > 0) {
       _currentPage = pageNo;
     }
 
     final response = await QuestionHttp.loadQuestions(categoryId: categoryId?? ALL_CATEGORY, pageNo: _currentPage, pageSize:  pageSize??10);
     final content = response['data'] ?? [];
+    if (content.isEmpty) {
+      // 没有更多数据了
+      setState(() {
+        _hasMore = false;
+        _isLoading = false;
+      });
+      return;
+    }
 
-    final _questions = content.map<Question?>((json) {
+    final _newQuestions = content.map<Question?>((json) {
       try {
         return Question.fromJson(json);
       } catch (e) {
         return null;
       }
-    })
-        .whereType<Question>()
-        .toList();
+    }).whereType<Question>().toList();
 
-    questions.addAll(_questions);
-    _currentPage ++;
+    setState(() {
+      _questions.addAll(_newQuestions);
+      _currentPage++;
+      _isLoading = false;
+    });
   }
 
   Widget _buildQuestionCard(Question question, int index) {
@@ -90,13 +141,14 @@ class _QuestionListviewState extends State<QuestionListview> {
     bool isExpanded = _expandedStates[index] ?? false;
     List<String> imageUrls = _parseImageUrls(question.images);
 
-    return SingleChildScrollView(
-      // margin: const EdgeInsets.only(bottom: 16.0),
+    return SizedBox(
+      height: MediaQuery.of(context).size.height,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 标题
             Text(
               '第${index + 1}题',
               style: const TextStyle(
@@ -105,64 +157,96 @@ class _QuestionListviewState extends State<QuestionListview> {
               ),
             ),
             const SizedBox(height: 8),
-            // 题目内容和图片的布局
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // 根据屏幕宽度决定布局方式
-                if (constraints.maxWidth < 600) {
-                  // 小屏幕：垂直布局
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      MathCell(
-                        content: question.content ?? '',
-                      ),
-                      const SizedBox(height: 4),
-                      MathCell(
-                        content: question.options ?? '',
-                      ),
-                      if (imageUrls.isNotEmpty) ...[
-                        const SizedBox(height: 12),
-                        _buildQuestionImages(imageUrls),
-                      ],
-                    ],
-                  );
-                } else {
-                  // 大屏幕：水平布局
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // 左侧：题目内容
-                      Expanded(
-                        flex: 2,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            MathCell(
-                              content: question.content ?? '',
-                            ),
-                            const SizedBox(height: 4),
-                            MathCell(
-                              content: question.options ?? '',
-                            ),
-                          ],
-                        ),
-                      ),
-                      // 右侧：图片显示
-                      if (imageUrls.isNotEmpty) ...[
-                        const SizedBox(width: 16),
+            
+            // 主要内容区域 - 使用Expanded确保不会超出屏幕
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  // 根据屏幕宽度决定布局方式
+                  if (constraints.maxWidth < 600) {
+                    // 小屏幕：垂直布局
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 题目内容
                         Expanded(
-                          flex: 1,
-                          child: _buildQuestionImages(imageUrls),
+                          flex: 3,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: ClipRect(
+                                  child: MathCell(
+                                    content: question.content ?? '',
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Expanded(
+                                child: ClipRect(
+                                  child: MathCell(
+                                    content: question.options ?? '',
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                        // 图片区域
+                        if (imageUrls.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Expanded(
+                            flex: 1,
+                            child: _buildQuestionImages(imageUrls),
+                          ),
+                        ],
                       ],
-                    ],
-                  );
-                }
-              },
+                    );
+                  } else {
+                    // 大屏幕：水平布局
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 左侧：题目内容
+                        Expanded(
+                          flex: 2,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: ClipRect(
+                                  child: MathCell(
+                                    content: question.content ?? '',
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Expanded(
+                                child: ClipRect(
+                                  child: MathCell(
+                                    content: question.options ?? '',
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // 右侧：图片显示
+                        if (imageUrls.isNotEmpty) ...[
+                          const SizedBox(width: 16),
+                          Expanded(
+                            flex: 1,
+                            child: _buildQuestionImages(imageUrls),
+                          ),
+                        ],
+                      ],
+                    );
+                  }
+                },
+              ),
             ),
+            
+            // 底部操作区域
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -183,6 +267,8 @@ class _QuestionListviewState extends State<QuestionListview> {
                 ),
               ],
             ),
+            
+            // 解答区域
             if (isExpanded) ...[
               const Divider(),
               const Text(
@@ -190,125 +276,11 @@ class _QuestionListviewState extends State<QuestionListview> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              MathCell(title:  '', content: question.answer ??''),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSlidingQuestionCard(Question question) {
-    List<String> imageUrls = _parseImageUrls(question.images);
-    
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '第${questions.indexOf(question) + 1}题',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-            // 题目内容和图片的布局
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // 根据屏幕宽度决定布局方式
-                if (constraints.maxWidth < 600) {
-                  // 小屏幕：垂直布局
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      MathCell(
-                        content: question.content ?? '',
-                      ),
-                      const SizedBox(height: 4),
-                      MathCell(
-                        content: question.options ?? '',
-                      ),
-                      if (imageUrls.isNotEmpty) ...[
-                        const SizedBox(height: 12),
-                        _buildQuestionImages(imageUrls),
-                      ],
-                    ],
-                  );
-                } else {
-                  // 大屏幕：水平布局
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // 左侧：题目内容
-                      Expanded(
-                        flex: 2,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            MathCell(
-                              content: question.content ?? '',
-                            ),
-                            const SizedBox(height: 4),
-                            MathCell(
-                              content: question.options ?? '',
-                            ),
-                          ],
-                        ),
-                      ),
-                      // 右侧：图片显示
-                      if (imageUrls.isNotEmpty) ...[
-                        const SizedBox(width: 16),
-                        Expanded(
-                          flex: 1,
-                          child: _buildQuestionImages(imageUrls),
-                        ),
-                      ],
-                    ],
-                  );
-                }
-              },
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _expandedStates[questions.indexOf(question)] =
-                          !(_expandedStates[questions.indexOf(question)] ?? false);
-                    });
-                  },
-                  child: Text(
-                    _expandedStates[questions.indexOf(question)] ?? false
-                        ? '收起解答'
-                        : '查看解答',
-                  ),
+              Expanded(
+                child: ClipRect(
+                  child: MathCell(title: '', content: question.answer ?? ''),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () {
-                      context.go('/admin/editQuestion?questionId=${question.id}');
-                  }
-                  ),
-
-              ],
-            ),
-            if (_expandedStates[questions.indexOf(question)] ?? false) ...[
-              const Divider(),
-              const Text(
-                '解析和答案:',
-                style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 4),
-              MathCell(title: '', content: question.answer ??''),
             ],
           ],
         ),
@@ -319,90 +291,35 @@ class _QuestionListviewState extends State<QuestionListview> {
   Widget _buildQuestionsPageView() {
     return PageView.builder(
           controller: _pageController, // 使用自定义的 PageController
-          physics: const ClampingScrollPhysics(),
+          physics: const ClampingScrollPhysics(), // 使用标准滚动物理特性
           scrollDirection: Axis.vertical,
-          itemCount: questions.length,
+          itemCount: _questions.length,
+          onPageChanged: (int page) {
+            // 当滑动到倒数第二个页面时，开始加载更多数据
+            if (page >= _questions.length - 2 && _hasMore && !_isLoading) {
+              _loadMoreQuestions();
+            }
+          },
           itemBuilder: (context, index) {
-            return _buildQuestionCard(questions[index], index);
+            return _buildQuestionCard(_questions[index], index);
           },
       );
   }
 
   @override
   Widget build(BuildContext context) {
+    print("build widget");
     return RefreshIndicator(
       onRefresh: _onRefresh,
-      child: FutureBuilder(
-          future: loadMoreQuestions(categoryId: widget.categoryId, pageNo: 1, pageSize: 10),
-          builder: (context, snapshot){
-            // List list = questions;
-            return Scaffold(
-              floatingActionButton: FloatingActionButton(
-                onPressed: () {
-                  context.go('/admin/addQuestion');
-                },
-                child: const Icon(Icons.add),
-              ),
-              body: Stack(
-                children: [
-                  // Padding(
-                  //   padding: const EdgeInsets.all(16.0),
-                  //   child: CategoryPanel(onItemTap: (int categoryId) {onChangeCategory(categoryId);}),
-                  // ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                    ],
-                  ),
-                  _buildQuestionsPageView()
-                  // Expanded(
-                  //   child:
-                  // )
-                  // _isSlidingMode
-                  //     ? PageView.builder(
-                  //         scrollDirection: Axis.vertical, // 修改：将滑动方向改为垂直
-                  //         itemCount: list.length,
-                  //         itemBuilder: (context, index) {
-                  //           return _buildSlidingQuestionCard(list[index]);
-                  //         },
-                  //     )
-                  //     :
-                  //       ListView.builder(
-                  //         padding: const EdgeInsets.all(16.0),
-                  //         itemCount: list.length + 1,
-                  //         itemBuilder: (context, index) {
-                  //           if (index == list.length) {
-                  //             if (_isLoading) {
-                  //               return const Center(
-                  //                 child: Padding(
-                  //                   padding: EdgeInsets.all(16.0),
-                  //                   child: CircularProgressIndicator(),
-                  //                 ),
-                  //               );
-                  //             }
-                  //             if (_hasMore) {
-                  //               return Center(
-                  //                 child: TextButton(
-                  //                   onPressed: () => controller.loadMoreQuestions(),
-                  //                   child: const Text('加载更多'),
-                  //                 ),
-                  //               );
-                  //             }
-                  //             return const Center(
-                  //               child: Padding(
-                  //                 padding: EdgeInsets.all(16.0),
-                  //                 child: Text('没有更多题目了'),
-                  //               ),
-                  //             );
-                  //   }
-                  //   return _buildQuestionCard(list[index], index);
-                  // },
-                  // )),
-
-                ],
-              ),
-            );
-          })
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            context.go('/admin/addQuestion');
+          },
+          child: const Icon(Icons.add),
+        ),
+        body: _buildQuestionsPageView(),
+      )
     );
   }
 
@@ -411,16 +328,14 @@ class _QuestionListviewState extends State<QuestionListview> {
    */
   Future<Null> _onRefresh() async {
     await Future.delayed(Duration(seconds: 1), () {
-      print('refresh');
       setState(() {});
     });
   }
 
-
   Future? onChangeCategory(int? _categoryId) async {
     _currentPage = 1;
-    questions.clear();
-    await loadMoreQuestions(categoryId: _categoryId);
+    _questions.clear();
+    await _loadMoreQuestions(categoryId: _categoryId);
   }
 
   // 解析图片URL字符串，返回URL列表

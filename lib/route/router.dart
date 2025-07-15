@@ -10,6 +10,7 @@ import 'package:imath/pages/culture/add_mathematician.dart';
 import 'package:imath/pages/culture/article_viewer.dart';
 import 'package:imath/pages/culture/culture_screen.dart';
 import 'package:imath/pages/culture/edit_article.dart';
+import 'package:imath/pages/demo/pageview_demo.dart';
 import 'package:imath/pages/home/book_listview.dart';
 import 'package:imath/pages/home/home_screen.dart';
 import 'package:imath/pages/home/news_detail.dart';
@@ -180,10 +181,15 @@ final router = GoRouter(
             path: 'test',
             builder: (context, state) => TestFunctionsPage(),
           ),
+
+        //
         ],
 
     ),
-
+    GoRoute(
+      path: '/pageview',
+      builder: (context, state) => PageViewDemo(),
+    ),
 
   ],
 );
