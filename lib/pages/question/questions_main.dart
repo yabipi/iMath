@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imath/config/constants.dart';
 import 'package:imath/core/context.dart';
 import 'package:imath/pages/common/bottom_navigation_bar.dart';
 import 'package:imath/pages/common/knowledge_tree.dart';
+import 'package:imath/providers/questions_provider.dart';
 import '../paper/paper_listview.dart';
 import 'question_listview.dart';
 
-class QuestionsMain extends StatefulWidget {
+class QuestionsMain extends ConsumerStatefulWidget {
   const QuestionsMain({super.key});
 
   @override
-  State<QuestionsMain> createState() => _QuestionsMainState();
+  ConsumerState<QuestionsMain> createState() => _QuestionsMainState();
 }
 
-class _QuestionsMainState extends State<QuestionsMain> {
-  int? categoryId = ALL_CATEGORY;
+class _QuestionsMainState extends ConsumerState<QuestionsMain> {
+  int? _categoryId = ALL_CATEGORY;
 
   @override
   void initState() {
@@ -24,10 +26,10 @@ class _QuestionsMainState extends State<QuestionsMain> {
   @override
   Widget build(BuildContext context) {
     String title;
-    if (categoryId == ALL_CATEGORY) {
+    if (_categoryId == ALL_CATEGORY) {
       title = MATH_LEVEL.Primary.value;
     } else {
-      title = context.get(CATEGORIES_KEY)[categoryId.toString()];
+      title = context.get(CATEGORIES_KEY)[_categoryId.toString()];
     }
 
     return Scaffold(
@@ -40,7 +42,7 @@ class _QuestionsMainState extends State<QuestionsMain> {
           ),
         ),
       ),
-      body: QuestionListview(categoryId: categoryId),
+      body: QuestionListview(),
       bottomNavigationBar: CustomBottomNavigationBar(),
       // 新增：侧边栏 Drawer
       drawer: Drawer(
@@ -61,7 +63,8 @@ class _QuestionsMainState extends State<QuestionsMain> {
             ),
             KnowledgeTree(level: MATH_LEVEL.Primary, onChangeCategory: (categoryId){
               setState(() {
-                this.categoryId = categoryId;
+                this._categoryId = categoryId;
+                ref.read(categoryIdProvider.notifier).state = categoryId;
                 Navigator.pop(context); // 关闭drawer
               });
             })

@@ -3,14 +3,15 @@ import 'package:go_router/go_router.dart';
 
 import 'package:imath/pages/admin/camera_screen.dart';
 import 'package:imath/pages/admin/pdf_uploader.dart';
+import 'package:imath/pages/demo/paper_screen.dart';
 import '../paper/add_paper_screen.dart';
 import '../question/add_question.dart';
 
 import '../knowledge/add_knowledge.dart';
 import '../culture/add_mathematician.dart';  // 新增导入
 
-import 'package:imath/demo/draggable_tree_screen.dart';
-import 'package:imath/demo/paper_screen.dart';
+import 'package:imath/pages/demo/draggable_tree_screen.dart';
+
 import 'package:imath/pages/admin/test_functions.dart';
 
 class AdminScreen extends StatelessWidget {

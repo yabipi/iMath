@@ -2,6 +2,11 @@
 
 数学宝典app
 
+setState(() {
+if(widget.categoryId != _categoryId) {
+_loadMoreQuestions(categoryId: widget.categoryId);
+}
+});
 
 # Run
 Android studio里设置additional run args: --dart-define-from-file=.env/dev.json

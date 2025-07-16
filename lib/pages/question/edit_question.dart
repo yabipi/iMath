@@ -54,7 +54,7 @@ class _QuestionEditViewState extends State<QuestionEditView> {
       contentController.text = question.content ?? '';
       optionsController.text = question.options ?? '';
       answerController.text = question.answer ?? '';
-      selectedBranch = question.categoryId ?? ALL_CATEGORY;
+      selectedBranch = question._categoryId ?? ALL_CATEGORY;
 
       selectedType = (question.type??'').isEmpty ? QuestionTypes[0] : question.type!;
       selectedImages = question.images?.split(',') ?? [];

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:gpt_markdown/gpt_markdown.dart';
@@ -6,38 +7,36 @@ import 'package:imath/pages/common/category_panel.dart';
 
 import 'package:imath/components/math_cell.dart';
 import 'package:imath/http/question.dart';
+import 'package:imath/providers/questions_provider.dart';
 
 import '../../config/constants.dart';
 import '../../core/context.dart';
 import '../../models/quiz.dart';
 
 
-class QuestionListview extends StatefulWidget {
-  int? categoryId = ALL_CATEGORY;
-  QuestionListview({super.key, this.categoryId});
+class QuestionListview extends ConsumerStatefulWidget {
+  // int? categoryId = ALL_CATEGORY;
+  QuestionListview({super.key});
 
   @override
-  State<QuestionListview> createState() => _QuestionListviewState();
+  ConsumerState<QuestionListview> createState() => _QuestionListviewState();
 }
 
-class _QuestionListviewState extends State<QuestionListview> {
-  List<Question> _questions = <Question>[];
+class _QuestionListviewState extends ConsumerState<QuestionListview> {
+  // List<Question> _questions = <Question>[];
   final Map<int, bool> _expandedStates = {};
-  late Future _future;
 
   late PageController _pageController; // 新增：用于监听 PageView 滑动事件
-  int? _categoryId;
-  int _currentPage = 1;
+
   bool _isLoading = false;
   bool _hasMore = true;
-  bool _isLoadingMore = false; // 防止重复加载的标志
 
   @override
   void initState() {
     super.initState();
-    _categoryId = widget.categoryId;
+
     _pageController = PageController();
-    _loadInitialData();
+    
     // 监听 PageView 滑动事件
     _pageController.addListener(() async {
       // 只有当滑动到最后一个页面时才加载更多
@@ -54,6 +53,18 @@ class _QuestionListviewState extends State<QuestionListview> {
       //   _currentPage++;
       // }
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // 设置分类ID
+      ref.read(categoryIdProvider.notifier).state = ALL_CATEGORY;
+      // 确保页码为1
+      ref.read(pageNoProvider.notifier).state = 1;
+      // 重置是否有更多数据
+      ref.read(hasMoreProvider.notifier).state = true;
+      // 触发初始加载
+      // ref.refresh(questionsFutureProvider);
+
+    });
+
   }
 
   @override
@@ -62,72 +73,87 @@ class _QuestionListviewState extends State<QuestionListview> {
     super.dispose();
   }
 
-  Future<void> _loadInitialData() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final response = await QuestionHttp.loadQuestions(categoryId: _categoryId?? ALL_CATEGORY, pageNo: _currentPage, pageSize: 10);
-      final content = response['data'] ?? [];
-      final _newQuestions = content.map<Question?>((json) {
-        try {
-          return Question.fromJson(json);
-        } catch (e) {
-          return null;
-        }
-      }).whereType<Question>().toList();
-
-      setState(() {
-        _questions.addAll(_newQuestions);
-        _currentPage++;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      // _showErrorSnackBar('加载数据失败: $e');
-    }
+  @override
+  void didUpdateWidget(QuestionListview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // 如果分类ID发生变化，更新provider并重新加载
+    // if (oldWidget.categoryId != widget.categoryId) {
+    //   _categoryId = widget.categoryId;
+    //   ref.read(categoryIdProvider.notifier).state = widget.categoryId ?? ALL_CATEGORY;
+    //   // 重置页码为1
+    //   ref.read(pageNoProvider.notifier).state = 1;
+    //   // 重置是否有更多数据
+    //   ref.read(hasMoreProvider.notifier).state = true;
+    //   // 触发重新加载
+    //   ref.refresh(questionsFutureProvider);
+    // }
   }
 
-  Future _loadMoreQuestions({int? categoryId, int? pageNo, int? pageSize}) async {
-    // 更新
-    if (_isLoading || !_hasMore) return;
+  // Future<void> _loadInitialData() async {
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+  //
+  //   try {
+  //     final response = await QuestionHttp.loadQuestions(categoryId: _categoryId?? ALL_CATEGORY, pageNo: _currentPage, pageSize: 10);
+  //     final content = response['data'] ?? [];
+  //     final _newQuestions = content.map<Question?>((json) {
+  //       try {
+  //         return Question.fromJson(json);
+  //       } catch (e) {
+  //         return null;
+  //       }
+  //     }).whereType<Question>().toList();
+  //
+  //     setState(() {
+  //       // _questions.addAll(_newQuestions);
+  //       _currentPage++;
+  //       _isLoading = false;
+  //     });
+  //   } catch (e) {
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //     // _showErrorSnackBar('加载数据失败: $e');
+  //   }
+  // }
 
-    setState(() {
-      _isLoading = true;
-    });
-
-    if(pageNo != null && pageNo > 0) {
-      _currentPage = pageNo;
-    }
-
-    final response = await QuestionHttp.loadQuestions(categoryId: categoryId?? ALL_CATEGORY, pageNo: _currentPage, pageSize:  pageSize??10);
-    final content = response['data'] ?? [];
-    if (content.isEmpty) {
-      // 没有更多数据了
-      setState(() {
-        _hasMore = false;
-        _isLoading = false;
-      });
-      return;
-    }
-
-    final _newQuestions = content.map<Question?>((json) {
-      try {
-        return Question.fromJson(json);
-      } catch (e) {
-        return null;
-      }
-    }).whereType<Question>().toList();
-
-    setState(() {
-      _questions.addAll(_newQuestions);
-      _currentPage++;
-      _isLoading = false;
-    });
-  }
+  // Future _loadMoreQuestions({int? categoryId, int? pageNo = 1, int? pageSize = 10}) async {
+  //   // 更新
+  //   // if (_isLoading || !_hasMore) return;
+  //   final response = await QuestionHttp.loadQuestions(categoryId: categoryId?? ALL_CATEGORY, pageNo: _currentPage, pageSize:  pageSize??10);
+  //   final content = response['data'] ?? [];
+  //   if (content.isEmpty) {
+  //     // 没有更多数据了
+  //     setState(() {
+  //       _hasMore = false;
+  //       _isLoading = false;
+  //       _questions.clear();
+  //       _isLoading = false;
+  //       _categoryId = categoryId;
+  //       if(pageNo != null && pageNo > 0) {
+  //         _currentPage = pageNo;
+  //       }
+  //     });
+  //     return;
+  //   }
+  //
+  //   final _newQuestions = content.map<Question?>((json) {
+  //     try {
+  //       return Question.fromJson(json);
+  //     } catch (e) {
+  //       return null;
+  //     }
+  //   }).whereType<Question>().toList();
+  //
+  //   setState(() {
+  //     _questions.addAll(_newQuestions);
+  //     _currentPage = pageNo??1;
+  //     _isLoading = false;
+  //     _categoryId = categoryId;
+  //   });
+  // }
 
   Widget _buildQuestionCard(Question question, int index) {
     if (question.title == null) {
@@ -289,26 +315,48 @@ class _QuestionListviewState extends State<QuestionListview> {
   }
 
   Widget _buildQuestionsPageView() {
+    final questions = ref.watch(questionsProvider);
     return PageView.builder(
           controller: _pageController, // 使用自定义的 PageController
           physics: const ClampingScrollPhysics(), // 使用标准滚动物理特性
           scrollDirection: Axis.vertical,
-          itemCount: _questions.length,
+          itemCount: questions.length,
           onPageChanged: (int page) {
             // 当滑动到倒数第二个页面时，开始加载更多数据
-            if (page >= _questions.length - 2 && _hasMore && !_isLoading) {
-              _loadMoreQuestions();
+            if (page >= questions.length - 2 && _hasMore && !_isLoading) {
+              print('Loading more questions, current page: ${ref.read(pageNoProvider)}');
+              ref.read(pageNoProvider.notifier).state = ref.read(pageNoProvider) + 1;
             }
           },
           itemBuilder: (context, index) {
-            return _buildQuestionCard(_questions[index], index);
+            return _buildQuestionCard(questions[index], index);
           },
       );
   }
 
   @override
   Widget build(BuildContext context) {
-    print("build widget");
+    // 监听分类变化和加载状态
+    ref.watch(categoryChangeProvider);
+    ref.watch(pageChangeProvider);
+    ref.watch(autoQuestionsFutureProvider); // 自动触发初始加载
+    final isLoading = ref.watch(isLoadingProvider);
+    final hasMore = ref.watch(hasMoreProvider);
+    final questions = ref.watch(questionsProvider);
+    final categoryId = ref.watch(categoryIdProvider);
+    final pageNo = ref.watch(pageNoProvider);
+    
+    // 打印调试信息
+    print('Questions count: ${questions.length}');
+    print('Is loading: $isLoading');
+    print('Has more: $hasMore');
+    print('Category ID: $categoryId');
+    print('Page No: $pageNo');
+    
+    // 更新本地状态
+    _isLoading = isLoading;
+    _hasMore = hasMore;
+    
     return RefreshIndicator(
       onRefresh: _onRefresh,
       child: Scaffold(
@@ -318,7 +366,21 @@ class _QuestionListviewState extends State<QuestionListview> {
           },
           child: const Icon(Icons.add),
         ),
-        body: _buildQuestionsPageView(),
+        body: Stack(
+          children: [
+            _buildQuestionsPageView(),
+            // 显示加载指示器
+            if (isLoading && questions.isEmpty)
+              const Center(
+                child: CircularProgressIndicator(),
+              ),
+            // 显示无数据提示
+            if (!isLoading && questions.isEmpty)
+              const Center(
+                child: Text('暂无数据'),
+              ),
+          ],
+        ),
       )
     );
   }
@@ -327,16 +389,17 @@ class _QuestionListviewState extends State<QuestionListview> {
    * 下拉刷新方法,为list重新赋值
    */
   Future<Null> _onRefresh() async {
-    await Future.delayed(Duration(seconds: 1), () {
-      setState(() {});
-    });
+    // 重置页码为1
+    ref.read(pageNoProvider.notifier).state = 1;
+    // 重置是否有更多数据
+    ref.read(hasMoreProvider.notifier).state = true;
+    // 触发重新加载
+    ref.refresh(questionsFutureProvider);
+    
+    // 等待加载完成
+    await Future.delayed(const Duration(milliseconds: 500));
   }
 
-  Future? onChangeCategory(int? _categoryId) async {
-    _currentPage = 1;
-    _questions.clear();
-    await _loadMoreQuestions(categoryId: _categoryId);
-  }
 
   // 解析图片URL字符串，返回URL列表
   List<String> _parseImageUrls(String? imagesString) {
