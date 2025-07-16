@@ -24,12 +24,12 @@ class ApiConfig {
       case Environment.PROD:
         return 'http://math.icodelib.cn';
       case Environment.DEV:
-        return 'http://192.168.1.100:8080';
+        return 'http://192.168.1.100:8888';
         // return 'http://math.icodelib.cn';
       case Environment.LOCAL:
-        return 'http://localhost:8080';
+        return 'http://localhost:8888';
       default:
-        return 'http://localhost:8080';
+        return 'http://localhost:8888';
     }
   }
 

@@ -314,16 +314,15 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
     );
   }
 
-  Widget _buildQuestionsPageView() {
-    final questions = ref.watch(questionsProvider);
+  Widget _buildQuestionsPageView(List<Question> questions) {
     return PageView.builder(
           controller: _pageController, // 使用自定义的 PageController
           physics: const ClampingScrollPhysics(), // 使用标准滚动物理特性
           scrollDirection: Axis.vertical,
-          itemCount: questions.length,
+          itemCount: questions?.length,
           onPageChanged: (int page) {
             // 当滑动到倒数第二个页面时，开始加载更多数据
-            if (page >= questions.length - 2 && _hasMore && !_isLoading) {
+            if (questions!.length > 2 && page >= questions!.length - 2 && _hasMore && !_isLoading) {
               print('Loading more questions, current page: ${ref.read(pageNoProvider)}');
               ref.read(pageNoProvider.notifier).state = ref.read(pageNoProvider) + 1;
             }
@@ -336,22 +335,23 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
 
   @override
   Widget build(BuildContext context) {
+    final questions = ref.watch(questionsFutureProvider).value ?? [];
     // 监听分类变化和加载状态
     ref.watch(categoryChangeProvider);
     ref.watch(pageChangeProvider);
     ref.watch(autoQuestionsFutureProvider); // 自动触发初始加载
     final isLoading = ref.watch(isLoadingProvider);
     final hasMore = ref.watch(hasMoreProvider);
-    final questions = ref.watch(questionsProvider);
+    // final questions = ref.watch(questionsProvider);
     final categoryId = ref.watch(categoryIdProvider);
     final pageNo = ref.watch(pageNoProvider);
     
     // 打印调试信息
-    print('Questions count: ${questions.length}');
-    print('Is loading: $isLoading');
-    print('Has more: $hasMore');
-    print('Category ID: $categoryId');
-    print('Page No: $pageNo');
+    // print('Questions count: ${questions.length}');
+    // print('Is loading: $isLoading');
+    // print('Has more: $hasMore');
+    // print('Category ID: $categoryId');
+    // print('Page No: $pageNo');
     
     // 更新本地状态
     _isLoading = isLoading;
@@ -368,14 +368,14 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
         ),
         body: Stack(
           children: [
-            _buildQuestionsPageView(),
+            _buildQuestionsPageView(questions),
             // 显示加载指示器
-            if (isLoading && questions.isEmpty)
+            if (isLoading)
               const Center(
                 child: CircularProgressIndicator(),
               ),
             // 显示无数据提示
-            if (!isLoading && questions.isEmpty)
+            if (questions.isEmpty)
               const Center(
                 child: Text('暂无数据'),
               ),

@@ -3,11 +3,6 @@ import 'package:imath/config/constants.dart';
 import 'package:imath/http/question.dart';
 import 'package:imath/models/quiz.dart';
 
-// 存储当前加载的问题列表
-final questionsProvider = StateNotifierProvider<QuestionsNotifier, List<Question>>((ref) {
-  return QuestionsNotifier();
-});
-
 // 分类ID提供者
 final categoryIdProvider = StateProvider<int>((ref) => ALL_CATEGORY);
 
@@ -20,31 +15,13 @@ final isLoadingProvider = StateProvider<bool>((ref) => false);
 // 是否还有更多数据的提供者
 final hasMoreProvider = StateProvider<bool>((ref) => true);
 
-// 问题列表状态管理器
-class QuestionsNotifier extends StateNotifier<List<Question>> {
-  QuestionsNotifier() : super([]);
-
-  // 清空列表
-  void clear() {
-    state = [];
-  }
-
-  // 添加新问题到列表末尾
-  void addQuestions(List<Question> newQuestions) {
-    state = [...state, ...newQuestions];
-  }
-
-  // 替换整个列表
-  void replaceQuestions(List<Question> questions) {
-    state = questions;
-  }
-}
-
 // 加载问题的FutureProvider
-final questionsFutureProvider = FutureProvider<void>((ref) async {
+final questionsFutureProvider = FutureProvider<List<Question>>((ref) async {
+  List<Question> questions = <Question>[];
+
   final categoryId = ref.watch(categoryIdProvider);
   final pageNo = ref.watch(pageNoProvider);
-  final questionsNotifier = ref.read(questionsProvider.notifier);
+  // final questions = ref.read(questionsProvider);
   final isLoading = ref.read(isLoadingProvider.notifier);
   final hasMore = ref.read(hasMoreProvider.notifier);
 
@@ -53,7 +30,7 @@ final questionsFutureProvider = FutureProvider<void>((ref) async {
   // 如果正在加载，直接返回
   if (ref.read(isLoadingProvider)) {
     print('Already loading, skipping...');
-    return;
+    return questions;
   }
 
   // 设置加载状态
@@ -96,10 +73,14 @@ final questionsFutureProvider = FutureProvider<void>((ref) async {
 
     // 如果是第一页，替换整个列表；否则追加到现有列表
     if (pageNo == 1) {
-      questionsNotifier.replaceQuestions(newQuestions);
+      questions.clear();
+      questions.addAll(newQuestions);
+      // ref.read(questionsProvider) = newQuestions;
+      // questionsNotifier(newQuestions);
       print('Replaced questions list with ${newQuestions.length} questions');
     } else {
-      questionsNotifier.addQuestions(newQuestions);
+      questions.addAll(newQuestions);
+      // questionsNotifier.addQuestions(newQuestions);
       print('Added ${newQuestions.length} questions to existing list');
     }
   } catch (e) {
@@ -110,6 +91,7 @@ final questionsFutureProvider = FutureProvider<void>((ref) async {
     isLoading.state = false;
     print('Finished loading questions');
   }
+  return questions;
 });
 
 // 自动触发的FutureProvider（可选）
