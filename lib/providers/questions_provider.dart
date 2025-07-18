@@ -15,84 +15,139 @@ final isLoadingProvider = StateProvider<bool>((ref) => false);
 // 是否还有更多数据的提供者
 final hasMoreProvider = StateProvider<bool>((ref) => true);
 
-// 加载问题的FutureProvider
-final questionsFutureProvider = FutureProvider<List<Question>>((ref) async {
-  List<Question> questions = <Question>[];
-
-  final categoryId = ref.watch(categoryIdProvider);
-  final pageNo = ref.watch(pageNoProvider);
-  // final questions = ref.read(questionsProvider);
-  final isLoading = ref.read(isLoadingProvider.notifier);
-  final hasMore = ref.read(hasMoreProvider.notifier);
-
-  // print('questionsFutureProvider triggered - categoryId: $categoryId, pageNo: $pageNo');
-
-  // 如果正在加载，直接返回
-  if (ref.read(isLoadingProvider)) {
-    print('Already loading, skipping...');
+class QuestionsNotifier extends AsyncNotifier<List<Question>> {
+  static List<Question> questions = <Question>[];
+  @override
+  Future<List<Question>> build() async {
+    final newQuestions = await loadMoreQuestions(ALL_CATEGORY, 1);
+    questions.addAll(newQuestions);
     return questions;
   }
 
-  // 设置加载状态
-  // isLoading.state = true;
-  print('Starting to load questions...');
-
-  try {
-    // 如果是第一页，清空列表
-    if (pageNo == 1) {
-      // questionsNotifier.clear();
-      print('Cleared questions list for first page');
+  void onChangeCategory(int newCategoryId) async {
+    if (ref.read(categoryIdProvider) == newCategoryId) {
+      return;
     }
-
-    // 调用API加载数据
-    final response = await QuestionHttp.loadQuestions(
-      categoryId: categoryId,
-      pageNo: pageNo,
-      pageSize: 10,
-    );
-
-    final content = response['data'] ?? [];
-    final newQuestions = content.map<Question?>((json) {
-      try {
-        return Question.fromJson(json);
-      } catch (e) {
-        return null;
-      }
-    }).whereType<Question>().toList();
-
-    print('Loaded ${newQuestions.length} questions from API');
-
-    // 检查是否还有更多数据
-    if (newQuestions.isEmpty || newQuestions.length < 10) {
-      hasMore.state = false;
-      print('No more questions available');
-    } else {
-      hasMore.state = true;
-      print('More questions available');
-    }
-
-    // 如果是第一页，替换整个列表；否则追加到现有列表
-    if (pageNo == 1) {
-      questions.clear();
-      questions.addAll(newQuestions);
-      // ref.read(questionsProvider) = newQuestions;
-      // questionsNotifier(newQuestions);
-      print('Replaced questions list with ${newQuestions.length} questions');
-    } else {
-      questions.addAll(newQuestions);
-      // questionsNotifier.addQuestions(newQuestions);
-      print('Added ${newQuestions.length} questions to existing list');
-    }
-  } catch (e) {
-    // 处理错误
-    print('加载问题失败: $e');
-  } finally {
-    // 清除加载状态
-    isLoading.state = false;
-    print('Finished loading questions');
+    state = AsyncValue.loading();
+    questions.clear();
+    ref.read(pageNoProvider.notifier).state = 1;
+    ref.read(categoryIdProvider.notifier).state = newCategoryId;
+    final newQuestions = await loadMoreQuestions(newCategoryId, 1);
+    questions.addAll(newQuestions);
+    state = AsyncValue.data(questions);
   }
-  return questions;
-});
+
+  void onChangePageNo(int newPageNo) async {
+    state = AsyncValue.loading();
+    int categoryId = ref.read(categoryIdProvider);
+    final newQuestions = await loadMoreQuestions(categoryId, newPageNo);
+    questions.addAll(newQuestions);
+    ref.read(pageNoProvider.notifier).state = newPageNo;
+    state = AsyncValue.data(questions);
+  }
+}
+
+final questionsProvider = AsyncNotifierProvider<QuestionsNotifier, List<Question>>(QuestionsNotifier.new);
+
+Future loadMoreQuestions(int categoryId, int pageNo) async {
+  // 调用API加载数据
+  final response = await QuestionHttp.loadQuestions(
+    categoryId: categoryId,
+    pageNo: pageNo,
+    pageSize: 10,
+  );
+
+  final content = response['data'] ?? [];
+  final newQuestions = content.map<Question?>((json) {
+    try {
+      return Question.fromJson(json);
+    } catch (e) {
+      return null;
+    }
+  }).whereType<Question>().toList();
+  return newQuestions;
+}
+
+
+
+// 加载问题的FutureProvider
+// final questionsFutureProvider = FutureProvider<List<Question>>((ref) async {
+//   List<Question> questions = <Question>[];
+//
+//   final categoryId = ref.watch(categoryIdProvider);
+//   final pageNo = ref.watch(pageNoProvider);
+//   // final questions = ref.read(questionsProvider);
+//   final isLoading = ref.read(isLoadingProvider.notifier);
+//   final hasMore = ref.read(hasMoreProvider.notifier);
+//
+//   // print('questionsFutureProvider triggered - categoryId: $categoryId, pageNo: $pageNo');
+//
+//   // 如果正在加载，直接返回
+//   if (ref.read(isLoadingProvider)) {
+//     print('Already loading, skipping...');
+//     return questions;
+//   }
+//
+//   // 设置加载状态
+//   // isLoading.state = true;
+//   print('Starting to load questions...');
+//
+//   try {
+//     // 如果是第一页，清空列表
+//     if (pageNo == 1) {
+//       // questionsNotifier.clear();
+//       print('Cleared questions list for first page');
+//     }
+//
+//     // 调用API加载数据
+//     final response = await QuestionHttp.loadQuestions(
+//       categoryId: categoryId,
+//       pageNo: pageNo,
+//       pageSize: 10,
+//     );
+//
+//     final content = response['data'] ?? [];
+//     final newQuestions = content.map<Question?>((json) {
+//       try {
+//         return Question.fromJson(json);
+//       } catch (e) {
+//         return null;
+//       }
+//     }).whereType<Question>().toList();
+//
+//     print('Loaded ${newQuestions.length} questions from API');
+//
+//     // 检查是否还有更多数据
+//     if (newQuestions.isEmpty || newQuestions.length < 10) {
+//       hasMore.state = false;
+//       print('No more questions available');
+//     } else {
+//       hasMore.state = true;
+//       print('More questions available');
+//     }
+//
+//     // 如果是第一页，替换整个列表；否则追加到现有列表
+//     if (pageNo == 1) {
+//       questions.clear();
+//       questions.addAll(newQuestions);
+//       // ref.read(questionsProvider) = newQuestions;
+//       // questionsNotifier(newQuestions);
+//       print('Replaced questions list with ${newQuestions.length} questions');
+//     } else {
+//       questions.addAll(newQuestions);
+//       // questionsNotifier.addQuestions(newQuestions);
+//       print('Added ${newQuestions.length} questions to existing list');
+//     }
+//   } catch (e) {
+//     // 处理错误
+//     print('加载问题失败: $e');
+//   } finally {
+//     // 清除加载状态
+//     isLoading.state = false;
+//     print('Finished loading questions');
+//   }
+//   return questions;
+// });
 
 // 自动触发的FutureProvider（可选）
 final autoQuestionsFutureProvider = FutureProvider.autoDispose<void>((ref) async {
@@ -102,7 +157,7 @@ final autoQuestionsFutureProvider = FutureProvider.autoDispose<void>((ref) async
   }
   
   // 触发主FutureProvider
-  ref.refresh(questionsFutureProvider);
+  // ref.refresh(questionsFutureProvider);
 });
 
 // 监听分类变化，重置页码并重新加载

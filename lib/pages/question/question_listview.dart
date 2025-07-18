@@ -40,31 +40,13 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
     // 监听 PageView 滑动事件
     _pageController.addListener(() async {
       // 只有当滑动到最后一个页面时才加载更多
-      // if (_pageController.page != null &&
-      //     _pageController.page! >= questions.length - 1 &&
-      //     _pageController.position.pixels == _pageController.position.maxScrollExtent) {
-      //   // 滑动到最底部，加载更多题目
-      //   print("load more");
-      //   // List<Question> newQuestions = await loadMoreQuestions(categoryId: widget.categoryId, pageNo: _currentPage, pageSize: 10);
-      //   setState(() {
-      //     // questions.addAll(newQuestions);
-      //     _future = loadMoreQuestions(categoryId: widget.categoryId, pageNo: _currentPage, pageSize: 10);
-      //   });
-      //   _currentPage++;
-      // }
+      if (_pageController.page != null &&
+          _pageController.position.pixels == _pageController.position.maxScrollExtent) {
+        // 滑动到最底部，加载更多题目
+        int newPageNo = ref.read(pageNoProvider) + 1;
+        ref.read(questionsProvider.notifier).onChangePageNo(newPageNo);
+      }
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 设置分类ID
-      ref.read(categoryIdProvider.notifier).state = ALL_CATEGORY;
-      // 确保页码为1
-      ref.read(pageNoProvider.notifier).state = 1;
-      // 重置是否有更多数据
-      ref.read(hasMoreProvider.notifier).state = true;
-      // 触发初始加载
-      // ref.refresh(questionsFutureProvider);
-
-    });
-
   }
 
   @override
@@ -322,10 +304,10 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
           itemCount: questions?.length,
           onPageChanged: (int page) {
             // 当滑动到倒数第二个页面时，开始加载更多数据
-            if (questions!.length > 2 && page >= questions!.length - 2 && _hasMore && !_isLoading) {
-              print('Loading more questions, current page: ${ref.read(pageNoProvider)}');
-              ref.read(pageNoProvider.notifier).state = ref.read(pageNoProvider) + 1;
-            }
+            // if (questions!.length > 2 && page >= questions!.length - 2 && _hasMore && !_isLoading) {
+            //   print('Loading more questions, current page: ${ref.read(pageNoProvider)}');
+            //   ref.read(pageNoProvider.notifier).state = ref.read(pageNoProvider) + 1;
+            // }
           },
           itemBuilder: (context, index) {
             return _buildQuestionCard(questions[index], index);
@@ -335,7 +317,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
 
   @override
   Widget build(BuildContext context) {
-    final questions = ref.watch(questionsFutureProvider).value ?? [];
+    final questions = ref.watch(questionsProvider).value ?? [];
     // 监听分类变化和加载状态
     ref.watch(categoryChangeProvider);
     ref.watch(pageChangeProvider);
@@ -394,7 +376,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
     // 重置是否有更多数据
     ref.read(hasMoreProvider.notifier).state = true;
     // 触发重新加载
-    ref.refresh(questionsFutureProvider);
+    // ref.refresh(questionsFutureProvider);
     
     // 等待加载完成
     await Future.delayed(const Duration(milliseconds: 500));
