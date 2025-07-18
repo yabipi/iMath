@@ -10,7 +10,7 @@ import 'package:imath/config/constants.dart';
 import 'package:imath/core/context.dart';
 import 'package:imath/http/knowledge.dart';
 import 'package:imath/mixins/category_mixin.dart';
-import 'package:imath/providers/settings_provider.dart';
+import 'package:imath/state/settings_provider.dart';
 import '../../config/api_config.dart';
 import '../../http/init.dart';
 

@@ -6,7 +6,6 @@ import 'package:imath/config/constants.dart';
 import 'package:imath/core/global.dart';
 import 'package:imath/mixins/category_mixin.dart';
 
-import '../../providers/settings_provider.dart';
 
 class CategoryPanel extends ConsumerWidget with CategoryMixin {
 

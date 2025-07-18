@@ -6,11 +6,9 @@ import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:imath/pages/common/category_panel.dart';
 
 import 'package:imath/components/math_cell.dart';
-import 'package:imath/http/question.dart';
-import 'package:imath/providers/questions_provider.dart';
 
-import '../../config/constants.dart';
-import '../../core/context.dart';
+import 'package:imath/state/questions_provider.dart';
+
 import '../../models/quiz.dart';
 
 
@@ -58,84 +56,9 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
   @override
   void didUpdateWidget(QuestionListview oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
-    // 如果分类ID发生变化，更新provider并重新加载
-    // if (oldWidget.categoryId != widget.categoryId) {
-    //   _categoryId = widget.categoryId;
-    //   ref.read(categoryIdProvider.notifier).state = widget.categoryId ?? ALL_CATEGORY;
-    //   // 重置页码为1
-    //   ref.read(pageNoProvider.notifier).state = 1;
-    //   // 重置是否有更多数据
-    //   ref.read(hasMoreProvider.notifier).state = true;
-    //   // 触发重新加载
-    //   ref.refresh(questionsFutureProvider);
-    // }
+
   }
 
-  // Future<void> _loadInitialData() async {
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-  //
-  //   try {
-  //     final response = await QuestionHttp.loadQuestions(categoryId: _categoryId?? ALL_CATEGORY, pageNo: _currentPage, pageSize: 10);
-  //     final content = response['data'] ?? [];
-  //     final _newQuestions = content.map<Question?>((json) {
-  //       try {
-  //         return Question.fromJson(json);
-  //       } catch (e) {
-  //         return null;
-  //       }
-  //     }).whereType<Question>().toList();
-  //
-  //     setState(() {
-  //       // _questions.addAll(_newQuestions);
-  //       _currentPage++;
-  //       _isLoading = false;
-  //     });
-  //   } catch (e) {
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //     // _showErrorSnackBar('加载数据失败: $e');
-  //   }
-  // }
-
-  // Future _loadMoreQuestions({int? categoryId, int? pageNo = 1, int? pageSize = 10}) async {
-  //   // 更新
-  //   // if (_isLoading || !_hasMore) return;
-  //   final response = await QuestionHttp.loadQuestions(categoryId: categoryId?? ALL_CATEGORY, pageNo: _currentPage, pageSize:  pageSize??10);
-  //   final content = response['data'] ?? [];
-  //   if (content.isEmpty) {
-  //     // 没有更多数据了
-  //     setState(() {
-  //       _hasMore = false;
-  //       _isLoading = false;
-  //       _questions.clear();
-  //       _isLoading = false;
-  //       _categoryId = categoryId;
-  //       if(pageNo != null && pageNo > 0) {
-  //         _currentPage = pageNo;
-  //       }
-  //     });
-  //     return;
-  //   }
-  //
-  //   final _newQuestions = content.map<Question?>((json) {
-  //     try {
-  //       return Question.fromJson(json);
-  //     } catch (e) {
-  //       return null;
-  //     }
-  //   }).whereType<Question>().toList();
-  //
-  //   setState(() {
-  //     _questions.addAll(_newQuestions);
-  //     _currentPage = pageNo??1;
-  //     _isLoading = false;
-  //     _categoryId = categoryId;
-  //   });
-  // }
 
   Widget _buildQuestionCard(Question question, int index) {
     if (question.title == null) {
@@ -328,18 +251,13 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
     final categoryId = ref.watch(categoryIdProvider);
     final pageNo = ref.watch(pageNoProvider);
     
-    // 打印调试信息
-    // print('Questions count: ${questions.length}');
-    // print('Is loading: $isLoading');
-    // print('Has more: $hasMore');
-    // print('Category ID: $categoryId');
-    // print('Page No: $pageNo');
-    
+
     // 更新本地状态
     _isLoading = isLoading;
     _hasMore = hasMore;
     
     return RefreshIndicator(
+      // onRefresh: ref.refresh(questionsProvider.future),
       onRefresh: _onRefresh,
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
@@ -376,8 +294,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
     // 重置是否有更多数据
     ref.read(hasMoreProvider.notifier).state = true;
     // 触发重新加载
-    // ref.refresh(questionsFutureProvider);
-    
+
     // 等待加载完成
     await Future.delayed(const Duration(milliseconds: 500));
   }

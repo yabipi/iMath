@@ -4,7 +4,7 @@ import 'package:imath/config/constants.dart';
 import 'package:imath/core/context.dart';
 import 'package:imath/pages/common/bottom_navigation_bar.dart';
 import 'package:imath/pages/common/knowledge_tree.dart';
-import 'package:imath/providers/questions_provider.dart';
+import 'package:imath/state/questions_provider.dart';
 import '../paper/paper_listview.dart';
 import 'question_listview.dart';
 

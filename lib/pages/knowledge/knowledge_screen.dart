@@ -10,7 +10,7 @@ import 'package:imath/pages/common/category_panel.dart';
 import 'package:imath/config/api_config.dart';
 import 'package:imath/config/constants.dart';
 import 'package:imath/pages/common/bottom_navigation_bar.dart';
-import 'package:imath/providers/settings_provider.dart';
+import 'package:imath/state/settings_provider.dart';
 
 import '../../http/init.dart';
 

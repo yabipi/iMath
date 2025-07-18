@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imath/config/constants.dart';
 import 'package:imath/core/global.dart';
-import 'package:imath/providers/settings_provider.dart';
+import 'package:imath/state/settings_provider.dart';
+
 
 mixin CategoryMixin {
   Map<String, String> getCategories(WidgetRef ref) {
