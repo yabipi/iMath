@@ -14,14 +14,14 @@ class CustomBottomNavigationBar extends StatelessWidget {
     int _currentIndex = 0;
     if (path == '/home') {
       _currentIndex = 0;
-    } else if (path == '/culture') {
-      _currentIndex = 1;
+    // } else if (path == '/culture') {
+    //   _currentIndex = 1;
     } else if (path == '/knowledge') {
-      _currentIndex = 2;
+      _currentIndex = 1;
     } else if (path == '/questions') {
-      _currentIndex = 3;
+      _currentIndex = 2;
     } else if (path == '/profile') {
-      _currentIndex = 4;
+      _currentIndex = 3;
     }
 
     return _currentIndex;
@@ -36,10 +36,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
           icon: Icon(Icons.home),
           label: '首页',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.history),
-          label: '数学世界',
-        ),
+        // BottomNavigationBarItem(
+        //   icon: Icon(Icons.history),
+        //   label: '数学世界',
+        // ),
         BottomNavigationBarItem(
           icon: Icon(Icons.school),
           label: '知识',
@@ -65,16 +65,16 @@ class CustomBottomNavigationBar extends StatelessWidget {
           case 0:
             context.go('/home'); // 使用 offAllNamed 替换 toNamed
             break;
+          // case 1:
+          //   context.go('/culture'); // 使用 offAllNamed 替换 toNamed
+          //   break;
           case 1:
-            context.go('/culture'); // 使用 offAllNamed 替换 toNamed
-            break;
-          case 2:
             context.go('/knowledge');
             break;
-          case 3:
+          case 2:
             context.go('/questions');
             break;
-          case 4:
+          case 3:
             context.go('/profile');
             break;
 

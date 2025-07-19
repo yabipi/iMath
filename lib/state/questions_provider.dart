@@ -31,8 +31,9 @@ class QuestionsNotifier extends AsyncNotifier<List<Question>> {
     ref.read(pageNoProvider.notifier).state = 1;
     ref.read(categoryIdProvider.notifier).state = newCategoryId;
     final newQuestions = await loadMoreQuestions(newCategoryId, 1);
-    state.value?.addAll(newQuestions);
-    // state = AsyncValue.data(questions);
+    // state.value?.addAll(newQuestions);
+
+    state = AsyncValue.data(newQuestions);
     // await future;
   }
 
@@ -40,8 +41,9 @@ class QuestionsNotifier extends AsyncNotifier<List<Question>> {
     // state = AsyncValue.loading();
     int categoryId = ref.read(categoryIdProvider);
     final newQuestions = await loadMoreQuestions(categoryId, newPageNo);
-    state.value?.addAll(newQuestions);
+    // state.value?.addAll(newQuestions);
     ref.read(pageNoProvider.notifier).state = newPageNo;
+    state = AsyncValue.data([...?state.value, ...newQuestions]);
     // state = AsyncValue.data(questions);
   }
 }

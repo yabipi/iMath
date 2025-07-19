@@ -208,9 +208,12 @@ class LoginScreen extends StatelessWidget{
                                   ),
                                   const SizedBox(width: 8),
                                   ElevatedButton(
-                                    onPressed: _isLoading
-                                        ? null
-                                        : controller.login,
+                                    onPressed: () {
+                                      goToCaptchaPage(context);
+                                    },
+                                    // onPressed: _isLoading
+                                    //     ? null
+                                    //     : controller.login,
                                     style: ElevatedButton.styleFrom(
                                       padding:
                                       const EdgeInsets.symmetric(vertical: 16),
@@ -237,6 +240,33 @@ class LoginScreen extends StatelessWidget{
       ),
       // 新增：添加底部导航栏
       // bottomNavigationBar: CustomBottomNavigationBar(),
+    );
+  }
+
+  void goToCaptchaPage(BuildContext context) {
+    context.go('/captcha');
+  }
+
+  void _showCaptchaDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('请完成验证'),
+          content: const Text('请完成验证，以继续登录。'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('取消'),
+            ),
+            TextButton(
+              onPressed: () {}, child: const Text('确定'),
+            )
+          ]
+        );
+      }
     );
   }
 }

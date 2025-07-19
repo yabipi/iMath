@@ -299,10 +299,14 @@ class _HomeScreenState extends State<HomeScreen> {
         if(item['title'] == '数学书籍') {
           context.go('/booklist');
         }
+        if(item['title'] == '大师风采') {
+          context.go('/mathematician');
+        }
+
         // 处理功能点击事件
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('点击了${item['title']}')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('点击了${item['title']}')),
+        // );
       },
       child: Container(
         height: 32,

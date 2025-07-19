@@ -136,7 +136,24 @@ class _QuestionEditViewState extends State<QuestionEditView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('编辑题目'),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              if (_formKey.currentState!.validate()) {
+                setState(() {
+                  _isSubmitting = true;
+                });
+                await updateQuestion();
+                setState(() {
+                  _isSubmitting = false;
+                });
+              }
+            },
+            child: const Icon(Icons.save),
+          ),
+        ],
       ),
+
       body: FutureBuilder(
         future: loadQuestion(),
         builder: (context, snapshot) {
@@ -223,20 +240,20 @@ class _QuestionEditViewState extends State<QuestionEditView> {
                     ),
                     const SizedBox(height: 16),
                     _buildImageSection(),
-                    Row(children: [
-                      Spacer(),
-                      ElevatedButton(
-                        onPressed: _isSubmitting ? null : updateQuestion,
-                        child: _isSubmitting
-                            ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                            : const Text('提交'),
-                      ),
-                      Spacer()
-                    ])
+                    // Row(children: [
+                    //   Spacer(),
+                    //   ElevatedButton(
+                    //     onPressed: _isSubmitting ? null : updateQuestion,
+                    //     child: _isSubmitting
+                    //         ? const SizedBox(
+                    //       height: 20,
+                    //       width: 20,
+                    //       child: CircularProgressIndicator(strokeWidth: 2),
+                    //     )
+                    //         : const Text('提交'),
+                    //   ),
+                    //   Spacer()
+                    // ])
                   ],
                 ),
               ),

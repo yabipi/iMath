@@ -10,6 +10,8 @@ import 'package:imath/pages/culture/add_mathematician.dart';
 import 'package:imath/pages/culture/article_viewer.dart';
 import 'package:imath/pages/culture/culture_screen.dart';
 import 'package:imath/pages/culture/edit_article.dart';
+import 'package:imath/pages/culture/mathematician_listview.dart';
+import 'package:imath/pages/culture/mathematician_screen.dart';
 import 'package:imath/pages/demo/pageview_demo.dart';
 import 'package:imath/pages/home/book_listview.dart';
 import 'package:imath/pages/home/home_screen.dart';
@@ -30,6 +32,7 @@ import 'package:imath/pages/user/pincode_input.dart';
 import 'package:imath/pages/user/profile_screen.dart';
 import 'package:imath/pages/user/register.dart';
 import 'package:imath/pages/user/settings.dart';
+import 'package:imath/pages/user/slider_captcha_client_verify.dart';
 
 
 final router = GoRouter(
@@ -45,6 +48,11 @@ final router = GoRouter(
       path: '/knowledge',
       builder: (context, state) => const KnowledgeScreen(),
     ),
+    GoRoute(
+      path: '/mathematician',
+      builder: (context, state) => MathematicianScreen(),
+    ),
+
     GoRoute(
       path: '/culture',
       builder: (context, state) {
@@ -111,6 +119,10 @@ final router = GoRouter(
     GoRoute(
       path: '/register',
       builder: (context, state) => RegisterPage(),
+    ),
+    GoRoute(
+      path: '/captcha',
+      builder: (context, state) => SliderCaptchaClientVerify(title: '人机验证',),
     ),
     GoRoute(
       path: '/verifycode',

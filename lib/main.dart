@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 import 'package:flutter/material.dart';
@@ -162,10 +163,18 @@ class MyApp extends StatelessWidget {
       Map<String, dynamic> _categories = json.decode(categoriesStr ?? '{}');
       context.set(CATEGORIES_KEY, _categories);
     }
+    return _buildScreenFitApp(context);
+  }
+
+  /**
+   * 创建路由Wrapper
+   */
+  Widget _buildRouterApp(BuildContext context) {
     return MaterialApp.router(
       title: '数学宝典',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
+        textTheme: TextTheme(bodyMedium: TextStyle(fontSize: 12.sp)),
         useMaterial3: true,
       ),
       routerConfig: router,
@@ -176,6 +185,22 @@ class MyApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         FlutterQuillLocalizations.delegate,
       ],
+    );
+  }
+
+  /**
+   * 创建适配屏幕的App
+   */
+  Widget _buildScreenFitApp(BuildContext context) {
+    return ScreenUtilInit(
+      designSize: const Size(360, 690),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      // Use builder only if you need to use library outside ScreenUtilInit context
+      builder: (_ , child) {
+        return _buildRouterApp(context);
+      },
+      // child: const HomePage(title: 'First Method'),
     );
   }
 }

@@ -79,16 +79,26 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 标题
-            Text(
-              '第${index + 1}题',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // 标题
+                Text(
+                  '第${index + 1}题',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () {
+                    context.go('/admin/editQuestion?questionId=${question.id}');
+                  },
+                ),
+              ],
             ),
             const SizedBox(height: 8),
-            
             // 主要内容区域 - 使用Expanded确保不会超出屏幕
             Expanded(
               child: LayoutBuilder(
@@ -105,21 +115,27 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: ClipRect(
-                                  child: MathCell(
-                                    content: question.content ?? '',
-                                  ),
-                                ),
+                              MathCell(
+                                content: question.content ?? '',
                               ),
+                              // Expanded(
+                              //   child: ClipRect(
+                              //     child: MathCell(
+                              //       content: question.content ?? '',
+                              //     ),
+                              //   ),
+                              // ),
                               const SizedBox(height: 4),
-                              Expanded(
-                                child: ClipRect(
-                                  child: MathCell(
-                                    content: question.options ?? '',
-                                  ),
-                                ),
+                              MathCell(
+                                content: question.content ?? '',
                               ),
+                              // Expanded(
+                              //   child: ClipRect(
+                              //     child: MathCell(
+                              //       content: question.options ?? '',
+                              //     ),
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),
@@ -144,21 +160,27 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: ClipRect(
-                                  child: MathCell(
-                                    content: question.content ?? '',
-                                  ),
-                                ),
+                              MathCell(
+                                content: question.content ?? '',
                               ),
+                              // Expanded(
+                              //   child: ClipRect(
+                              //     child: MathCell(
+                              //       content: question.content ?? '',
+                              //     ),
+                              //   ),
+                              // ),
                               const SizedBox(height: 4),
-                              Expanded(
-                                child: ClipRect(
-                                  child: MathCell(
-                                    content: question.options ?? '',
-                                  ),
-                                ),
+                              MathCell(
+                                content: question.options ?? '',
                               ),
+                              // Expanded(
+                              //   child: ClipRect(
+                              //     child: MathCell(
+                              //       content: question.options ?? '',
+                              //     ),
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),
@@ -176,7 +198,6 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
                 },
               ),
             ),
-            
             // 底部操作区域
             const SizedBox(height: 8),
             Row(
@@ -190,12 +211,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
                   },
                   child: Text(isExpanded ? '收起解答' : '查看解答'),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () {
-                    context.go('/admin/editQuestion?questionId=${question.id}');
-                  },
-                ),
+
               ],
             ),
             
@@ -227,10 +243,6 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
           itemCount: questions?.length,
           onPageChanged: (int page) {
             // 当滑动到倒数第二个页面时，开始加载更多数据
-            // if (questions!.length > 2 && page >= questions!.length - 2 && _hasMore && !_isLoading) {
-            //   print('Loading more questions, current page: ${ref.read(pageNoProvider)}');
-            //   ref.read(pageNoProvider.notifier).state = ref.read(pageNoProvider) + 1;
-            // }
           },
           itemBuilder: (context, index) {
             return _buildQuestionCard(questions[index], index);
@@ -248,10 +260,6 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
     final isLoading = ref.watch(isLoadingProvider);
     final hasMore = ref.watch(hasMoreProvider);
     // final questions = ref.watch(questionsProvider);
-    final categoryId = ref.watch(categoryIdProvider);
-    final pageNo = ref.watch(pageNoProvider);
-    
-
     // 更新本地状态
     _isLoading = isLoading;
     _hasMore = hasMore;
@@ -326,26 +334,26 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
       children: [
         Row(
           children: [
-            const Icon(
-              Icons.image,
-              size: 16,
-              color: Colors.grey,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              '题目图片 (${imageUrls.length})',
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
-              ),
-            ),
+            // const Icon(
+            //   Icons.image,
+            //   size: 16,
+            //   color: Colors.grey,
+            // ),
+            // const SizedBox(width: 4),
+            // Text(
+            //   '题目图片 (${imageUrls.length})',
+            //   style: const TextStyle(
+            //     fontSize: 14,
+            //     fontWeight: FontWeight.bold,
+            //     color: Colors.grey,
+            //   ),
+            // ),
           ],
         ),
         const SizedBox(height: 8),
         if (imageUrls.length == 1)
           SizedBox(
-            height: 120,
+            height: 140,
             child: _buildImageItem(imageUrls.first),
           )
         else
@@ -390,7 +398,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
                 imageUrl,
                 width: double.infinity,
                 height: double.infinity,
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return Container(
@@ -429,7 +437,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: const Icon(

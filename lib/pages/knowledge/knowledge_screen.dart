@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:imath/mixins/category_mixin.dart';
@@ -40,26 +41,28 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> with Category
       appBar: AppBar(
         title: const Text(''),
         centerTitle: true, // 确保标题居中
-        flexibleSpace: Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 260.0,
-              vertical: 8.0),
-          child: SizedBox(
-              width: 240,
-              child:TextField(
+        flexibleSpace: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Spacer(),
+            SizedBox(
+              width: 0.5.sw, // 使用屏幕宽度的70%
+              child: TextField(
                 decoration: InputDecoration(
                   hintText: '搜索...',
-                  prefixIcon: Icon(Icons.search),
+                  prefixIcon: Icon(Icons.search, size: 20.sp),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24.0),
+                    borderRadius: BorderRadius.circular(24.r),
                   ),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                 ),
                 onChanged: (value) {
                   // 在这里处理搜索逻辑
                 },
               )
-          )
-
+            ),
+            Spacer(),
+          ],
         ),
         leading: Builder(
           builder: (context) => IconButton(
@@ -88,7 +91,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> with Category
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
                   return ListView(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(8.w),
                     children: buildKnowItems(snapshot.data!['items']),
                   );
                 }
@@ -107,15 +110,15 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> with Category
   List<Widget> buildKnowItems(List<dynamic> items) {
     final itemList = items.map((_knowledge) {
       return Container(
-        margin: const EdgeInsets.symmetric(vertical: 4.0),
+        margin: EdgeInsets.symmetric(vertical: 4.h),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(8.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+              color: Colors.grey.withValues(alpha: 0.5),
+              blurRadius: 4.r,
+              offset: Offset(0, 2.h),
             ),
           ],
         ),
@@ -124,8 +127,8 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> with Category
             ListTile(
               title: Text(
                 _knowledge['Title'],
-                style: const TextStyle(
-                  fontSize: 18,
+                style: TextStyle(
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.blue,
                 ),
@@ -134,8 +137,8 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> with Category
                 _knowledge['Content'].length > 100
                     ? '${_knowledge['Content'].substring(0, 100)}...'
                     : _knowledge['Content'],
-                style: const TextStyle(
-                  fontSize: 14,
+                style: TextStyle(
+                  fontSize: 14.sp,
                   color: Colors.black87,
                 ),
               ),
@@ -151,10 +154,10 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> with Category
               },
             ),
             Positioned(
-              bottom: 8,
-              right: 8,
+              bottom: 8.h,
+              right: 8.w,
               child: IconButton(
-                icon: const Icon(Icons.edit),
+                icon: Icon(Icons.edit, size: 20.sp),
                 onPressed: () {
                   context.go('/admin/editknow?knowledgeId=${_knowledge['ID']}');
                 },
