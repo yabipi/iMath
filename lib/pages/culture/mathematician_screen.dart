@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:imath/config/config.dart';
 
 import 'package:imath/pages/common/bottom_navigation_bar.dart';
 import '../../models/mathematician.dart';
@@ -33,7 +34,7 @@ class _MathematicianScreenState extends State<MathematicianScreen> {
       initialIndex: currentIndex,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('大师风采'),
+          title: Text(HOME_COLUMN.PEOPLE.value),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {

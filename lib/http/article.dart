@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:imath/config/api_config.dart';
+import 'package:imath/config/constants.dart';
 import 'init.dart';
 
 class ArticleHttp {
@@ -29,9 +30,9 @@ class ArticleHttp {
     return response.data;
   }
 
-  static Future loadArticles() async {
+  static Future loadArticles({ArticleType articleType = ArticleType.normal, int pageNo = 1, int pageSize = 10}) async {
     final response = await Request().get(
-        '${ApiConfig.SERVER_BASE_URL}/api/article'
+        '${ApiConfig.SERVER_BASE_URL}/api/article?pageNo=${pageNo}&pageSize=${pageSize}&type=${articleType.value}'
     );
     return response.data;
   }

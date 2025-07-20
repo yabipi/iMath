@@ -91,6 +91,19 @@ enum PaperViewMode {
   ExamMode,
 }
 
+// 文章类型
+enum ArticleType {
+  normal(0, '普通文章'), // 普通文章
+  hot(1, '热门文章'), // 热门文章
+  experience(2, '治学经验'), // 治学经验
+  story(3, '人物故事'), // 人物故事
+  problem(4, '难题欣赏'); // 难题欣赏
+
+  final int value;
+  final String label;
+  const ArticleType(this.value, this.label);
+}
+
 class ApiCode {
   // 成功
   static const int SUCCESS = 200;

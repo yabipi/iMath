@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:imath/config/config.dart';
 import 'package:imath/pages/common/bottom_navigation_bar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -40,30 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
     },
   ];
 
-  // 功能区数据
-  final List<Map<String, dynamic>> functionItems = [
-    {
-      'icon': Icons.person,
-      'title': '大师风采',
-      'color': Colors.blue,
-    },
-    {
-      'icon': Icons.school,
-      'title': '治学经验',
-      'color': Colors.green,
-    },
-    {
-      'icon': Icons.book,
-      'title': '数学书籍',
-      'color': Colors.orange,
-    },
-    {
-      'icon': Icons.star,
-      'title': '名题欣赏',
-      'color': Colors.purple,
-    },
-  ];
-
   // 文章列表数据
   final List<Map<String, dynamic>> articles = [
     {
@@ -97,9 +74,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('iMath'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        title: Text('数学天地'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -282,9 +259,9 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisSpacing: 6,
               childAspectRatio: 1.2,
             ),
-            itemCount: functionItems.length,
+            itemCount: HOME_COLUMN.values.length,
             itemBuilder: (context, index) {
-              return _buildFunctionItem(functionItems[index]);
+              return _buildFunctionItem(HOME_COLUMN.values[index]);
             },
           ),
         ],
@@ -293,20 +270,26 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // 功能项组件
-  Widget _buildFunctionItem(Map<String, dynamic> item) {
+  Widget _buildFunctionItem(HOME_COLUMN item) {
     return GestureDetector(
       onTap: () {
-        if(item['title'] == '数学书籍') {
-          context.go('/booklist');
-        }
-        if(item['title'] == '大师风采') {
-          context.go('/mathematician');
+        switch(item) {
+          case HOME_COLUMN.BOOKS:
+            context.go('/booklist');
+            break;
+          case HOME_COLUMN.PEOPLE:
+            context.go('/mathematician');
+            break;
+          case HOME_COLUMN.EXPERIENCE:
+            context.go('/experience');
+            break;
+          case HOME_COLUMN.PROBLEMS:
+            context.go('/problems');
+            break;
+          default:
+            break;
         }
 
-        // 处理功能点击事件
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(content: Text('点击了${item['title']}')),
-        // );
       },
       child: Container(
         height: 32,
@@ -328,18 +311,18 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               padding: EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: item['color'].withOpacity(0.1),
+                color: item.color.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                item['icon'],
+                item.icon,
                 size: 16,
-                color: item['color'],
+                color: item.color,
               ),
             ),
             SizedBox(height: 6),
             Text(
-              item['title'],
+              item.value,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,

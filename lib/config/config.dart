@@ -1,3 +1,6 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 class Config {
   static bool? DEBUG = true;
 
@@ -15,4 +18,16 @@ class Config {
   static const REFRESH_LANGUAGE = "refreshLanguageApp";
   static const THEME_COLOR = "theme-color";
   static const LOCALE = "locale";
+}
+
+enum HOME_COLUMN {
+  PEOPLE("大师风采", Icons.person, Colors.blue),
+  BOOKS("数学书籍", Icons.book, Colors.orange),
+  PROBLEMS("难题欣赏", Icons.person, Colors.blue),
+  EXPERIENCE("治学经验", Icons.star, Colors.purple);
+  /// 默认
+  final String value;
+  final IconData icon;
+  final Color color;
+  const HOME_COLUMN(this.value, this.icon, this.color);
 }

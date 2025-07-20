@@ -11,8 +11,10 @@ import 'package:imath/pages/culture/article_viewer.dart';
 import 'package:imath/pages/culture/culture_screen.dart';
 import 'package:imath/pages/culture/edit_article.dart';
 import 'package:imath/pages/culture/edit_mathematician.dart';
+import 'package:imath/pages/culture/experience_screen.dart';
 import 'package:imath/pages/culture/mathematician_listview.dart';
 import 'package:imath/pages/culture/mathematician_screen.dart';
+import 'package:imath/pages/culture/problems_screen.dart';
 import 'package:imath/pages/demo/pageview_demo.dart';
 import 'package:imath/pages/home/book_listview.dart';
 import 'package:imath/pages/home/home_screen.dart';
@@ -75,6 +77,15 @@ final router = GoRouter(
       path: '/booklist',
       builder: (context, state) => BookListView(),
     ),
+    GoRoute(
+      path: '/experience',
+      builder: (context, state) => ExperienceScreen(),
+    ),
+    GoRoute(
+      path: '/problems',
+      builder: (context, state) => ProblemsScreen(),
+    ),
+    //
     GoRoute(
       path: '/newsdetail',
       builder: (context, state) => NewsDetailPage(),

@@ -9,6 +9,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
+import 'package:imath/config/constants.dart'; // 新增导入：constants.dart
 import 'package:imath/http/article.dart';
 import 'package:path/path.dart' as path;
 
@@ -49,13 +50,19 @@ class _AddArticlePageState extends State<AddArticlePage> {
   final FocusNode _editorFocusNode = FocusNode();
   final ScrollController _editorScrollController = ScrollController();
 
+  ArticleType _selectedArticleType = ArticleType.normal; // 新增：选中的文章类型
+
   void _submitArticle() async {
     // TODO: 实现文章提交逻辑
     final title = _titleController.text;
     List deltaJson = _controller.document.toDelta().toJson();
     String html = DeltaToHTML.encodeJson(deltaJson);
     // 可以在这里调用API或进行其他处理
-    await ArticleHttp.addArticle({"title": title, "content": html});
+    await ArticleHttp.addArticle({
+      "title": title,
+      "content": html,
+      "type": _selectedArticleType.value // 新增：提交选中的文章类型
+    });
     SmartDialog.showToast('创建成功');
     context.go('/culture');
   }
@@ -63,10 +70,6 @@ class _AddArticlePageState extends State<AddArticlePage> {
   @override
   void initState() {
     super.initState();
-    // Load document
-    // _controller.document = Document.fromJson([
-    //   {'insert': '内容'},
-    // ]);
   }
 
   @override
@@ -74,6 +77,12 @@ class _AddArticlePageState extends State<AddArticlePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('添加文章'),
+        actions: [
+          TextButton(
+            onPressed: _submitArticle,
+            child: const Icon(Icons.save)
+          ),
+        ],
       ),
       body: _buildQuillEditor(),
     );
@@ -95,57 +104,31 @@ class _AddArticlePageState extends State<AddArticlePage> {
               ),
             ),
           ),
-
           SizedBox(height: 4),
-          // QuillSimpleToolbar(
-          //   controller: _controller,
-          //   // config: QuillSimpleToolbarConfig(
-          //   //   // embedButtons: FlutterQuillEmbeds.toolbarButtons(),
-          //   //   // showClipboardPaste: true,
-          //   //   customButtons: [
-          //   //     // QuillToolbarCustomButtonOptions(
-          //   //     //   icon: const Icon(Icons.add_alarm_rounded),
-          //   //     //   onPressed: () {
-          //   //     //     _controller.document.insert(
-          //   //     //       _controller.selection.extentOffset,
-          //   //     //       TimeStampEmbed(
-          //   //     //         DateTime.now().toString(),
-          //   //     //       ),
-          //   //     //     );
-          //   //     //
-          //   //     //     _controller.updateSelection(
-          //   //     //       TextSelection.collapsed(
-          //   //     //         offset: _controller.selection.extentOffset + 1,
-          //   //     //       ),
-          //   //     //       ChangeSource.local,
-          //   //     //     );
-          //   //     //   },
-          //   //     // ),
-          //   //   ],
-          //   //   buttonOptions: QuillSimpleToolbarButtonOptions(
-          //   //     base: QuillToolbarBaseButtonOptions(
-          //   //       afterButtonPressed: () {
-          //   //         final isDesktop = {
-          //   //           TargetPlatform.linux,
-          //   //           TargetPlatform.windows,
-          //   //           TargetPlatform.macOS
-          //   //         }.contains(defaultTargetPlatform);
-          //   //         if (isDesktop) {
-          //   //           _editorFocusNode.requestFocus();
-          //   //         }
-          //   //       },
-          //   //     ),
-          //   //     linkStyle: QuillToolbarLinkStyleButtonOptions(
-          //   //       validateLink: (link) {
-          //   //         // Treats all links as valid. When launching the URL,
-          //   //         // `https://` is prefixed if the link is incomplete (e.g., `google.com` → `https://google.com`)
-          //   //         // however this happens only within the editor.
-          //   //         return true;
-          //   //       },
-          //   //     ),
-          //   //   ),
-          //   // ),
-          // ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: DropdownButtonFormField<ArticleType>(
+              value: _selectedArticleType,
+              decoration: InputDecoration(
+                labelText: '文章类型',
+                border: OutlineInputBorder(),
+              ),
+              items: ArticleType.values.map((ArticleType type) {
+                return DropdownMenuItem<ArticleType>(
+                  value: type,
+                  child: Text(
+                    type.label, // 显示枚举名称
+                  ),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedArticleType = value!;
+                });
+              },
+            ),
+          ),
+          SizedBox(height: 4),
           QuillSimpleToolbar(
               controller: _controller,
               config: QuillSimpleToolbarConfig(
@@ -168,7 +151,6 @@ class _AddArticlePageState extends State<AddArticlePage> {
                 ),
               ),
           ),
-
           Expanded(
             child: QuillEditor(
               focusNode: _editorFocusNode,
@@ -177,34 +159,10 @@ class _AddArticlePageState extends State<AddArticlePage> {
               config: QuillEditorConfig(
                 placeholder: '请输入内容...',
                 padding: const EdgeInsets.all(16),
-                // embedBuilders: [
-                //   ...FlutterQuillEmbeds.editorBuilders(
-                //     imageEmbedConfig: QuillEditorImageEmbedConfig(
-                //       imageProviderBuilder: (context, imageUrl) {
-                //         // https://pub.dev/packages/flutter_quill_extensions#-image-assets
-                //         if (imageUrl.startsWith('assets/')) {
-                //           return AssetImage(imageUrl);
-                //         }
-                //         return null;
-                //       },
-                //     ),
-                //     videoEmbedConfig: QuillEditorVideoEmbedConfig(
-                //       customVideoBuilder: (videoUrl, readOnly) {
-                //         // To load YouTube videos https://github.com/singerdmx/flutter-quill/releases/tag/v10.8.0
-                //         return null;
-                //       },
-                //     ),
-                //   ),
-                //   TimeStampEmbedBuilder(),
-                // ],
               ),
             ),
           ),
-          SizedBox(height: 6),
-          ElevatedButton(
-            onPressed: _submitArticle,
-            child: Text('提交'),
-          ),
+
         ],
       ),
     );
