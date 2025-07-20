@@ -68,6 +68,10 @@ pm2 start -n iMath python -- -m http.server 8000
 - https://gitlab.com/testapp-system/katex_flutter
 - https://github.com/djade007/latext
 
+### HTML相关
+- webview_flutter和flutter_inappwebview
+- flutter_html
+
 ### 图片图像
 - https://github.com/hnvn/flutter_image_cropper/tree/master?tab=readme-ov-file
 - https://github.com/Yalantis/uCrop
