@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../models/mathematician.dart';
 
 class MathematicianDetailScreen extends StatelessWidget {
@@ -14,6 +15,14 @@ class MathematicianDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(mathematician.name),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              context.go('/admin/editMathematician?mathematicianId=${mathematician.id}');
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -26,7 +35,7 @@ class MathematicianDetailScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.grey[200],
                 image: DecorationImage(
-                  image: AssetImage(mathematician.imageUrl),
+                  image: AssetImage(mathematician.image),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -48,13 +57,13 @@ class MathematicianDetailScreen extends StatelessWidget {
                           color: Colors.blue.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: Text(
-                          mathematician.country,
-                          style: const TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        // child: Text(
+                        //   mathematician.country,
+                        //   style: const TextStyle(
+                        //     color: Colors.blue,
+                        //     fontWeight: FontWeight.bold,
+                        //   ),
+                        // ),
                       ),
                       const SizedBox(width: 8),
                       Container(
@@ -67,7 +76,7 @@ class MathematicianDetailScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          mathematician.birth_death,
+                          mathematician.title,
                           style: const TextStyle(
                             color: Colors.green,
                             fontWeight: FontWeight.bold,
@@ -103,29 +112,29 @@ class MathematicianDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  ...mathematician.contributions.map((achievement) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.star,
-                          color: Colors.amber,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            achievement,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              height: 1.5,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )),
+                  // ...mathematician.contributions.map((achievement) => Padding(
+                  //   padding: const EdgeInsets.only(bottom: 8.0),
+                  //   child: Row(
+                  //     crossAxisAlignment: CrossAxisAlignment.start,
+                  //     children: [
+                  //       const Icon(
+                  //         Icons.star,
+                  //         color: Colors.amber,
+                  //         size: 20,
+                  //       ),
+                  //       const SizedBox(width: 8),
+                  //       Expanded(
+                  //         child: Text(
+                  //           achievement,
+                  //           style: const TextStyle(
+                  //             fontSize: 16,
+                  //             height: 1.5,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // )),
                 ],
               ),
             ),

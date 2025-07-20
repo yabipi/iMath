@@ -174,7 +174,11 @@ class MyApp extends StatelessWidget {
       title: '数学宝典',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
-        textTheme: TextTheme(bodyMedium: TextStyle(fontSize: 12.sp)),
+        textTheme: TextTheme(
+            bodyLarge: TextStyle(fontSize: 10.sp),
+            bodyMedium: TextStyle(fontSize: 8.sp),
+            bodySmall: TextStyle(fontSize: 6.sp)
+        ),
         useMaterial3: true,
       ),
       routerConfig: router,

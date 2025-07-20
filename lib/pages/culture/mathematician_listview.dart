@@ -55,11 +55,11 @@ class MathematicianListviewState extends State<MathematicianListview> with Autom
                   child: ListTile(
                     leading: ClipRRect(
                       borderRadius: BorderRadius.circular(25),
-                      child: Image.asset(
-                        mathematician?.imageUrl??'',
+                      child: Image.network(
+                        mathematician?.image??'',
                         width: 50,
                         height: 50,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
                           return SvgPicture.asset(
                             'assets/images/placeholder.svg',
@@ -70,9 +70,7 @@ class MathematicianListviewState extends State<MathematicianListview> with Autom
                       ),
                     ),
                     title: Text(mathematician?.name??''),
-                    subtitle: Text(
-                      '${mathematician?.country??''} · ${mathematician?.birth_death??''}',
-                    ),
+                    subtitle: Text("${mathematician?.title??''}"),
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
                       Navigator.push(
@@ -106,7 +104,7 @@ class MathematicianListviewState extends State<MathematicianListview> with Autom
   }
 
   Future fetchData() async {
-    List<Mathematician> _mathematicians = [...mathematicians];
+    List<Mathematician> _mathematicians = [];
     final data = await CultureHttp.loadMathematicians();
     for (var item in data) {
       Mathematician m = Mathematician.fromJson(item);

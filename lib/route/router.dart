@@ -10,6 +10,7 @@ import 'package:imath/pages/culture/add_mathematician.dart';
 import 'package:imath/pages/culture/article_viewer.dart';
 import 'package:imath/pages/culture/culture_screen.dart';
 import 'package:imath/pages/culture/edit_article.dart';
+import 'package:imath/pages/culture/edit_mathematician.dart';
 import 'package:imath/pages/culture/mathematician_listview.dart';
 import 'package:imath/pages/culture/mathematician_screen.dart';
 import 'package:imath/pages/demo/pageview_demo.dart';
@@ -174,7 +175,13 @@ final router = GoRouter(
               return QuestionEditView(questionId: int.parse(questionId!));
             },
           ),
-
+          GoRoute(
+            path: 'editMathematician',
+            builder: (context, state) {
+              final mathematicianId = state.uri.queryParameters['mathematicianId'];
+              return EditMathematicianScreen(mathematicianId: int.parse(mathematicianId!));
+            },
+          ),
           GoRoute(
             path: 'addknow',
             builder: (context, state) => const AddKnowledgeView(),
