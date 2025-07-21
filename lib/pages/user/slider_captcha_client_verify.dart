@@ -27,7 +27,7 @@ class _SliderCaptchaClientVerifyState extends State<SliderCaptchaClientVerify> {
             title: '拖动滑块进行验证',
             image: Image.asset(
               'assets/images/back1.png',
-              fit: BoxFit.fitWidth,
+              fit: BoxFit.contain,
             ),
             colorBar: Colors.blue,
             colorCaptChar: Colors.blue,
