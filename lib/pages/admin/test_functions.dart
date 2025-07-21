@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:imath/pages/demo/easy_refresh_list.dart';
 import 'package:imath/pages/demo/simple_list_view.dart';
 import 'package:imath/pages/question/slide_question.dart';
 
@@ -45,9 +46,16 @@ class TestFunctionsPage extends StatelessWidget {
                 _buildTestButton(context, "布局管理", () {
                   // TODO: 布局管理逻辑
                 }),
-                _buildTestButton(context, "PageView无限下拉", () {
+                _buildTestButton(context, "无限下拉列表", () {
                   // TODO: 布局管理逻辑
-                  context.go('/pageview');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EasyRefreshListScreen(),
+                    ),
+                  );
+                  // context.go('/pageview');
+                  //
                 }),
                 _buildTestButton(context, "ListView", () {
                   Navigator.push(

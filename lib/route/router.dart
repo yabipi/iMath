@@ -1,5 +1,6 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
+import 'package:imath/models/article.dart';
 import 'package:imath/models/user.dart';
 import 'package:imath/pages/admin/admin_screen.dart';
 import 'package:imath/pages/admin/camera_screen.dart';
@@ -67,8 +68,8 @@ final router = GoRouter(
         GoRoute(
           path: 'article',
           builder: (context, state) {
-            final article = state.extra as Map<String, dynamic>;
-            return ArticleViewer(title: article['title'], articleId: article['id']);
+            final article = state.extra as Article;
+            return ArticleViewer(title: article.title, articleId: article.id);
           },
         ),
       ],

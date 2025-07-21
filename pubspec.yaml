@@ -73,6 +73,10 @@ dependencies:
   hooks_riverpod: ^2.6.1
   flutter_screenutil: ^5.9.3
   slider_captcha: ^1.0.2
+  easy_refresh: ^3.4.0
+  flutter_spinkit: ^5.2.1
+  simple_animations: ^5.2.0
+  intl: ^0.20.2
 
 #    git:
 ##      url: https://github.com/yabipi/flutter_math.git

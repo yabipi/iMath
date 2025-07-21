@@ -5,6 +5,7 @@ import 'package:imath/config/config.dart';
 import 'package:imath/config/constants.dart';
 
 import 'package:imath/pages/common/bottom_navigation_bar.dart';
+import 'package:imath/pages/culture/article_refresh_list.dart';
 import '../../models/mathematician.dart';
 import 'article_listview.dart';
 import 'mathematician_detail_screen.dart';
@@ -41,7 +42,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
         },
         child: const Icon(Icons.add),
       ),
-      body: ArticleListView(articleType: ArticleType.experience),
+      body: ArticleRefreshListScreen(articleType: ArticleType.experience),
       bottomNavigationBar: CustomBottomNavigationBar(),
     );
   }
