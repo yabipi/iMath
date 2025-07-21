@@ -60,6 +60,9 @@ flutter build web --web-renderer html
 flutter build web
 pm2 start -n iMath python -- -m http.server 8000
 
+## 启动画面
+dart run flutter_native_splash:create
+
 ## 依赖组件
 ### Math相关组件
 - https://github.com/shahxad-akram/flutter_tex: A Flutter Package to render Mathematics, Physics and Chemistry Equations based on LaTeX
