@@ -67,7 +67,7 @@ class LoadingNoMore extends StatelessWidget {
       height: 50,
       alignment: Alignment.center,
       child: Text(
-        '— 我是有底线的 —',
+        '— 没有更多数据了 —',
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w400,

@@ -58,21 +58,11 @@ final router = GoRouter(
     ),
 
     GoRoute(
-      path: '/culture',
+      path: '/article',
       builder: (context, state) {
-        final String index = state.uri.queryParameters['tab']?? '0';
-        return CultureScreen(initialIndex: int.parse(index));
+        final article = state.extra as Article;
+        return ArticleViewer(title: article.title, articleId: article.id);
       },
-
-      routes: <RouteBase>[ // Add child routes
-        GoRoute(
-          path: 'article',
-          builder: (context, state) {
-            final article = state.extra as Article;
-            return ArticleViewer(title: article.title, articleId: article.id);
-          },
-        ),
-      ],
     ),
     GoRoute(
       path: '/booklist',

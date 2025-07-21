@@ -44,7 +44,7 @@ class _ArticleRefreshListScreenState extends State<ArticleRefreshListScreen> {
           title: Text(item.title),
           subtitle: Text(DateUtil.formatDate(item.date) ?? ''),
           onTap: () {
-            context.go("/culture/article", extra: item);
+            context.push("/article", extra: item);
           },
         );
       },

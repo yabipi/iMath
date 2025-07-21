@@ -73,7 +73,7 @@ class _EditArticlePageState extends State<EditArticlePage> {
     // 可以在这里调用API或进行其他处理
     await ArticleHttp.updateArticle(widget.articleId, {"title": title, "content": html});
     SmartDialog.showToast('修改成功');
-    context.go('/culture?tab=1');
+    context.go('/home');
   }
 
   @override
@@ -88,6 +88,12 @@ class _EditArticlePageState extends State<EditArticlePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('文章编辑'),
+        actions: [
+          TextButton(
+              onPressed: _submitArticle,
+              child: const Icon(Icons.save)
+          ),
+        ],
       ),
       body: FutureBuilder(
         future: _future,
@@ -150,11 +156,7 @@ class _EditArticlePageState extends State<EditArticlePage> {
               ),
             ),
           ),
-          SizedBox(height: 6),
-          ElevatedButton(
-            onPressed: _submitArticle,
-            child: Text('提交'),
-          ),
+
         ],
       ),
     );

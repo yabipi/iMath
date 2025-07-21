@@ -52,11 +52,17 @@ class ArticleViewerState extends State<ArticleViewer> {
       appBar: AppBar(
         title: Text(widget.title),
         centerTitle: true, // 标题居中
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            context.pop();
+          },
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.edit),
             onPressed: () {
-              context.go("/admin/editArticle/${widget.articleId}");
+              context.push("/admin/editArticle/${widget.articleId}");
             },
           ),
         ],

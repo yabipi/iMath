@@ -38,7 +38,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.go('/admin/addArticle');
+          context.push('/admin/addArticle');
         },
         child: const Icon(Icons.add),
       ),

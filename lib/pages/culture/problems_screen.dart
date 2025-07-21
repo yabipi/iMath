@@ -37,7 +37,7 @@ class _ProblemsScreenState extends State<ProblemsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.go('/admin/addArticle');
+          context.push('/admin/addArticle');
         },
         child: const Icon(Icons.add),
       ),

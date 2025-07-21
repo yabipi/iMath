@@ -5,7 +5,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:simple_animations/simple_animations.dart';
 
 /// 下拉刷新的动画文字
-const _kRefreshText = 'PAY · PARK';
+const _kRefreshText = '正在获取最新数据中...';
 
 class RefreshHeader extends Header {
   const RefreshHeader({

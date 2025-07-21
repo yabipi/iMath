@@ -64,7 +64,7 @@ class _AddArticlePageState extends State<AddArticlePage> {
       "type": _selectedArticleType.value // 新增：提交选中的文章类型
     });
     SmartDialog.showToast('创建成功');
-    context.go('/culture');
+    context.go('/home');
   }
 
   @override
