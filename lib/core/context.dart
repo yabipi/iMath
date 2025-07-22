@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:imath/config/constants.dart';
 import 'package:imath/db/Storage.dart';
 import 'package:imath/models/user.dart';
+import 'package:imath/state/global_state.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:logger/logger.dart';
 
@@ -31,7 +32,8 @@ extension Context on BuildContext{
   // 工厂方法返回唯一的实例
   // factory Context() => _instance;
 
-  static final Map<String, dynamic> _data = {};
+  // static final Map<String, dynamic> _data = {};
+
   static String? token = null;
   static User? _currentUser;
 
@@ -67,20 +69,7 @@ extension Context on BuildContext{
     // }
   }
 
-  // 设置键值对
-  void set(String key, dynamic value) {
-    _data[key] = value;
-  }
 
-  // 获取键值对
-  dynamic get(String key) {
-    return _data[key];
-  }
-
-  // 删除键值对
-  void remove(String key) {
-    _data.remove(key);
-  }
 
   User? get currentUser => _currentUser;
 
@@ -89,7 +78,7 @@ extension Context on BuildContext{
   }
 
   int getCategoryId(String category) {
-    Map<String, dynamic> categories = get(CATEGORIES_KEY);
+    Map<String, dynamic> categories = GlobalState.get(CATEGORIES_KEY);
     return categories[category] as int;
   }
 

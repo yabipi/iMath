@@ -1,6 +1,7 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imath/models/article.dart';
+import 'package:imath/models/knowledges.dart';
 import 'package:imath/models/user.dart';
 import 'package:imath/pages/admin/admin_screen.dart';
 import 'package:imath/pages/admin/camera_screen.dart';
@@ -22,6 +23,7 @@ import 'package:imath/pages/home/home_screen.dart';
 import 'package:imath/pages/home/news_detail.dart';
 import 'package:imath/pages/knowledge/add_knowledge.dart';
 import 'package:imath/pages/knowledge/edit_knowledge.dart';
+import 'package:imath/pages/knowledge/knowledge_detail.dart';
 import 'package:imath/pages/knowledge/knowledge_screen.dart';
 import 'package:imath/pages/paper/add_paper_screen.dart';
 import 'package:imath/pages/question/add_question.dart';
@@ -63,6 +65,13 @@ final router = GoRouter(
         final article = state.extra as Article;
         return ArticleViewer(title: article.title, articleId: article.id);
       },
+    ),
+    GoRoute(
+      path: '/knowdetail',
+      builder: (context, state) {
+        final knowledgeId = state.uri.queryParameters['knowledgeId'] ?? '0';
+        return KnowledgeDetailScreen(knowledgeId: int.parse(knowledgeId));
+      }
     ),
     GoRoute(
       path: '/booklist',

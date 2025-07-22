@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart'; // 引入 image_picker 包
+import 'package:imath/state/global_state.dart';
 import 'dart:io'; // 引入 File 类
 
 import '../../config/api_config.dart';
@@ -50,7 +51,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
     String? content = '';
     _contentController.text = content ?? '';
     // 获取全局数据
-    categories = context.get(CATEGORIES_KEY);
+    categories = GlobalState.get(CATEGORIES_KEY);
   }
 
   @override

@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'package:imath/config/constants.dart';
 import 'package:imath/http/question.dart';
+import 'package:imath/state/global_state.dart';
 
 import '../../config/api_config.dart';
 import 'package:imath/core/context.dart';
@@ -132,7 +133,7 @@ class _QuestionEditViewState extends State<QuestionEditView> {
 
   @override
   Widget build(BuildContext context) {
-    final categories = context.get(CATEGORIES_KEY);
+    final categories = GlobalState.get(CATEGORIES_KEY);
     return Scaffold(
       appBar: AppBar(
         title: const Text('编辑题目'),

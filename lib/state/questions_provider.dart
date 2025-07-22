@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imath/config/constants.dart';
 import 'package:imath/http/question.dart';
+import 'package:imath/models/question.dart';
 import 'package:imath/models/quiz.dart';
 
 // 分类ID提供者

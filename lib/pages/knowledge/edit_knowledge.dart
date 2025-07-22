@@ -25,6 +25,7 @@ class _EditKnowledgeViewState extends ConsumerState<EditKnowledgeView> with Cate
   late Map<String, String> categories;
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
+  final _subtitleController = TextEditingController();
   final _contentController = TextEditingController();
   final _levelController = TextEditingController();
   String? _selectedCategory;
@@ -39,13 +40,15 @@ class _EditKnowledgeViewState extends ConsumerState<EditKnowledgeView> with Cate
   Future<void> _fetchKnowledge() async {
     // knowledgeId = Get.arguments['knowledgeId'] as int;
     final response = await Request().get('${ApiConfig.SERVER_BASE_URL}/api/know/${widget.knowledgeId}');
-    String title = response.data['know_item']['Title'];
-    String content = response.data['know_item']['Content'];
+    String title = response.data['know_item']['title'];
+    String subtitle = response.data['know_item']['subtitle'];
+    String content = response.data['know_item']['content'];
     String category = response.data['know_item']['category'];
 
     setState(() {
       _titleController.text = title;
       _contentController.text = content ?? '';
+      _subtitleController.text = subtitle;
       // 修改: 使用函数式编程找到对应的分类ID
       _selectedCategory = category;
       // _selectedCategory = categories?.entries.firstWhere((entry) => entry.value == category).key as int ?? 0;
@@ -61,19 +64,15 @@ class _EditKnowledgeViewState extends ConsumerState<EditKnowledgeView> with Cate
   }
 
   Future<void> _updateKnowledge() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
     try {
       final response = await Request().put(
         '${ApiConfig.SERVER_BASE_URL}/api/know/${widget.knowledgeId}',
         options: Options(contentType: Headers.jsonContentType),
         data: {
           'title': _titleController.text,
+          'subtitle': _subtitleController.text,
           'content': _contentController.text,
-          'category': categories?[_selectedCategory],
-          // 'level': _levelController.text,
+          'category': _selectedCategory,
         },
       );
 
@@ -108,13 +107,30 @@ class _EditKnowledgeViewState extends ConsumerState<EditKnowledgeView> with Cate
     return Scaffold(
       appBar: AppBar(
         title: const Text('编辑知识点'),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              if (_formKey.currentState!.validate()) {
+                setState(() {
+                  _isSubmitting = true;
+                });
+                await _updateKnowledge();
+                setState(() {
+                  _isSubmitting = false;
+                });
+              }
+            },
+            child: const Icon(Icons.save),
+          ),
+        ],
       ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DropdownButtonFormField<String>(
                 value: _selectedCategory,
@@ -150,40 +166,39 @@ class _EditKnowledgeViewState extends ConsumerState<EditKnowledgeView> with Cate
               ),
               const SizedBox(height: 16),
               TextFormField(
-                controller: _contentController,
+                controller: _subtitleController,
                 decoration: const InputDecoration(
-                  labelText: '知识点内容',
+                  labelText: '副标题',
                   border: OutlineInputBorder(),
-                  alignLabelWithHint: true,
                 ),
-                maxLines: 5,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '请输入知识点内容';
+                    return '请输入知识点标题';
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 16),
-
-              Row(
-                children: [
-                  Spacer(),
-                  ElevatedButton(
-                    onPressed: _isSubmitting ? null : _updateKnowledge,
-                    child: _isSubmitting
-                        ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                      ),
-                    )
-                        : const Text('提交'),
+              TextFormField(
+                  controller: _contentController,
+                  decoration: const InputDecoration(
+                    labelText: '知识点内容',
+                    border: OutlineInputBorder(),
+                    alignLabelWithHint: true,
+                    filled: true,
                   ),
-                  Spacer(),
-                ]
-              ),
+                  minLines: 6,
+                  maxLines: 16,
+                  // expands: true,
+                  textAlignVertical: TextAlignVertical.top,
+                  keyboardType: TextInputType.multiline,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '请输入知识点内容';
+                    }
+                    return null;
+                  }
+              )
             ],
           ),
         ),

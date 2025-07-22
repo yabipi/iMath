@@ -4,6 +4,7 @@ import 'package:flutter_math_fork/flutter_math.dart';
 // import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:http/http.dart' as http;
 import 'package:imath/components/math_cell.dart';
+import 'package:imath/models/question.dart';
 import 'dart:convert';
 import '../../config/api_config.dart';
 import '../../http/init.dart';

@@ -2,6 +2,7 @@
 import 'package:dio/dio.dart';
 import 'package:imath/config/api_config.dart';
 import 'package:imath/config/constants.dart';
+import 'package:imath/models/question.dart';
 import 'package:imath/models/quiz.dart';
 
 import 'init.dart';

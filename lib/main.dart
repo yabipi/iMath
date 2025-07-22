@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:imath/models/user.dart';
 import 'package:imath/route/router.dart';
 import 'package:imath/services/connectivity_service.dart';
+import 'package:imath/state/global_state.dart';
 import 'package:imath/utils/device_util.dart';
 
 // import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -161,7 +162,7 @@ class MyApp extends StatelessWidget {
     String? categoriesStr = GStorage.mathdata.get(CATEGORIES_KEY);
     if (categoriesStr != null) {
       Map<String, dynamic> _categories = json.decode(categoriesStr ?? '{}');
-      context.set(CATEGORIES_KEY, _categories);
+      GlobalState.set(CATEGORIES_KEY, _categories);
     }
     return _buildScreenFitApp(context);
   }
@@ -175,9 +176,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         textTheme: TextTheme(
-            bodyLarge: TextStyle(fontSize: 14.sp),
-            bodyMedium: TextStyle(fontSize: 12.sp),
-            bodySmall: TextStyle(fontSize: 10.sp)
+            bodyLarge: TextStyle(
+              fontSize: ThemeData.light().textTheme.bodyLarge?.fontSize, // 保持平台默认
+              fontWeight: FontWeight.w500, // 仅修改字重等属性
+            ),
+            // bodyMedium: TextStyle(fontSize: 12.sp),
+            // bodySmall: TextStyle(fontSize: 10.sp)
         ),
         useMaterial3: true,
       ),

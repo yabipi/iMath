@@ -12,9 +12,7 @@ import 'mathematician_detail_screen.dart';
 import 'mathematician_listview.dart';
 
 class ExperienceScreen extends StatefulWidget {
-
   ExperienceScreen({super.key});
-
 
   @override
   _ExperienceScreenState createState() => _ExperienceScreenState();
@@ -23,18 +21,20 @@ class ExperienceScreen extends StatefulWidget {
 class _ExperienceScreenState extends State<ExperienceScreen> {
   final GlobalKey<MathematicianListviewState> _mathematicianListKey = GlobalKey<MathematicianListviewState>();
 
-
   @override
   void initState() {
     super.initState();
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(HOME_COLUMN.EXPERIENCE.value),
+        title: Text(
+          HOME_COLUMN.EXPERIENCE.value,
+          textAlign: TextAlign.center,
+        ),
+        centerTitle: true, // 确保标题居中
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
