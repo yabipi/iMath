@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:imath/config/constants.dart';
+import 'package:imath/state/global_state.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:universal_platform/universal_platform.dart';
@@ -581,7 +582,7 @@ class _AvatarEditScreenState extends State<AvatarEditScreen> {
       final String base64Image = await _convertImageToBase64(_selectedImage!);
       
       // 获取当前用户ID
-      final currentUser = context.currentUser;
+      final currentUser = GlobalState.currentUser;
       if (currentUser?.id == null) {
         throw Exception('用户信息不完整，无法更新头像');
       }

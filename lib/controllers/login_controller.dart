@@ -3,17 +3,16 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:developer';
+import 'package:imath/config/constants.dart';
 
-import 'package:imath/core/context.dart';
 import 'package:imath/db/Storage.dart';
 import 'package:imath/http/auth.dart';
 import 'package:imath/models/user.dart';
 import 'package:oauth2/oauth2.dart';
 
-import '../../services/auth_api_service.dart';
+import '../../services/auth_service.dart';
 
-class LoginController {
+class LoginController extends AuthService{
   final GlobalKey<FormState> loginFormKey =
       GlobalKey<FormState>(debugLabel: '__loginFormKey__');
 
@@ -24,14 +23,12 @@ class LoginController {
   final emailController = TextEditingController();
 
   late BuildContext context;
-  late AuthApiService _authenticationService;
+  late AuthService _authenticationService;
 
   LoginController(BuildContext context) {
     this.context = context;
-    _authenticationService = AuthApiService();
+    _authenticationService = AuthService();
   }
-
-
 
   Future<void> sendVerificationCode(String phone, String verifyCode) async {
 
@@ -45,18 +42,16 @@ class LoginController {
 
   }
 
-  Future<Credentials?> refreshToken() async {
-    try {
-      return _authenticationService.refreshToken();
-    } catch (e) {
-      // printError(info: 'exception refreshToken:  ${e.toString()}');
-      rethrow;
-    }
-  }
+  // Future<Credentials?> refreshToken() async {
+  //   try {
+  //     return _authenticationService.refreshToken();
+  //   } catch (e) {
+  //     // printError(info: 'exception refreshToken:  ${e.toString()}');
+  //     rethrow;
+  //   }
+  // }
 
   Credentials? tokenCredentials() => _authenticationService.credentials;
-
-
 
   bool isAuthenticated() {
     return !_authenticationService.sessionIsExpired();
@@ -83,16 +78,8 @@ class LoginController {
   Future<void> login() async {
     log('${emailController.text}, ${passwordController.text}');
     try {
-      final result = await AuthHttp.signIn(emailController.text, passwordController.text);
-      String token = result['token'];
-      final user = User.fromJson(result['user']);
-      if (token.isNotEmpty) {
-        GStorage.userInfo.put('token', token);
-      }
-      GStorage.userInfo.put('user', result['user']);
-      // 刷新当前用户
-      context.currentUser = user;
-      context.go('/profile', extra:  user);
+      await signin(emailController.text, passwordController.text);
+      context.go('/profile');
     } catch (err, _) {
       passwordController.clear();
       rethrow;
@@ -101,7 +88,7 @@ class LoginController {
 
   Future<void> logout() async {
     try {
-      await AuthHttp.signOut(context.currentUser?.username);
+      await signout();
       context.go('/login');
     } catch (err, _) {
       rethrow;

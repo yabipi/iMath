@@ -147,13 +147,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 将初始数据挂载到context上
-    context.refreshToken();
-    final originalMap = GStorage.userInfo.get('user');
+    GlobalState.refreshToken();
+    final originalMap = GStorage.userInfo.get(Constants.USER_KEY);
     if (originalMap != null) {
       final Map<String, dynamic> userJson = Map<String, dynamic>.from(originalMap);
       if (userJson != null) {
         final user = User.fromJson(userJson);
-        context.currentUser = user;
+        GlobalState.currentUser = user;
       }
     }
 

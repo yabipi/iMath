@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'package:imath/config/constants.dart';
 import 'package:imath/http/question.dart';
+import 'package:imath/models/question.dart';
 import 'package:imath/state/global_state.dart';
 
 import '../../config/api_config.dart';
@@ -29,7 +30,7 @@ class _QuestionEditViewState extends State<QuestionEditView> {
   late int _questionId;
   int selectedBranch = ALL_CATEGORY;
   String selectedType = QuestionTypes[0];
-  List<String> selectedImages = [];
+  bool loaded = false; // 标记是否已经初始化
 
   // 获取全局 Context 实例
   late final categories;
@@ -49,21 +50,24 @@ class _QuestionEditViewState extends State<QuestionEditView> {
   }
 
   // 加载题目数据
-  Future loadQuestion() async {
+  Future<void> loadQuestion() async {
+    if (loaded) {
+      return;
+    }
     try {
-      final question = await QuestionHttp.getQuestion(_questionId);
-      contentController.text = question.content ?? '';
-      optionsController.text = question.options ?? '';
-      answerController.text = question.answer ?? '';
-      selectedBranch = question._categoryId ?? ALL_CATEGORY;
+      final Question? question = await QuestionHttp.getQuestion(_questionId);
+      if (question != null) {
+        contentController.text = question.content ?? '';
+        optionsController.text = question.options ?? '';
+        answerController.text = question.answer ?? '';
+        selectedBranch = question.categoryId ?? ALL_CATEGORY;
 
-      selectedType = (question.type??'').isEmpty ? QuestionTypes[0] : question.type!;
-      selectedImages = question.images?.split(',') ?? [];
-
-      return question;
-
+        selectedType = (question.type??'').isEmpty ? QuestionTypes[0] : question.type!;
+        _selectedImages = question.images?.split(',') ?? [];
+      }
+      loaded = true;
     } catch (e) {
-      return null;
+      return;
     }
   }
   // 提交题目编辑
@@ -107,7 +111,7 @@ class _QuestionEditViewState extends State<QuestionEditView> {
           final fileUrl = data['fileUrl'];
           final secureUrl = fileUrl.replaceFirst('http://', 'https://');
           setState(() {
-            _selectedImages.add(secureUrl);
+            _selectedImages = [..._selectedImages, secureUrl];
           });
         } else {
           throw Exception('图片上传失败');
@@ -241,20 +245,6 @@ class _QuestionEditViewState extends State<QuestionEditView> {
                     ),
                     const SizedBox(height: 16),
                     _buildImageSection(),
-                    // Row(children: [
-                    //   Spacer(),
-                    //   ElevatedButton(
-                    //     onPressed: _isSubmitting ? null : updateQuestion,
-                    //     child: _isSubmitting
-                    //         ? const SizedBox(
-                    //       height: 20,
-                    //       width: 20,
-                    //       child: CircularProgressIndicator(strokeWidth: 2),
-                    //     )
-                    //         : const Text('提交'),
-                    //   ),
-                    //   Spacer()
-                    // ])
                   ],
                 ),
               ),
@@ -295,7 +285,7 @@ class _QuestionEditViewState extends State<QuestionEditView> {
                     _selectedImages[i],
                     width: 100,
                     height: 100,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         width: 100,

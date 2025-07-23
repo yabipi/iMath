@@ -6,11 +6,13 @@ import 'package:go_router/go_router.dart';
 import 'package:imath/controllers/login_controller.dart';
 import 'package:imath/core/context.dart';
 import 'package:imath/pages/common/bottom_navigation_bar.dart';
+import 'package:imath/state/global_state.dart';
 import '../../models/user.dart';
 import '../../controllers/user_controller.dart';
 import 'login_screen.dart';
 import '../admin/camera_screen.dart';
 import '../admin/admin_screen.dart';
+import 'phone_login.dart';
 
 // extends GetView<LoginController>
 class ProfileScreen extends ConsumerWidget {
@@ -39,10 +41,10 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     controller = LoginController(context);
     if (this.user == null) {
-      this.user = context.currentUser;
+      this.user = GlobalState.currentUser;
     }
     if(this.user == null)
-      return LoginScreen();
+      return PhoneLoginPage();
     else return Scaffold(
       appBar: AppBar(
         title: const Text('个人中心'),
@@ -78,10 +80,10 @@ class ProfileScreen extends ConsumerWidget {
                     children: [
                       CircleAvatar(
                         radius: 40,
-                        backgroundImage: user?.avatar != null 
+                        backgroundImage: user?.avatar != null && user!.avatar!.length > 0
                             ? MemoryImage(base64Decode(user!.avatar!))
                             : null,
-                        child: user?.avatar == null
+                        child: user?.avatar == null || user!.avatar!.length == 0
                             ? const Icon(Icons.person, size: 40)
                             : null,
                       ),
@@ -199,7 +201,7 @@ class ProfileScreen extends ConsumerWidget {
               // 导航到关于页面
               context.go('/profile');
               _logout(context);
-              context.logout();
+              controller.logout();
             },
           ),
           // ListTile(

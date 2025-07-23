@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../config/api_config.dart';
 
-import '../services/auth_api_service.dart';
+import '../services/auth_service.dart';
 
 class SignupController {
   final GlobalKey<FormState> signupFormKey =

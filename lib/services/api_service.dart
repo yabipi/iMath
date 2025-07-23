@@ -3,11 +3,11 @@ import 'dart:developer';
 import 'package:oauth2/oauth2.dart';
 
 import '../config/api_config.dart';
-import 'auth_api_service.dart';
+import 'auth_service.dart';
 
 class ApiService {
   bool isLoginRequest(request) {
-    return (ApiConfig.SERVER_BASE_URL + AuthApiService.signInUrl ==
+    return (ApiConfig.SERVER_BASE_URL + AuthService.signInUrl ==
         request.url.toString());
   }
 

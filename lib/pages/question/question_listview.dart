@@ -93,7 +93,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
                 IconButton(
                   icon: const Icon(Icons.edit),
                   onPressed: () {
-                    context.go('/admin/editQuestion?questionId=${question.id}');
+                    context.push('/admin/editQuestion?questionId=${question.id}');
                   },
                 ),
               ],

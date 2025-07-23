@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 
-import '../services/auth_api_service.dart';
+import '../services/auth_service.dart';
 // extends GetMiddleware
 class AuthMiddleware  {
-  late AuthApiService _authenticationService;
+  late AuthService _authenticationService;
 
   @override
   RouteSettings? redirect(String? route) {

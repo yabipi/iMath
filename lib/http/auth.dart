@@ -13,7 +13,7 @@ class AuthHttp {
     return response;
   }
 
-  static Future verifyCaptcha(String captcha, String phone) async {
+  static Future verifyCaptcha(String phone, String captcha) async {
     final response = await Request().post(
         '${ApiConfig.SERVER_BASE_URL}/api/user/verifyCaptcha',
       options: Options(contentType: Headers.jsonContentType),

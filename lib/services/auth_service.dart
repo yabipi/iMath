@@ -3,8 +3,11 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:imath/config/constants.dart';
 
 import 'package:imath/core/context.dart';
+import 'package:imath/http/auth.dart';
+import 'package:imath/state/global_state.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 import '../config/api_config.dart';
@@ -17,7 +20,12 @@ import 'package:path_provider/path_provider.dart';
 
 import '../mixins/helper_mixin.dart';
 
-class AuthApiService extends ApiService {
+import 'package:imath/models/user.dart';
+
+/**
+ * 集中了认证登录相关的服务
+ */
+class AuthService extends ApiService {
   static String signUpUrl = '/api/user/register';
   static String signInUrl = '/api/oauth/token';
 
@@ -141,6 +149,55 @@ class AuthApiService extends ApiService {
     _credentialsFile.delete();
     credentials = null;
     return true;
+  }
+
+  Future<void> signin(String username, String password) async {
+    try {
+      final result = await AuthHttp.signIn(username, password);
+      _saveUser(result);
+    } catch (err, _) {
+      rethrow;
+    }
+  }
+
+  /**
+   * 手机验证码登录
+   */
+  static Future<bool> signinWithPhone(String phone, String pincode) async {
+    try {
+      final result = await AuthHttp.verifyCaptcha(phone, pincode);
+      if (result['code'] == ApiCode.SUCCESS) {
+        // SmartDialog.showToast('验证码正确');
+        _saveUser(result);
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err, _) {
+      return false;
+    }
+  }
+
+  static void _saveUser(result) {
+    final user = User.fromJson(result[Constants.USER_KEY]);
+    String token = result[Constants.USER_TOKEN];
+
+    if (token.isNotEmpty) {
+      GStorage.userInfo.put(Constants.USER_TOKEN, token);
+    }
+    GStorage.userInfo.put(Constants.USER_KEY, result[Constants.USER_KEY]);
+    // 刷新当前用户
+    GlobalState.currentUser = user;
+  }
+
+  Future<void> signout() async {
+    try {
+      await AuthHttp.signOut(GlobalState.currentUser?.username);
+      GStorage.userInfo.delete(Constants.USER_KEY);
+      GlobalState.currentUser = null;
+    } catch (err, _) {
+      rethrow;
+    }
   }
 
   bool sessionIsEmpty() {

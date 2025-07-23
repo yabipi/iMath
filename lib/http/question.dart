@@ -1,4 +1,6 @@
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:imath/config/api_config.dart';
 import 'package:imath/config/constants.dart';
@@ -18,18 +20,15 @@ class QuestionHttp {
     return response.data;
   }
 
-  static Future getQuestion(int questionId) async {
+  static FutureOr<Question?> getQuestion(int questionId) async {
     try {
       final response = await Request().get(
           '${ApiConfig.SERVER_BASE_URL}/api/question/${questionId}'
       );
 
       if (response.statusCode == 200) {
-        // final data = json.decode(response.body);
         final question = Question.fromJson(response.data);
         return question;
-        // _titleController.text = question.title ?? '';
-        // _contentController.text = question.content ?? '';
       }
     } catch  (e) {
       return null;

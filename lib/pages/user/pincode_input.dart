@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:imath/http/auth.dart';
 import 'package:imath/models/user.dart';
+import 'package:imath/services/auth_service.dart';
 import 'package:imath/widgets/timer_button.dart';
 import 'package:pinput/pinput.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -53,12 +54,6 @@ class _PinputScreenState extends State<PinputScreen> {
       duration: 60,
     );// 初始化控制器
     timerBtnController = timerBtn?.controller;
-    // AuthHttp.sendCaptcha();
-
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   SmartDialog.showToast('验证码已发送');
-    // });
-
     timerBtn.controller?.startTimer();
   }
 
@@ -117,6 +112,7 @@ class _PinputScreenState extends State<PinputScreen> {
                         length: 6,
                         controller: pinController,
                         focusNode: focusNode,
+                        autofocus: true,
                         defaultPinTheme: defaultPinTheme,
                         validator: (value) {
                           return null;
@@ -125,11 +121,9 @@ class _PinputScreenState extends State<PinputScreen> {
                         },
                         hapticFeedbackType: HapticFeedbackType.lightImpact,
                         onCompleted: (pin) async {
-                          final response = await AuthHttp.verifyCaptcha(pin, widget.phone);
-                          if (response['code'] == 1) {
-                            // SmartDialog.showToast('验证码正确');
-                            final user = User.fromJson(response['data']);
-                            context.go('/profile', extra: user);
+                          final result = await AuthService.signinWithPhone(widget.phone, pin);
+                          if (result) {
+                            context.go('/profile');
                           } else {
                             SmartDialog.showToast('验证码错误');
                             timerBtnController?.enableButton();

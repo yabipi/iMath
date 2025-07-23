@@ -34,9 +34,6 @@ extension Context on BuildContext{
 
   // static final Map<String, dynamic> _data = {};
 
-  static String? token = null;
-  static User? _currentUser;
-
   void showMsg(String msg) {
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(content: Text(msg)),
@@ -49,54 +46,12 @@ extension Context on BuildContext{
     );
   }
 
-
-  void refreshToken() {
-    token = GStorage.userInfo.get('token') ?? '';
-    // if (token!.isNotEmpty) {
-    //   try {
-    //     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
-    //     final role = decodedToken['role'];
-    //     print('Role: $role');
-    //     currentUser = User(username: decodedToken['username']);
-    //     print(currentUser?.username);
-    //     final exp = decodedToken['exp'];
-    //     // 格式化 exp 时间戳为可读的日期时间格式
-    //     final formattedExp = DateTime.fromMillisecondsSinceEpoch(exp * 1000).toString();
-    //     print('Token Expiration Time: $formattedExp');
-    //   } catch (e) {
-    //     log('Error decoding token: $e');
-    //   }
-    // }
-  }
-
-
-
-  User? get currentUser => _currentUser;
-
-  set currentUser(User? user) {
-    _currentUser = user;
-  }
-
   int getCategoryId(String category) {
     Map<String, dynamic> categories = GlobalState.get(CATEGORIES_KEY);
     return categories[category] as int;
   }
 
-  bool isLoggedIn() {
-    bool hasExpired = JwtDecoder.isExpired(token!);
-    if (!hasExpired) {
-      return true;
-    } else {
-      return false;
-    }
-  }
 
-
-  void logout() {
-    GStorage.userInfo.delete('token');
-    token = null;
-    _currentUser = null;
-  }
 }
 
 

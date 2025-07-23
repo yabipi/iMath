@@ -1,6 +1,6 @@
 import 'package:imath/controllers/login_controller.dart';
 
-import '../services/auth_api_service.dart';
+import '../services/auth_service.dart';
 import '../services/connectivity_service.dart';
 
 

@@ -1,5 +1,5 @@
 import '../controllers/signup_controller.dart';
-import '../services/auth_api_service.dart';
+import '../services/auth_service.dart';
 
 // class SignupBinding extends Bindings {
 //   @override

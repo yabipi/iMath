@@ -5,7 +5,7 @@ import 'package:oauth2/oauth2.dart';
 import '../config/api_config.dart';
 
 import '../mixins/helper_mixin.dart';
-import '../services/auth_api_service.dart';
+import '../services/auth_service.dart';
 
 class HomeController {
   HomeController();

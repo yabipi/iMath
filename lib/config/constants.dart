@@ -57,6 +57,9 @@ class Constants {
   static const String thirdSign = '04224646d1fea004e79606d3b038c84a';
   static const String thirdApi =
       'https://www.mcbbs.net/template/mcbbs/image/special_photo_bg.png';
+
+  static const String USER_KEY = "user";
+  static const String USER_TOKEN = "token";
 }
 
 const int ALL_CATEGORY = 0;
@@ -70,6 +73,7 @@ enum MATH_LEVEL {
   Primary,
   Advanced,
 }
+
 extension MATH_LEVEL_Extension on MATH_LEVEL {
   String get value {
     switch (this) {

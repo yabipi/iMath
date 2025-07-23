@@ -33,6 +33,7 @@ import 'package:imath/pages/question/questions_screen.dart';
 import 'package:imath/pages/user/about_me.dart';
 import 'package:imath/pages/user/avatar_edit.dart';
 import 'package:imath/pages/user/login_screen.dart';
+import 'package:imath/pages/user/phone_login.dart';
 import 'package:imath/pages/user/pincode_input.dart';
 
 import 'package:imath/pages/user/profile_screen.dart';
@@ -126,7 +127,7 @@ final router = GoRouter(
     // 用户登录管理相关
     GoRoute(
       path: '/login',
-      builder: (context, state) => LoginScreen(),
+      builder: (context, state) => PhoneLoginPage(),
     ),
     GoRoute(
       path: '/register',
