@@ -115,8 +115,6 @@ Future<void> initializeApp() async {
 
 
 void main() async {
-  logger.d('Starting app...', version());
-
   WidgetsFlutterBinding.ensureInitialized();
   await GStorage.init();
 
