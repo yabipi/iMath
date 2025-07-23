@@ -1,22 +1,18 @@
 // ignore_for_file: avoid_print
 import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
+
 import 'dart:io';
 import 'dart:math' show Random;
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
+import 'package:dio/browser.dart';
+
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 // import 'package:dio_http2_adapter/dio_http2_adapter.dart';
 import 'package:hive/hive.dart';
 import 'package:imath/db/Storage.dart';
 import 'package:imath/utils/device_util.dart';
 import 'package:imath/utils/utils.dart';
-// import 'package:pilipala/utils/id_utils.dart';
-// import '../utils/storage.dart';
-// import '../utils/utils.dart';
-// import 'api.dart';
 
 import '../config/api_config.dart';
 import '../config/constants.dart';
@@ -48,6 +44,10 @@ class Request {
       );
       cookieManager = CookieManager(cookieJar);
       dio.interceptors.add(cookieManager);
+    } else {
+      // dio.httpClientAdapter = BrowserHttpClientAdapter(withCredentials: true);
+      // dio.options.extra['withCredentials'] = true;
+      // dio.httpClientAdapter = BrowserHttpClientAdapter(withCredentials: true);
     }
 
     // final List<Cookie> cookie = await cookieManager.cookieJar

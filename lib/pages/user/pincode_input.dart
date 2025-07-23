@@ -48,6 +48,7 @@ class _PinputScreenState extends State<PinputScreen> {
       onPressed: () {
         AuthHttp.sendCaptcha(widget.phone);
         SmartDialog.showToast('验证码已重新发送');
+        pinController.clear();
         timerBtnController?.startTimer();
       },
       text: Text('重新发送验证码'),
@@ -75,7 +76,8 @@ class _PinputScreenState extends State<PinputScreen> {
                 context.go('/login'); // 返回上一页
               },
             ),
-            title: Text("验证码"),
+            title: Text("验证码校验"),
+            centerTitle:  true,
           ),
           body: Column(
             children: [
@@ -126,7 +128,8 @@ class _PinputScreenState extends State<PinputScreen> {
                             context.go('/profile');
                           } else {
                             SmartDialog.showToast('验证码错误');
-                            timerBtnController?.enableButton();
+                            pinController.clear();
+                            // timerBtnController?.enableButton();
                           }
                           // debugPrint('onCompleted: $pin');
                         },

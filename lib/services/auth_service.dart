@@ -195,6 +195,7 @@ class AuthService extends ApiService {
       await AuthHttp.signOut(GlobalState.currentUser?.username);
       GStorage.userInfo.delete(Constants.USER_KEY);
       GlobalState.currentUser = null;
+      await Request.setCookie();
     } catch (err, _) {
       rethrow;
     }
