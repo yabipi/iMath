@@ -11,6 +11,7 @@ import '../knowledge/add_knowledge.dart';
 import '../culture/add_mathematician.dart';  // 新增导入
 
 import 'package:imath/pages/demo/draggable_tree_screen.dart';
+import 'package:imath/pages/demo/treesliver_drag_demo.dart';
 
 import 'package:imath/pages/admin/test_functions.dart';
 
@@ -93,6 +94,19 @@ class AdminScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const DraggableTreeScreen(),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.drag_handle),
+            title: const Text('TreeSliver拖拽演示'),
+            subtitle: const Text('TreeSliver组件的拖拽功能'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TreeSliverDragDemo(),
                 ),
               );
             },
