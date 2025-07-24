@@ -21,6 +21,13 @@ class CustomTreeNode {
   }
 }
 
+/// 拖拽位置类型
+enum DragPosition {
+  child,    // 作为子节点
+  siblingAbove,  // 作为兄弟节点，位于上方
+  siblingBelow,  // 作为兄弟节点，位于下方
+}
+
 /// 专门演示TreeSliver拖拽功能的页面
 
 class TreeSliverDragDemo extends StatefulWidget {
@@ -33,6 +40,9 @@ class TreeSliverDragDemo extends StatefulWidget {
 class _TreeSliverDragDemoState extends State<TreeSliverDragDemo> {
   CustomTreeNode? _selectedNode;
   CustomTreeNode? _draggedNode;
+  CustomTreeNode? _dragTargetNode;
+  DragPosition? _dragPosition;
+  final GlobalKey _listKey = GlobalKey();
   
   // 创建一个更复杂的树结构用于演示
   final List<CustomTreeNode> _tree = <CustomTreeNode>[
@@ -73,34 +83,129 @@ class _TreeSliverDragDemoState extends State<TreeSliverDragDemo> {
   void _onDragEnd() {
     setState(() {
       _draggedNode = null;
+      _dragTargetNode = null;
+      _dragPosition = null;
     });
   }
 
+  void _onDragUpdate(DragUpdateDetails details, CustomTreeNode targetNode) {
+    setState(() {
+      _dragTargetNode = targetNode;
+      _dragPosition = _calculateDragPosition(details, targetNode);
+    });
+  }
+
+  DragPosition _calculateDragPosition(DragUpdateDetails details, CustomTreeNode targetNode) {
+    // 获取目标节点的渲染对象
+    final RenderBox? renderBox = _listKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null) return DragPosition.child;
+
+    // 获取目标节点在列表中的位置
+    final targetIndex = _findNodeIndex(targetNode, _tree);
+    if (targetIndex == -1) return DragPosition.child;
+
+    // 计算目标节点的中心位置
+    final targetCenter = _getNodeCenterPosition(targetIndex);
+    final dragY = details.globalPosition.dy;
+    
+    // 节点高度（假设为固定值，实际应该动态获取）
+    const nodeHeight = 48.0;
+    const quarterHeight = nodeHeight / 4;
+    const halfHeight = nodeHeight / 2;
+    
+    final distance = (dragY - targetCenter).abs();
+    
+    if (distance < quarterHeight) {
+      return DragPosition.child;
+    } else if (distance < halfHeight) {
+      return dragY < targetCenter ? DragPosition.siblingAbove : DragPosition.siblingBelow;
+    } else {
+      return dragY < targetCenter ? DragPosition.siblingAbove : DragPosition.siblingBelow;
+    }
+  }
+
+  double _getNodeCenterPosition(int index) {
+    // 简化的计算，实际应该根据节点在树中的层级来计算
+    const nodeHeight = 48.0;
+    const padding = 16.0;
+    return padding + (index * nodeHeight) + (nodeHeight / 2);
+  }
+
+  int _findNodeIndex(CustomTreeNode node, List<CustomTreeNode> tree, [int currentIndex = 0]) {
+    for (int i = 0; i < tree.length; i++) {
+      if (tree[i] == node) {
+        return currentIndex + i;
+      }
+      if (tree[i].isExpanded) {
+        final childIndex = _findNodeIndex(node, tree[i].children, currentIndex + i + 1);
+        if (childIndex != -1) return childIndex;
+      }
+    }
+    return -1;
+  }
+
   void _onDragAccepted(CustomTreeNode draggedNode, CustomTreeNode targetNode) {
+    if (_dragPosition == null) return;
+    
     setState(() {
       // 防止拖拽到自己或子节点
       if (_isDescendant(draggedNode, targetNode)) {
         return;
       }
       
-      // 从原位置移除
+      // 从原位置移除节点
       _removeNodeFromTree(draggedNode, _tree);
       
-      // 添加到目标位置
-      final newChildren = <CustomTreeNode>[
-        ...targetNode.children,
-        draggedNode,
-      ];
-      
-      // 创建新的节点来替换原节点
-      final newTargetNode = targetNode.copyWith(
-        children: newChildren,
-        isExpanded: true,
-      );
-      
-      // 替换原节点
-      _replaceNodeInTree(targetNode, newTargetNode, _tree);
+      switch (_dragPosition!) {
+        case DragPosition.child:
+          _addAsChild(draggedNode, targetNode);
+          break;
+        case DragPosition.siblingAbove:
+          _addAsSibling(draggedNode, targetNode, above: true);
+          break;
+        case DragPosition.siblingBelow:
+          _addAsSibling(draggedNode, targetNode, above: false);
+          break;
+      }
     });
+  }
+
+  void _addAsChild(CustomTreeNode draggedNode, CustomTreeNode targetNode) {
+    // 将节点添加到目标位置
+    final newChildren = <CustomTreeNode>[
+      ...targetNode.children,
+      draggedNode,
+    ];
+    
+    // 创建新的节点来替换原节点
+    final newTargetNode = targetNode.copyWith(
+      children: newChildren,
+      isExpanded: true,
+    );
+    
+    // 替换原节点
+    _replaceNodeInTree(targetNode, newTargetNode, _tree);
+  }
+
+  void _addAsSibling(CustomTreeNode draggedNode, CustomTreeNode targetNode, {required bool above}) {
+    // 找到目标节点的父节点
+    final parent = _findParentNode(targetNode, _tree);
+    
+    if (parent != null) {
+      // 作为兄弟节点添加到父节点
+      final parentChildren = List<CustomTreeNode>.from(parent.children);
+      final targetIndex = parentChildren.indexOf(targetNode);
+      final insertIndex = above ? targetIndex : targetIndex + 1;
+      parentChildren.insert(insertIndex, draggedNode);
+      
+      final newParent = parent.copyWith(children: parentChildren);
+      _replaceNodeInTree(parent, newParent, _tree);
+    } else {
+      // 目标节点是根节点
+      final targetIndex = _tree.indexOf(targetNode);
+      final insertIndex = above ? targetIndex : targetIndex + 1;
+      _tree.insert(insertIndex, draggedNode);
+    }
   }
 
   bool _isDescendant(CustomTreeNode parent, CustomTreeNode child) {
@@ -129,6 +234,17 @@ class _TreeSliverDragDemoState extends State<TreeSliverDragDemo> {
       }
       _replaceNodeInTree(oldNode, newNode, tree[i].children);
     }
+  }
+
+  CustomTreeNode? _findParentNode(CustomTreeNode targetNode, List<CustomTreeNode> tree) {
+    for (final node in tree) {
+      if (node.children.contains(targetNode)) {
+        return node;
+      }
+      final parent = _findParentNode(targetNode, node.children);
+      if (parent != null) return parent;
+    }
+    return null;
   }
 
   void _addNewNode() {
@@ -209,19 +325,43 @@ class _TreeSliverDragDemoState extends State<TreeSliverDragDemo> {
               onAcceptWithDetails: (details) {
                 _onDragAccepted(details.data, node);
               },
+              onMove: (details) {
+                _onDragUpdate(details, node);
+              },
               builder: (context, candidateData, rejectedData) {
                 Widget result = _buildNodeContent(node, level);
                 
                 // 拖拽悬停效果
                 if (candidateData.isNotEmpty) {
+                  Color borderColor = Colors.blue;
+                  Color backgroundColor = Colors.blue.withValues(alpha: 0.1);
+                  
+                  // 根据拖拽位置显示不同的视觉效果
+                  if (_dragTargetNode == node && _dragPosition != null) {
+                    switch (_dragPosition!) {
+                      case DragPosition.child:
+                        borderColor = Colors.green;
+                        backgroundColor = Colors.green.withValues(alpha: 0.1);
+                        break;
+                      case DragPosition.siblingAbove:
+                        borderColor = Colors.orange;
+                        backgroundColor = Colors.orange.withValues(alpha: 0.1);
+                        break;
+                      case DragPosition.siblingBelow:
+                        borderColor = Colors.purple;
+                        backgroundColor = Colors.purple.withValues(alpha: 0.1);
+                        break;
+                    }
+                  }
+                  
                   result = Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: Colors.blue,
+                        color: borderColor,
                         width: 3,
                       ),
                       borderRadius: BorderRadius.circular(6),
-                      color: Colors.blue.withValues(alpha: 0.1),
+                      color: backgroundColor,
                     ),
                     child: result,
                   );
@@ -295,7 +435,7 @@ class _TreeSliverDragDemoState extends State<TreeSliverDragDemo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TreeSliver 拖拽演示'),
+        title: const Text('TreeSliver 智能拖拽演示'),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
         actions: [
@@ -327,17 +467,18 @@ class _TreeSliverDragDemoState extends State<TreeSliverDragDemo> {
                     ),
                   ),
                   const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[100],
-                      borderRadius: BorderRadius.circular(12),
+                  if (_dragTargetNode != null && _dragPosition != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: _getPositionColor(_dragPosition!),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        _getPositionText(_dragPosition!),
+                        style: const TextStyle(fontSize: 12, color: Colors.white),
+                      ),
                     ),
-                    child: const Text(
-                      '拖拽到目标节点上',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -351,15 +492,32 @@ class _TreeSliverDragDemoState extends State<TreeSliverDragDemo> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  '操作说明:',
+                  '智能拖拽说明:',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 const Text('• 点击箭头: 展开/折叠子节点'),
                 const Text('• 点击节点: 选中节点'),
                 const Text('• 长按节点: 开始拖拽'),
-                const Text('• 拖拽到其他节点: 移动节点'),
-                const Text('• 点击节点选中后可以删除'),
+                const Text('• 拖拽到节点中心附近: 成为子节点'),
+                const Text('• 拖拽到节点上方/下方: 成为兄弟节点'),
+                const Text('• 不同颜色表示不同的放置位置'),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Container(width: 16, height: 16, color: Colors.green),
+                    const SizedBox(width: 8),
+                    const Text('子节点', style: TextStyle(fontSize: 12)),
+                    const SizedBox(width: 16),
+                    Container(width: 16, height: 16, color: Colors.orange),
+                    const SizedBox(width: 8),
+                    const Text('兄弟节点(上方)', style: TextStyle(fontSize: 12)),
+                    const SizedBox(width: 16),
+                    Container(width: 16, height: 16, color: Colors.purple),
+                    const SizedBox(width: 8),
+                    const Text('兄弟节点(下方)', style: TextStyle(fontSize: 12)),
+                  ],
+                ),
               ],
             ),
           ),
@@ -367,6 +525,7 @@ class _TreeSliverDragDemoState extends State<TreeSliverDragDemo> {
           // 树形结构
           Expanded(
             child: ListView.builder(
+              key: _listKey,
               padding: const EdgeInsets.all(16),
               itemCount: _tree.length,
               itemBuilder: (context, index) {
@@ -401,6 +560,28 @@ class _TreeSliverDragDemoState extends State<TreeSliverDragDemo> {
         ],
       ),
     );
+  }
+
+  Color _getPositionColor(DragPosition position) {
+    switch (position) {
+      case DragPosition.child:
+        return Colors.green;
+      case DragPosition.siblingAbove:
+        return Colors.orange;
+      case DragPosition.siblingBelow:
+        return Colors.purple;
+    }
+  }
+
+  String _getPositionText(DragPosition position) {
+    switch (position) {
+      case DragPosition.child:
+        return '作为子节点';
+      case DragPosition.siblingAbove:
+        return '作为兄弟节点(上方)';
+      case DragPosition.siblingBelow:
+        return '作为兄弟节点(下方)';
+    }
   }
 
   void _expandAll(CustomTreeNode node) {
