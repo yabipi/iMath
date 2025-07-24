@@ -292,9 +292,9 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
         if (_dragTargetNode == node && _dragPosition == DragPosition.siblingAbove)
           Container(
             height: 3,
-            margin: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.orange,
+              color: Colors.blue,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -422,9 +422,9 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
         if (_dragTargetNode == node && _dragPosition == DragPosition.siblingBelow)
           Container(
             height: 3,
-            margin: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.purple,
+              color: Colors.blue,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
