@@ -103,6 +103,14 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
     setState(() {
       _dragTargetNode = targetNode;
       _dragPosition = _calculateDragPosition(details, targetNode);
+      
+      // 调试信息
+      final targetLevel = _getNodeLevel(targetNode, _tree);
+      final targetLeft = 16.0 + (targetLevel * 20.0);
+      final textWidth = targetNode.data.length * 10.0 + 20.0 + 16.0;
+      final targetRight = targetLeft + textWidth;
+      
+      print('拖拽调试: dragLeft=${details.offset.dx}, targetRight=$targetRight, 目标节点="${targetNode.data}", 层级=$targetLevel');
     });
   }
 
@@ -129,7 +137,11 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
     // 计算目标节点的水平位置（根据层级缩进）
     final targetLevel = _getNodeLevel(targetNode, _tree);
     final targetLeft = padding + (targetLevel * 20.0); // 每层缩进20px
-    final targetRight = targetLeft + 200.0; // 假设节点宽度为200px
+    
+    // 估算目标节点文本的右边缘位置
+    // 文本宽度 = 文本长度 * 字符宽度(约10px) + 图标宽度(20px) + 间距(16px) + 缩进(level * 20)
+    final textWidth = targetNode.data.length * 10.0 + 20.0 + 16.0;
+    final targetRight = targetLeft + textWidth;
     
     // 判断逻辑：首先检查水平位置
     if (dragLeft > targetRight) {
