@@ -331,24 +331,6 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            // const Icon(
-            //   Icons.image,
-            //   size: 16,
-            //   color: Colors.grey,
-            // ),
-            // const SizedBox(width: 4),
-            // Text(
-            //   '题目图片 (${imageUrls.length})',
-            //   style: const TextStyle(
-            //     fontSize: 14,
-            //     fontWeight: FontWeight.bold,
-            //     color: Colors.grey,
-            //   ),
-            // ),
-          ],
-        ),
         const SizedBox(height: 8),
         if (imageUrls.length == 1)
           SizedBox(
@@ -357,18 +339,15 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
           )
         else
           // 多张图片时使用网格布局
-          ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: (120 * ((imageUrls.length + 1) ~/ 2)).toDouble(), // 计算网格高度
-            ),
+          Expanded(
             child: GridView.builder(
-              shrinkWrap: true,
+              // shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-                childAspectRatio: 1.2,
+                crossAxisCount: 1,
+                crossAxisSpacing: 4,
+                mainAxisSpacing: 4,
+                childAspectRatio: 1.0,
               ),
               itemCount: imageUrls.length,
               itemBuilder: (context, index) {
@@ -395,8 +374,8 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
             children: [
               Image.network(
                 imageUrl,
-                width: double.infinity,
-                height: double.infinity,
+                // width: double.infinity,
+                // height: double.infinity,
                 fit: BoxFit.contain,
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;

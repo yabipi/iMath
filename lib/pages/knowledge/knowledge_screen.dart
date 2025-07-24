@@ -98,9 +98,10 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> with Category
             // 分类标签区域
             CategoryPanel(onItemTap: (int categoryId) {onChangeCategory(categoryId);}),
             Expanded(
-                child: ListView.builder(
+                child: ListView.separated(
                     padding: EdgeInsets.all(8),
                     itemCount: knowledges.length,
+                    separatorBuilder: (BuildContext context, int index) => Divider(),
                     itemBuilder: (BuildContext context, int index){
                       if (knowledges.length > 0) {
                         return _buildKnowItem(knowledges[index]);
@@ -137,6 +138,9 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> with Category
       ),
       subtitle: Text(
         item.subtitle ?? '',
+        style: TextStyle(
+          color: Colors.grey,
+        ),
       ),
       trailing: IconButton(
         icon: const Icon(Icons.edit),
