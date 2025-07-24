@@ -99,14 +99,14 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
     });
   }
 
-  void _onDragUpdate(DragUpdateDetails details, CustomTreeNode targetNode) {
+  void _onDragUpdate(DragTargetDetails<CustomTreeNode> details, CustomTreeNode targetNode) {
     setState(() {
       _dragTargetNode = targetNode;
       _dragPosition = _calculateDragPosition(details, targetNode);
     });
   }
 
-  DragPosition _calculateDragPosition(DragUpdateDetails details, CustomTreeNode targetNode) {
+  DragPosition _calculateDragPosition(DragTargetDetails<CustomTreeNode> details, CustomTreeNode targetNode) {
     // 获取目标节点的渲染对象
     final RenderBox? renderBox = _listKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return DragPosition.child;
@@ -117,7 +117,7 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
 
     // 计算目标节点的中心位置
     final targetCenter = _getNodeCenterPosition(targetIndex);
-    final dragY = details.globalPosition.dy;
+    final dragY = details.offset.dy;
     
     // 节点高度（假设为固定值，实际应该动态获取）
     const nodeHeight = 48.0;
