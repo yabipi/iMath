@@ -122,27 +122,26 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
     final targetCenter = targetTop + (nodeHeight / 2);
     final targetBottom = targetTop + nodeHeight;
     
-    // 获取拖拽位置（源节点顶部位置）
+    // 获取拖拽位置
     final dragTop = details.offset.dy;
+    final dragLeft = details.offset.dx;
     
-    // 计算距离
-    final distanceToTop = (dragTop - targetTop).abs();
-    final distanceToCenter = (dragTop - targetCenter).abs();
-    final distanceToBottom = (dragTop - targetBottom).abs();
+    // 计算目标节点的水平位置（根据层级缩进）
+    final targetLevel = _getNodeLevel(targetNode, _tree);
+    final targetLeft = padding + (targetLevel * 20.0); // 每层缩进20px
+    final targetRight = targetLeft + 200.0; // 假设节点宽度为200px
     
-    // 判断逻辑
-    if (distanceToCenter < nodeHeight / 4) {
-      // 距离中心小于1/4节点高度，成为子节点
+    // 判断逻辑：首先检查水平位置
+    if (dragLeft > targetRight) {
+      // 源节点左边缘超过目标节点右边缘，成为子节点
       return DragPosition.child;
-    } else if (distanceToTop < nodeHeight / 4) {
-      // 距离顶部小于1/4节点高度，成为上方兄弟节点
-      return DragPosition.siblingAbove;
-    } else if (distanceToBottom < nodeHeight / 4) {
-      // 距离底部小于1/4节点高度，成为下方兄弟节点
-      return DragPosition.siblingBelow;
     } else {
-      // 默认根据位置判断
-      return dragTop < targetCenter ? DragPosition.siblingAbove : DragPosition.siblingBelow;
+      // 其他情况根据垂直位置判断兄弟节点位置
+      if (dragTop < targetCenter) {
+        return DragPosition.siblingAbove;
+      } else {
+        return DragPosition.siblingBelow;
+      }
     }
   }
 
@@ -154,6 +153,19 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
       if (tree[i].isExpanded) {
         final childIndex = _findNodeIndex(node, tree[i].children, currentIndex + i + 1);
         if (childIndex != -1) return childIndex;
+      }
+    }
+    return -1;
+  }
+
+  int _getNodeLevel(CustomTreeNode targetNode, List<CustomTreeNode> tree, [int level = 0]) {
+    for (final node in tree) {
+      if (node == targetNode) {
+        return level;
+      }
+      if (node.isExpanded) {
+        final childLevel = _getNodeLevel(targetNode, node.children, level + 1);
+        if (childLevel != -1) return childLevel;
       }
     }
     return -1;
@@ -534,9 +546,9 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
                 const Text('• 点击箭头: 展开/折叠子节点'),
                 const Text('• 点击节点: 选中节点'),
                 const Text('• 长按节点: 开始拖拽'),
-                const Text('• 拖拽到节点中心附近: 成为子节点（绿色边框）'),
-                const Text('• 拖拽到节点上方: 成为上方兄弟节点（橙色横线）'),
-                const Text('• 拖拽到节点下方: 成为下方兄弟节点（紫色横线）'),
+                const Text('• 拖拽到节点右侧: 成为子节点（绿色边框）'),
+                const Text('• 拖拽到节点上方: 成为上方兄弟节点（蓝色横线）'),
+                const Text('• 拖拽到节点下方: 成为下方兄弟节点（蓝色横线）'),
               ],
             ),
           ),
@@ -586,9 +598,9 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
       case DragPosition.child:
         return Colors.green;
       case DragPosition.siblingAbove:
-        return Colors.orange;
+        return Colors.blue;
       case DragPosition.siblingBelow:
-        return Colors.purple;
+        return Colors.blue;
     }
   }
 
