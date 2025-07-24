@@ -23,6 +23,50 @@ class KnowledgeScreen extends ConsumerStatefulWidget {
 
 class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> with CategoryMixin {
   late Map<String, String> categories;
+  
+  // 定义10个不同的图标和对应的渐变色
+  final List<Map<String, dynamic>> _iconSet = [
+    {
+      'icon': Icons.school,
+      'colors': [Colors.deepPurple.shade300, Colors.purple.shade400],
+    },
+    {
+      'icon': Icons.science,
+      'colors': [Colors.blue.shade300, Colors.blue.shade500],
+    },
+    {
+      'icon': Icons.calculate,
+      'colors': [Colors.green.shade300, Colors.green.shade500],
+    },
+    {
+      'icon': Icons.functions,
+      'colors': [Colors.orange.shade300, Colors.orange.shade500],
+    },
+    {
+      'icon': Icons.timeline,
+      'colors': [Colors.red.shade300, Colors.red.shade500],
+    },
+    {
+      'icon': Icons.analytics,
+      'colors': [Colors.teal.shade300, Colors.teal.shade500],
+    },
+    {
+      'icon': Icons.pie_chart,
+      'colors': [Colors.indigo.shade300, Colors.indigo.shade500],
+    },
+    {
+      'icon': Icons.trending_up,
+      'colors': [Colors.cyan.shade300, Colors.cyan.shade500],
+    },
+    {
+      'icon': Icons.data_usage,
+      'colors': [Colors.pink.shade300, Colors.pink.shade500],
+    },
+    {
+      'icon': Icons.psychology,
+      'colors': [Colors.amber.shade300, Colors.amber.shade500],
+    },
+  ];
 
   @override
   void initState(){
@@ -98,19 +142,19 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> with Category
             // 分类标签区域
             CategoryPanel(onItemTap: (int categoryId) {onChangeCategory(categoryId);}),
             Expanded(
-                child: ListView.separated(
-                    padding: EdgeInsets.all(8),
+                child: ListView.builder(
+                    padding: const EdgeInsets.all(8),
                     itemCount: knowledges.length,
-                    separatorBuilder: (BuildContext context, int index) => Divider(),
                     itemBuilder: (BuildContext context, int index){
                       if (knowledges.length > 0) {
                         return _buildKnowItem(knowledges[index]);
-                        // return ListTile(
-                        //   title: Text(knowledges[index].title),
-                        // );
                       } else {
-                        return ListTile(
-                          title: Text('无效数据'),
+                        return const Card(
+                          margin: EdgeInsets.all(8),
+                          child: ListTile(
+                            title: Text('暂无知识点数据'),
+                            leading: Icon(Icons.info_outline, color: Colors.grey),
+                          ),
                         );
                       }
                     }
@@ -128,30 +172,95 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> with Category
    * 此处items不能用List<Map<String, dynamic>>声明
    */
   Widget _buildKnowItem(Knowledge item) {
-    return ListTile(
-      title: Text(
-        item.title,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: Colors.blue,
-        ),
+    // 根据知识点ID选择图标，确保同一个知识点总是显示相同的图标
+    final iconData = _getIconForKnowledge(item.id);
+    
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
       ),
-      subtitle: Text(
-        item.subtitle ?? '',
-        style: TextStyle(
-          color: Colors.grey,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: iconData['colors'],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: iconData['colors'][0].withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Icon(
+            iconData['icon'],
+            color: Colors.white,
+            size: 24,
+          ),
         ),
-      ),
-      trailing: IconButton(
-        icon: const Icon(Icons.edit),
-        onPressed: () {
-          context.push('/admin/editknow?knowledgeId=${item.id}');
+        title: Text(
+          item.title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.black87,
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 4),
+            Text(
+              item.subtitle ?? '',
+              style: const TextStyle(
+                color: Colors.grey,
+                fontSize: 14,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+        trailing: Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: IconButton(
+            icon: const Icon(
+              Icons.edit_outlined,
+              color: Colors.deepPurple,
+            ),
+            onPressed: () {
+              context.push('/admin/editknow?knowledgeId=${item.id}');
+            },
+          ),
+        ),
+        onTap: () {
+          context.push('/knowdetail?knowledgeId=${item.id}');
         },
       ),
-      onTap: () {
-        context.push('/knowdetail?knowledgeId=${item.id}');
-      },
     );
+  }
+
+  // 根据知识点ID获取对应的图标和颜色
+  Map<String, dynamic> _getIconForKnowledge(int? knowledgeId) {
+    if (knowledgeId == null) {
+      return _iconSet[0]; // 默认返回第一个图标
+    }
+    
+    // 使用知识点ID的哈希值来选择图标，确保同一个知识点总是显示相同的图标
+    final index = knowledgeId.abs() % _iconSet.length;
+    return _iconSet[index];
   }
 
   void onChangeCategory(int categoryId) {

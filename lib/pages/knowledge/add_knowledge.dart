@@ -24,6 +24,7 @@ class AddKnowledgeView extends ConsumerStatefulWidget {
 class _AddKnowledgeViewState extends ConsumerState<AddKnowledgeView> with CategoryMixin {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
+  final _subtitleController = TextEditingController();
   final _contentController = TextEditingController();
   final _levelController = TextEditingController();
   String? _selectedCategory;
@@ -58,6 +59,7 @@ class _AddKnowledgeViewState extends ConsumerState<AddKnowledgeView> with Catego
     try {
       final data =  {
         'title': _titleController.text,
+        'subtitle': _subtitleController.text,
         'content': _contentController.text,
         'category': _selectedCategory,
         'level': ref.read(mathLevelProvider).value,
@@ -137,13 +139,27 @@ class _AddKnowledgeViewState extends ConsumerState<AddKnowledgeView> with Catego
               ),
               const SizedBox(height: 16),
               TextFormField(
+                controller: _subtitleController,
+                decoration: const InputDecoration(
+                  labelText: '副标题',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return '请输入知识点标题';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
                 controller: _contentController,
                 decoration: const InputDecoration(
                   labelText: '知识点内容',
                   border: OutlineInputBorder(),
                   alignLabelWithHint: true,
                 ),
-                maxLines: 5,
+                maxLines: 10,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return '请输入知识点内容';

@@ -338,20 +338,18 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
             child: _buildImageItem(imageUrls.first),
           )
         else
-          // 多张图片时使用网格布局
+          // 多张图片时使用垂直列表布局，确保每张图片都能完整显示
           Expanded(
-            child: GridView.builder(
-              // shrinkWrap: true,
+            child: ListView.separated(
+              shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1,
-                crossAxisSpacing: 4,
-                mainAxisSpacing: 4,
-                childAspectRatio: 1.0,
-              ),
               itemCount: imageUrls.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
-                return _buildImageItem(imageUrls[index]);
+                return SizedBox(
+                  height: 120, // 固定高度确保图片不会被裁剪
+                  child: _buildImageItem(imageUrls[index]),
+                );
               },
             ),
           ),
@@ -372,41 +370,44 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
           onTap: () => _showImageDialog(imageUrl),
           child: Stack(
             children: [
-              Image.network(
-                imageUrl,
-                // width: double.infinity,
-                // height: double.infinity,
-                fit: BoxFit.contain,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    color: Colors.grey[200],
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                            : null,
+              // 使用 Center 包装确保图片居中显示
+              Center(
+                child: Image.network(
+                  imageUrl,
+                  width: double.infinity,
+                  height: double.infinity,
+                  fit: BoxFit.contain, // 保持宽高比，确保图片完整显示
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      color: Colors.grey[200],
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
+                        ),
                       ),
-                    ),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    color: Colors.grey[200],
-                    child: const Center(
-                      child: Icon(
-                        Icons.broken_image,
-                        color: Colors.grey,
-                        size: 40,
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      color: Colors.grey[200],
+                      child: const Center(
+                        child: Icon(
+                          Icons.broken_image,
+                          color: Colors.grey,
+                          size: 40,
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
               // 添加点击提示
               Positioned(
