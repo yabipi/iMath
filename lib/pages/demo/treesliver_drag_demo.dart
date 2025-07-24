@@ -104,23 +104,34 @@ class _TreeSliverDragDemoState extends State<TreeSliverDragDemo> {
     final targetIndex = _findNodeIndex(targetNode, _tree);
     if (targetIndex == -1) return DragPosition.child;
 
-    // 计算目标节点的中心位置
-    final targetCenter = _getNodeCenterPosition(targetIndex);
-    final dragY = details.offset.dy;
-    
-    // 节点高度（假设为固定值，实际应该动态获取）
+    // 计算目标节点的位置信息
     const nodeHeight = 48.0;
-    const quarterHeight = nodeHeight / 4;
-    const halfHeight = nodeHeight / 2;
+    const padding = 16.0;
+    final targetTop = padding + (targetIndex * nodeHeight);
+    final targetCenter = targetTop + (nodeHeight / 2);
+    final targetBottom = targetTop + nodeHeight;
     
-    final distance = (dragY - targetCenter).abs();
+    // 获取拖拽位置（源节点顶部位置）
+    final dragTop = details.offset.dy;
     
-    if (distance < quarterHeight) {
+    // 计算距离
+    final distanceToTop = (dragTop - targetTop).abs();
+    final distanceToCenter = (dragTop - targetCenter).abs();
+    final distanceToBottom = (dragTop - targetBottom).abs();
+    
+    // 判断逻辑
+    if (distanceToCenter < nodeHeight / 4) {
+      // 距离中心小于1/4节点高度，成为子节点
       return DragPosition.child;
-    } else if (distance < halfHeight) {
-      return dragY < targetCenter ? DragPosition.siblingAbove : DragPosition.siblingBelow;
+    } else if (distanceToTop < nodeHeight / 4) {
+      // 距离顶部小于1/4节点高度，成为上方兄弟节点
+      return DragPosition.siblingAbove;
+    } else if (distanceToBottom < nodeHeight / 4) {
+      // 距离底部小于1/4节点高度，成为下方兄弟节点
+      return DragPosition.siblingBelow;
     } else {
-      return dragY < targetCenter ? DragPosition.siblingAbove : DragPosition.siblingBelow;
+      // 默认根据位置判断
+      return dragTop < targetCenter ? DragPosition.siblingAbove : DragPosition.siblingBelow;
     }
   }
 
@@ -273,6 +284,17 @@ class _TreeSliverDragDemoState extends State<TreeSliverDragDemo> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // 上方横线指示器（当拖拽到上方兄弟节点时）
+        if (_dragTargetNode == node && _dragPosition == DragPosition.siblingAbove)
+          Container(
+            height: 3,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.orange,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        
         // 节点本身
         GestureDetector(
           onTap: () {
@@ -392,6 +414,17 @@ class _TreeSliverDragDemoState extends State<TreeSliverDragDemo> {
           ),
         ),
         
+        // 下方横线指示器（当拖拽到下方兄弟节点时）
+        if (_dragTargetNode == node && _dragPosition == DragPosition.siblingBelow)
+          Container(
+            height: 3,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.purple,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        
         // 子节点
         if (node.isExpanded && node.children.isNotEmpty)
           Padding(
@@ -499,9 +532,9 @@ class _TreeSliverDragDemoState extends State<TreeSliverDragDemo> {
                 const Text('• 点击箭头: 展开/折叠子节点'),
                 const Text('• 点击节点: 选中节点'),
                 const Text('• 长按节点: 开始拖拽'),
-                const Text('• 拖拽到节点中心附近: 成为子节点'),
-                const Text('• 拖拽到节点上方/下方: 成为兄弟节点'),
-                const Text('• 不同颜色表示不同的放置位置'),
+                const Text('• 拖拽到节点中心附近: 成为子节点（绿色边框）'),
+                const Text('• 拖拽到节点上方: 成为上方兄弟节点（橙色横线）'),
+                const Text('• 拖拽到节点下方: 成为下方兄弟节点（紫色横线）'),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -541,8 +574,8 @@ class _TreeSliverDragDemoState extends State<TreeSliverDragDemo> {
           FloatingActionButton(
             onPressed: _addNewNode,
             backgroundColor: Colors.green,
-            child: const Icon(Icons.add),
             tooltip: '添加新节点',
+            child: const Icon(Icons.add),
           ),
           const SizedBox(height: 16),
           FloatingActionButton(
@@ -554,8 +587,8 @@ class _TreeSliverDragDemoState extends State<TreeSliverDragDemo> {
               });
             },
             backgroundColor: Colors.orange,
-            child: const Icon(Icons.expand_more),
             tooltip: '展开所有',
+            child: const Icon(Icons.expand_more),
           ),
         ],
       ),
