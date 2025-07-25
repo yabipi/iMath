@@ -65,7 +65,7 @@ class _HtmlEditorState extends State<HtmlEditor> {
     return Container(
       constraints: BoxConstraints(
         minHeight: 150,
-        maxHeight: 500,
+        maxHeight: 360,
       ),
       child: Column(
         children: [

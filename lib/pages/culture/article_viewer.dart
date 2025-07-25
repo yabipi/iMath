@@ -46,6 +46,28 @@ class ArticleViewerState extends State<ArticleViewer> {
     content = article['content'];
   }
 
+  /// 根据平台和设备类型获取合适的字体大小
+  double _getFontSize() {
+    if (DeviceUtil.isWeb) {
+      // Web平台使用较大的字体
+      return 16.0;
+    } else if (DeviceUtil.isMobile) {
+      // 移动端根据屏幕密度调整
+      final mediaQuery = MediaQuery.of(context);
+      final pixelRatio = mediaQuery.devicePixelRatio;
+      if (pixelRatio >= 3.0) {
+        return 18.0; // 高密度屏幕
+      } else if (pixelRatio >= 2.0) {
+        return 16.0; // 中等密度屏幕
+      } else {
+        return 14.0; // 低密度屏幕
+      }
+    } else {
+      // 桌面端
+      return 16.0;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,13 +96,36 @@ class ArticleViewerState extends State<ArticleViewer> {
               return Center(child: CircularProgressIndicator());
             } else {
               return SingleChildScrollView(
-                // child: Text(widget.content),
+                padding: EdgeInsets.all(16.0),
                 child: Html(
                   data: content,
                   style: {
-                    'flutter': Style(
-                      display: Display.block,
-                      fontSize: FontSize(5, Unit.em),
+                    'body': Style(
+                      fontSize: FontSize(_getFontSize(), Unit.px),
+                      lineHeight: LineHeight(1.6),
+                    ),
+                    'p': Style(
+                      fontSize: FontSize(_getFontSize(), Unit.px),
+                      margin: Margins.only(bottom: 8),
+                    ),
+                    'h1': Style(
+                      fontSize: FontSize(_getFontSize() * 1.8, Unit.px),
+                      fontWeight: FontWeight.bold,
+                      margin: Margins.only(top: 16, bottom: 8),
+                    ),
+                    'h2': Style(
+                      fontSize: FontSize(_getFontSize() * 1.5, Unit.px),
+                      fontWeight: FontWeight.bold,
+                      margin: Margins.only(top: 14, bottom: 6),
+                    ),
+                    'h3': Style(
+                      fontSize: FontSize(_getFontSize() * 1.3, Unit.px),
+                      fontWeight: FontWeight.bold,
+                      margin: Margins.only(top: 12, bottom: 4),
+                    ),
+                    'li': Style(
+                      fontSize: FontSize(_getFontSize(), Unit.px),
+                      margin: Margins.only(bottom: 4),
                     ),
                   },
                   // padding: EdgeInsets.all(8.0),

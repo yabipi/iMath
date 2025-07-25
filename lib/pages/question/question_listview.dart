@@ -105,50 +105,8 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
                 builder: (context, constraints) {
                   // 根据屏幕宽度决定布局方式
                   if (constraints.maxWidth < 600) {
-                    // 小屏幕：垂直布局
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 题目内容
-                        Expanded(
-                          flex: 3,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              MathCell(
-                                content: question.content ?? '',
-                              ),
-                              // Expanded(
-                              //   child: ClipRect(
-                              //     child: MathCell(
-                              //       content: question.content ?? '',
-                              //     ),
-                              //   ),
-                              // ),
-                              const SizedBox(height: 4),
-                              MathCell(
-                                content: question.content ?? '',
-                              ),
-                              // Expanded(
-                              //   child: ClipRect(
-                              //     child: MathCell(
-                              //       content: question.options ?? '',
-                              //     ),
-                              //   ),
-                              // ),
-                            ],
-                          ),
-                        ),
-                        // 图片区域
-                        if (imageUrls.isNotEmpty) ...[
-                          const SizedBox(height: 12),
-                          Expanded(
-                            flex: 1,
-                            child: _buildQuestionImages(imageUrls),
-                          ),
-                        ],
-                      ],
-                    );
+                    // 小屏幕：使用Tab布局
+                    return _buildMobileTabLayout(question, imageUrls);
                   } else {
                     // 大屏幕：水平布局
                     return Row(
@@ -232,6 +190,63 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
           ],
         ),
       ),
+    );
+  }
+
+  // 新增：小屏幕Tab布局方法
+  Widget _buildMobileTabLayout(Question question, List<String> imageUrls) {
+    return DefaultTabController(
+      length: imageUrls.isNotEmpty ? 2 : 1,
+      child: Column(
+        children: [
+          // Tab栏
+          if (imageUrls.isNotEmpty)
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const TabBar(
+                labelColor: Colors.blue,
+                unselectedLabelColor: Colors.grey,
+                indicatorColor: Colors.blue,
+                tabs: [
+                  Tab(text: '题目'),
+                  Tab(text: '图片'),
+                ],
+              ),
+            ),
+          const SizedBox(height: 8),
+          // Tab内容
+          Expanded(
+            child: TabBarView(
+              children: [
+                // 第一个Tab：题目内容
+                _buildQuestionContent(question),
+                // 第二个Tab：图片内容（仅在有图片时显示）
+                if (imageUrls.isNotEmpty)
+                  _buildQuestionImages(imageUrls),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 新增：题目内容组件
+  Widget _buildQuestionContent(Question question) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MathCell(
+          content: question.content ?? '',
+        ),
+        const SizedBox(height: 4),
+        MathCell(
+          content: question.options ?? '',
+        ),
+      ],
     );
   }
 

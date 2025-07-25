@@ -177,11 +177,15 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         textTheme: TextTheme(
             bodyLarge: TextStyle(
-              fontSize: ThemeData.light().textTheme.bodyLarge?.fontSize, // 保持平台默认
-              fontWeight: FontWeight.w500, // 仅修改字重等属性
+              fontSize: DeviceUtil.isWeb ? 16.0 : 20.0, // Web平台稍大
+              fontWeight: FontWeight.w500,
             ),
-            // bodyMedium: TextStyle(fontSize: 12.sp),
-            // bodySmall: TextStyle(fontSize: 10.sp)
+            bodyMedium: TextStyle(
+              fontSize: DeviceUtil.isWeb ? 14.0 : 20.0,
+            ),
+            bodySmall: TextStyle(
+              fontSize: DeviceUtil.isWeb ? 12.0 : 20.0,
+            ),
         ),
         useMaterial3: true,
       ),
