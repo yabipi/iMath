@@ -59,7 +59,6 @@ class HtmlEditor extends StatefulWidget {
 class _HtmlEditorState extends State<HtmlEditor> {
   final FocusNode _editorFocusNode = FocusNode();
   final ScrollController _editorScrollController = ScrollController();
-  final EditorController _controller = EditorController();
 
   @override
   Widget build(BuildContext context) {
@@ -71,14 +70,14 @@ class _HtmlEditorState extends State<HtmlEditor> {
       child: Column(
         children: [
           QuillSimpleToolbar(
-            controller: _controller.controller,
+            controller: widget.controller.controller,
             config: toolbarConfig,
           ),
           Expanded(
             child: QuillEditor(
               focusNode: _editorFocusNode,
               scrollController: _editorScrollController,
-              controller: _controller.controller,
+              controller: widget.controller.controller,
               config: QuillEditorConfig(
                 placeholder: '请输入内容...',
                 padding: const EdgeInsets.all(16),
