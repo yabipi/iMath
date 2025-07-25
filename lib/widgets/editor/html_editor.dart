@@ -82,6 +82,9 @@ class _HtmlEditorState extends State<HtmlEditor> {
                 placeholder: '请输入内容...',
                 padding: const EdgeInsets.all(16),
               ),
+              // imageEmbedBuilder: (context, image) {
+              //   return Image.network(image['src'] as String);
+              // },
             ),
           ),
         ],

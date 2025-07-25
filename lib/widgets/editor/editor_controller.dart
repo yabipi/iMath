@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io' as io;
 
 import 'package:delta_to_html/delta_to_html.dart';
@@ -50,7 +51,10 @@ class EditorController {
     var delta = HtmlToDelta().convert(_content??'', transformTableAsEmbed: false);
     _controller.document = Document.fromDelta(delta);
   }
-  // String get plainText => _controller.document.toPlainText();
+
+  String get plainText => _controller.document.toPlainText();
+
+  String get json => jsonEncode(_controller.document.toDelta().toJson());
 
   void clear() {
     _controller.clear();
