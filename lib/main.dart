@@ -146,6 +146,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Size size = MediaQuery.of(context).size;
+    // debugPrint("width = ${size.width}, height = ${size.height}");
     // 将初始数据挂载到context上
     GlobalState.refreshToken();
     final originalMap = GStorage.userInfo.get(Constants.USER_KEY);

@@ -8,7 +8,7 @@ import '../paper/add_paper_screen.dart';
 import '../question/add_question.dart';
 
 import '../knowledge/add_knowledge.dart';
-import '../culture/add_mathematician.dart';  // 新增导入
+import '../culture/mathematician_add.dart';  // 新增导入
 
 import 'package:imath/pages/demo/draggable_tree_screen.dart';
 import 'package:imath/pages/demo/treesliver_drag_demo.dart';

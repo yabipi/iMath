@@ -19,7 +19,7 @@ class _LoginPageState extends State<PhoneLoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('用户登录'),
+        title: const Text('手机号登录'),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -30,246 +30,233 @@ class _LoginPageState extends State<PhoneLoginPage> {
       ),
       // 使用SafeArea包裹内容，避免与刘海屏、状态栏等重叠
       body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // 标题
-                const Text(
-                  '手机号登录',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+        child: Padding(
+          padding: const EdgeInsetsGeometry.only(top: 26.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              // 第一行：国家/地区选择
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '国家/地区',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[700],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 40),
-                
-                // 第一行：国家/地区选择
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '国家/地区',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () {
-                        // 这里可弹出选择框让用户选择国家/地区代码，示例中简单模拟切换
-                        setState(() {
-                          _countryCode = _countryCode == '+86' ? '+1' : '+86';
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              _countryCode == '+86' ? '中国大陆' : '其他',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            const Icon(
-                              Icons.arrow_drop_down,
-                              size: 16,
-                              color: Colors.grey,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                
-                // 第二行：区号 + 手机号输入框
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // 区号框
-                    Container(
-                      height: 56, // 固定高度，与输入框保持一致
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () {
+                      // 这里可弹出选择框让用户选择国家/地区代码，示例中简单模拟切换
+                      setState(() {
+                        _countryCode = _countryCode == '+86' ? '+1' : '+86';
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          bottomLeft: Radius.circular(12),
-                        ),
-                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Center(
-                        child: Text(
-                          _countryCode,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                    ),
-                    // 手机号输入框
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.5 - 80, // 减去区号框的宽度
-                      child: TextField(
-                        controller: _phoneController,
-                        decoration: InputDecoration(
-                          hintText: '请输入手机号',
-                          hintStyle: TextStyle(color: Colors.grey.shade400),
-                          border: const OutlineInputBorder(
-                            borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(12),
-                              bottomRight: Radius.circular(12),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _countryCode == '+86' ? '中国大陆' : '其他',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
                             ),
-                            borderSide: BorderSide(color: Colors.grey),
                           ),
-                          enabledBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(12),
-                              bottomRight: Radius.circular(12),
-                            ),
-                            borderSide: BorderSide(color: Colors.grey),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: const BorderRadius.only(
-                              topRight: Radius.circular(12),
-                              bottomRight: Radius.circular(12),
-                            ),
-                            borderSide: BorderSide(color: Colors.blue.shade400, width: 2),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey.shade50,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                          isDense: true, // 减少内部间距
-                        ),
-                        keyboardType: TextInputType.phone,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                
-                // 协议勾选选项
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Transform.scale(
-                      scale: 0.9,
-                      child: Checkbox(
-                        value: _agreedToTerms,
-                        onChanged: (value) {
-                          setState(() {
-                            _agreedToTerms = value ?? false;
-                          });
-                        },
-                        activeColor: Colors.blue.shade400,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _agreedToTerms = !_agreedToTerms;
-                        });
-                      },
-                      child: RichText(
-                        text: TextSpan(
-                          style: const TextStyle(
-                            fontSize: 14,
+                          const SizedBox(width: 4),
+                          const Icon(
+                            Icons.arrow_drop_down,
+                            size: 16,
                             color: Colors.grey,
                           ),
-                          children: [
-                            const TextSpan(text: '我已阅读并同意'),
-                            WidgetSpan(
-                              child: GestureDetector(
-                                onTap: () => _showUserAgreementDialog(context),
-                                child: Text(
-                                  '《用户协议》',
-                                  style: TextStyle(
-                                    color: Colors.blue.shade400,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const TextSpan(text: '和'),
-                            WidgetSpan(
-                              child: GestureDetector(
-                                onTap: () => _showPrivacyPolicyDialog(context),
-                                child: Text(
-                                  '《隐私政策》',
-                                  style: TextStyle(
-                                    color: Colors.blue.shade400,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // 第二行：区号 + 手机号输入框
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // 区号框
+                  Container(
+                    height: 56, // 固定高度，与输入框保持一致
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        bottomLeft: Radius.circular(12),
+                      ),
+                      color: Colors.grey.shade50,
+                    ),
+                    child: Center(
+                      child: Text(
+                        _countryCode,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
                         ),
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                
-                // 登录按钮 - 适配字体宽度
-                Container(
-                  constraints: const BoxConstraints(
-                    minWidth: 120,
-                    minHeight: 48,
                   ),
-                  child: ElevatedButton(
-                    onPressed: _agreedToTerms ? () {
-                      // 这里可处理登录逻辑，比如校验手机号、调用接口等
-                      String phoneNumber = _phoneController.text.trim();
-                      if (phoneNumber.isNotEmpty) {
-                        // debugPrint('点击了立即登录，手机号：$_countryCode$phoneNumber');
-                        AuthHttp.sendCaptcha(phoneNumber);
-                        context.go('/verifycode?phone=${phoneNumber}');
-                        SmartDialog.showToast('验证码已发送');
-                      } else {
-                        SmartDialog.showToast('请输入手机号');
-                      }
-                    } : null, // 如果未同意协议，按钮禁用
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue.shade400,
-                      foregroundColor: Colors.white,
+                  // 手机号输入框
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.8 - 80, // 减去区号框的宽度
+                    child: TextField(
+                      controller: _phoneController,
+                      decoration: InputDecoration(
+                        hintText: '请输入手机号',
+                        hintStyle: TextStyle(color: Colors.grey.shade400),
+                        border: const OutlineInputBorder(
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(12),
+                            bottomRight: Radius.circular(12),
+                          ),
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        enabledBorder: const OutlineInputBorder(
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(12),
+                            bottomRight: Radius.circular(12),
+                          ),
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(12),
+                            bottomRight: Radius.circular(12),
+                          ),
+                          borderSide: BorderSide(color: Colors.blue.shade400, width: 2),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        isDense: true, // 减少内部间距
+                      ),
+                      keyboardType: TextInputType.phone,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // 协议勾选选项
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Transform.scale(
+                    scale: 0.9,
+                    child: Checkbox(
+                      value: _agreedToTerms,
+                      onChanged: (value) {
+                        setState(() {
+                          _agreedToTerms = value ?? false;
+                        });
+                      },
+                      activeColor: Colors.blue.shade400,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      elevation: 2,
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                    ),
-                    child: const Text(
-                      '获取验证码',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                        borderRadius: BorderRadius.circular(4),
                       ),
                     ),
                   ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _agreedToTerms = !_agreedToTerms;
+                      });
+                    },
+                    child: RichText(
+                      text: TextSpan(
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                        children: [
+                          const TextSpan(text: '我已阅读并同意'),
+                          WidgetSpan(
+                            child: GestureDetector(
+                              onTap: () => _showUserAgreementDialog(context),
+                              child: Text(
+                                '《用户协议》',
+                                style: TextStyle(
+                                  color: Colors.blue.shade400,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const TextSpan(text: '和'),
+                          WidgetSpan(
+                            child: GestureDetector(
+                              onTap: () => _showPrivacyPolicyDialog(context),
+                              child: Text(
+                                '《隐私政策》',
+                                style: TextStyle(
+                                  color: Colors.blue.shade400,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+
+              // 登录按钮 - 适配字体宽度
+              Container(
+                constraints: const BoxConstraints(
+                  minWidth: 120,
+                  minHeight: 48,
                 ),
-              ],
-            ),
+                child: ElevatedButton(
+                  onPressed: _agreedToTerms ? () {
+                    // 这里可处理登录逻辑，比如校验手机号、调用接口等
+                    String phoneNumber = _phoneController.text.trim();
+                    if (phoneNumber.isNotEmpty) {
+                      // debugPrint('点击了立即登录，手机号：$_countryCode$phoneNumber');
+                      AuthHttp.sendCaptcha(phoneNumber);
+                      context.go('/verifycode?phone=${phoneNumber}');
+                      SmartDialog.showToast('验证码已发送');
+                    } else {
+                      SmartDialog.showToast('请输入手机号');
+                    }
+                  } : null, // 如果未同意协议，按钮禁用
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade400,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    elevation: 2,
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  ),
+                  child: const Text(
+                    '获取验证码',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
