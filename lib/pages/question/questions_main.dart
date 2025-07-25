@@ -6,6 +6,7 @@ import 'package:imath/pages/common/bottom_navigation_bar.dart';
 import 'package:imath/pages/common/knowledge_tree.dart';
 import 'package:imath/state/global_state.dart';
 import 'package:imath/state/questions_provider.dart';
+import 'package:imath/state/settings_provider.dart';
 import '../paper/paper_listview.dart';
 import 'question_listview.dart';
 
@@ -28,7 +29,7 @@ class _QuestionsMainState extends ConsumerState<QuestionsMain> {
   Widget build(BuildContext context) {
     String title;
     if (_categoryId == ALL_CATEGORY) {
-      title = MATH_LEVEL.Primary.value;
+      title = ref.watch(mathLevelProvider).value;
     } else {
       title = GlobalState.get(CATEGORIES_KEY)[_categoryId.toString()];
     }

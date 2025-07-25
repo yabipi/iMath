@@ -165,12 +165,12 @@ final router = GoRouter(
             },
           ),
           GoRoute(
-            path: 'addpaper',
+            path: 'addPaper',
             builder: (context, state) => AddPaperScreen(),
           ),
 
           GoRoute(
-            path: 'addquestion',
+            path: 'addQuestion',
             builder: (context, state) => AddQuestionScreen(paperId: -1),
           ),
         GoRoute(

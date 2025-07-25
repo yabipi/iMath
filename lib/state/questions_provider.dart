@@ -47,6 +47,18 @@ class QuestionsNotifier extends AsyncNotifier<List<Question>> {
     state = AsyncValue.data([...?state.value, ...newQuestions]);
     // state = AsyncValue.data(questions);
   }
+
+  // 新增：刷新题目列表的方法
+  void refreshQuestions() async {
+    // 重置页码
+    ref.read(pageNoProvider.notifier).state = 1;
+    ref.read(hasMoreProvider.notifier).state = true;
+    
+    // 重新加载第一页数据
+    int categoryId = ref.read(categoryIdProvider);
+    final newQuestions = await loadMoreQuestions(categoryId, 1);
+    state = AsyncValue.data(newQuestions);
+  }
 }
 
 final questionsProvider = AsyncNotifierProvider<QuestionsNotifier, List<Question>>(QuestionsNotifier.new);

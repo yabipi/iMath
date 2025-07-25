@@ -9,6 +9,7 @@ import 'package:imath/pages/common/category_panel.dart';
 import 'package:imath/components/math_cell.dart';
 
 import 'package:imath/state/questions_provider.dart';
+import 'package:imath/utils/device_util.dart';
 
 import '../../models/quiz.dart';
 
@@ -48,6 +49,8 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
     });
   }
 
+
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -84,7 +87,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
               children: [
                 // 标题
                 Text(
-                  '第${index + 1}题',
+                  '第${index + 1}题 ${question.title}',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -104,7 +107,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   // 根据屏幕宽度决定布局方式
-                  if (constraints.maxWidth < 600) {
+                  if (DeviceUtil.isMobile) {
                     // 小屏幕：使用Tab布局
                     return _buildMobileTabLayout(question, imageUrls);
                   } else {
@@ -285,7 +288,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            context.go('/admin/addQuestion');
+            context.push('/admin/addQuestion');
           },
           child: const Icon(Icons.add),
         ),

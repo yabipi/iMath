@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:http/http.dart' as http;
@@ -6,26 +7,29 @@ import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'package:imath/config/constants.dart';
 import 'package:imath/http/question.dart';
+import 'package:imath/mixins/category_mixin.dart';
 import 'package:imath/models/question.dart';
 import 'package:imath/state/global_state.dart';
+import 'package:imath/state/questions_provider.dart';
 
 import '../../config/api_config.dart';
 import 'package:imath/core/context.dart';
 
 
-class QuestionEditView extends StatefulWidget {
+class QuestionEditView extends ConsumerStatefulWidget {
   final int questionId;
   const QuestionEditView({super.key, required this.questionId});
 
   @override
-  State<QuestionEditView> createState() => _QuestionEditViewState();
+  ConsumerState<QuestionEditView> createState() => _QuestionEditViewState();
 }
 
-class _QuestionEditViewState extends State<QuestionEditView> {
+class _QuestionEditViewState extends ConsumerState<QuestionEditView> with CategoryMixin{
   final _formKey = GlobalKey<FormState>();
-  TextEditingController contentController = TextEditingController();
-  TextEditingController optionsController = TextEditingController();
-  TextEditingController answerController = TextEditingController();
+  TextEditingController _titleController = TextEditingController();
+  TextEditingController _contentController = TextEditingController();
+  TextEditingController _optionsController = TextEditingController();
+  TextEditingController _answerController = TextEditingController();
 
   late int _questionId;
   int selectedBranch = ALL_CATEGORY;
@@ -33,7 +37,7 @@ class _QuestionEditViewState extends State<QuestionEditView> {
   bool loaded = false; // 标记是否已经初始化
 
   // 获取全局 Context 实例
-  late final categories;
+  late Map<String, dynamic> categories;
 
   bool _isSubmitting = false;
   List<String> _selectedImages = [];
@@ -57,9 +61,10 @@ class _QuestionEditViewState extends State<QuestionEditView> {
     try {
       final Question? question = await QuestionHttp.getQuestion(_questionId);
       if (question != null) {
-        contentController.text = question.content ?? '';
-        optionsController.text = question.options ?? '';
-        answerController.text = question.answer ?? '';
+        _titleController.text = question.title ?? '';
+        _contentController.text = question.content ?? '';
+        _optionsController.text = question.options ?? '';
+        _answerController.text = question.answer ?? '';
         selectedBranch = question.categoryId ?? ALL_CATEGORY;
 
         selectedType = (question.type??'').isEmpty ? QuestionTypes[0] : question.type!;
@@ -75,18 +80,17 @@ class _QuestionEditViewState extends State<QuestionEditView> {
     try {
       QuestionHttp.updateQuestion(widget.questionId, {
         'categoryId': selectedBranch,
-        'content': contentController.text,
-        'options': optionsController.text,
-        'answer': answerController.text,
+        'title': _titleController.text,
+        'content': _contentController.text,
+        'options': _optionsController.text,
+        'answer': _answerController.text,
         'type': selectedType,
         'images': _selectedImages.join(','),
       });
+      ref.invalidate(questionsProvider);
       context.go('/questions');
 
     } catch (e) {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text('更新失败: $e')),
-      // );
       rethrow;
     } finally {
 
@@ -137,7 +141,7 @@ class _QuestionEditViewState extends State<QuestionEditView> {
 
   @override
   Widget build(BuildContext context) {
-    final categories = GlobalState.get(CATEGORIES_KEY);
+    categories = getCategories(ref);
     return Scaffold(
       appBar: AppBar(
         title: const Text('编辑题目'),
@@ -207,7 +211,22 @@ class _QuestionEditViewState extends State<QuestionEditView> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
-                      controller: contentController,
+                      controller: _titleController,
+                      decoration: const InputDecoration(
+                        labelText: '题目标题',
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 1,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return '请输入题目标题';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _contentController,
                       decoration: const InputDecoration(
                         labelText: '题目内容',
                         border: OutlineInputBorder(),
@@ -222,7 +241,7 @@ class _QuestionEditViewState extends State<QuestionEditView> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
-                      controller: optionsController,
+                      controller: _optionsController,
                       decoration: const InputDecoration(
                         labelText: '题目选项',
                         border: OutlineInputBorder(),
@@ -234,7 +253,7 @@ class _QuestionEditViewState extends State<QuestionEditView> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
-                      controller: answerController,
+                      controller: _answerController,
                       decoration: const InputDecoration(
                         labelText: '解析和答案',
                         border: OutlineInputBorder(),

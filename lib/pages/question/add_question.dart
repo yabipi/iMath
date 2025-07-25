@@ -1,11 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart'; // 引入 image_picker 包
+import 'package:imath/mixins/category_mixin.dart';
 import 'package:imath/state/global_state.dart';
+import 'package:imath/state/settings_provider.dart';
+import 'package:imath/state/questions_provider.dart';
 import 'dart:io'; // 引入 File 类
 
 import '../../config/api_config.dart';
@@ -13,16 +17,17 @@ import '../../config/constants.dart';
 import '../../core/context.dart';
 import '../../http/init.dart';
 
-class AddQuestionScreen extends StatefulWidget {
+class AddQuestionScreen extends ConsumerStatefulWidget {
   final int paperId;
 
   AddQuestionScreen({super.key, required this.paperId});
 
   @override
-  State<AddQuestionScreen> createState() => _AddQuestionScreenState();
+  ConsumerState<AddQuestionScreen> createState() => _AddQuestionScreenState();
+
 }
 
-class _AddQuestionScreenState extends State<AddQuestionScreen> {
+class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> with CategoryMixin {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _optionController = TextEditingController();
@@ -51,7 +56,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
     String? content = '';
     _contentController.text = content ?? '';
     // 获取全局数据
-    categories = GlobalState.get(CATEGORIES_KEY);
+    // categories = GlobalState.get(CATEGORIES_KEY);
   }
 
   @override
@@ -239,29 +244,17 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
     });
 
     try {
-      // 构建选项数据
-      // List<Map<String, String>> options = [];
-      // if (_selectedType == QuestionTypes[0] || _selectedType == QuestionTypes[1]) {
-      //   for (int i = 0; i < _optionControllers.length; i++) {
-      //     if (_optionControllers[i].text.isNotEmpty) {
-      //       options.add({
-      //         'label': String.fromCharCode(65 + i),
-      //         // 'content': _optionControllers[i].text,
-      //         'content': _optionController.text,
-      //       });
-      //     }
-      //   }
-      // }
-
+      MATH_LEVEL level = ref.watch(mathLevelProvider);
       final response = await Request().post(
         '${ApiConfig.SERVER_BASE_URL}/api/question/create',
         options: Options(contentType: Headers.jsonContentType),
         data: {
-          // 'title': _titleController.text,
+          'title': _titleController.text,
           'content': _contentController.text,
           'options': _optionController.text,
           'answer': _answerController.text,
           'categoryId': _selectedBranch,
+          'level': level.value,
           'type': _selectedType,
           'images': _selectedImages.join(','), // 直接使用 fileId 列表
         },
@@ -272,6 +265,8 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('题目添加成功')),
           );
+          // 刷新题目列表 - 使用 invalidate 方法
+          ref.invalidate(questionsProvider);
           // Navigator.pop(context, true);
           // Get.toNamed('/questions');
           context.go('/questions');
@@ -364,6 +359,7 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    categories = getCategories(ref);
     return Scaffold(
       appBar: AppBar(
         title: const Text('添加题目'),
@@ -410,6 +406,21 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
                   setState(() {
                     _selectedType = newValue!;
                   });
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  labelText: '题目标题',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 1,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return '请输入题目标题';
+                  }
+                  return null;
                 },
               ),
               const SizedBox(height: 16),

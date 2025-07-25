@@ -59,8 +59,8 @@ Future<void> initMathData() async {
     final categories = await CategoryHttp.getCategories();
     Map<String, String> _categories = {ALL_CATEGORY.toString(): '全部'};
     // 单独存放初等数学和高等数学分类
-    Map<String, String> primary_categories = {};
-    Map<String, String> advanced_categories = {};
+    Map<String, String> primary_categories = {ALL_CATEGORY.toString(): '全部分支'};
+    Map<String, String> advanced_categories = {ALL_CATEGORY.toString(): '全部分支'};
     for (var item in categories) {
       _categories[item['ID'].toString()] = item['CategoryName'];
       if (item['level'] == MATH_LEVEL.Primary.value) {

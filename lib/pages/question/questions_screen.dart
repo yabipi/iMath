@@ -5,6 +5,7 @@ import 'package:imath/pages/common/knowledge_tree.dart';
 import '../paper/paper_listview.dart';
 import 'question_listview.dart';
 
+@Deprecated('暂时不用')
 class QuestionsScreen extends StatefulWidget {
   const QuestionsScreen({super.key});
 
@@ -13,7 +14,6 @@ class QuestionsScreen extends StatefulWidget {
 }
 
 class _QuestionsScreenState extends State<QuestionsScreen> {
-
 
   @override
   void initState() {

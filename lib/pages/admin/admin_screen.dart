@@ -72,7 +72,7 @@ class AdminScreen extends StatelessWidget {
             title: const Text('添加题目'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              context.go("/admin/addquestion");
+              context.go("/admin/addQuestion");
             },
           ),
           const Divider(),
