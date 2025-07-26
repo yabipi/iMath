@@ -14,8 +14,8 @@ class QuestionHttp {
 
   }
 
-  static Future loadQuestions({int? categoryId=ALL_CATEGORY, int? pageNo=1, int? pageSize=10}) async {
-    final url = '${ApiConfig.SERVER_BASE_URL}/api/question/list?categoryId=${categoryId}&pageNo=$pageNo&pageSize=$pageSize';
+  static Future loadQuestions({int? categoryId=ALL_CATEGORY, int? pageNo=1, int? pageSize=10, String? level}) async {
+    final url = '${ApiConfig.SERVER_BASE_URL}/api/question/list?categoryId=${categoryId}&pageNo=$pageNo&pageSize=$pageSize&level=${level}';
     final response = await Request().get(url);
     return response.data;
   }

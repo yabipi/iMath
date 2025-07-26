@@ -63,7 +63,7 @@ class _QuestionsMainState extends ConsumerState<QuestionsMain> {
                 ),
               ),
             ),
-            KnowledgeTree(level: MATH_LEVEL.Primary, onChangeCategory: (categoryId){
+            KnowledgeTree(onChangeCategory: (categoryId){
               setState(() {
                 this._categoryId = categoryId;
                 ref.read(questionsProvider.notifier).onChangeCategory(categoryId);

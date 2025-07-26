@@ -1,10 +1,12 @@
 import 'package:animated_tree_view/tree_view/tree_node.dart';
 import 'package:animated_tree_view/tree_view/tree_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imath/config/constants.dart';
 
 import 'package:imath/core/context.dart';
 import 'package:imath/core/global.dart';
+import 'package:imath/state/settings_provider.dart';
 
 final defaultTree = TreeNode.root()
   ..addAll([
@@ -40,17 +42,17 @@ final Map<int, Color> colorMapper = {
   10: Colors.blueGrey[900]!,
 };
 
-class KnowledgeTree extends StatelessWidget {
-  MATH_LEVEL level;
+class KnowledgeTree extends ConsumerWidget {
   // 定义mock的JSON数据
   late Map<String, dynamic> categories;
   void Function(int)? onChangeCategory;
   int stateCount = 0;
-  KnowledgeTree({super.key, required this.level, this.onChangeCategory});
+  KnowledgeTree({super.key, this.onChangeCategory});
 
   @override
-  Widget build(BuildContext context) {
-    return _buildListView();
+  Widget build(BuildContext context, WidgetRef ref) {
+    MATH_LEVEL level = ref.watch(mathLevelProvider);
+    return _buildListView(level);
   }
 
   Widget _buildTree() {
@@ -69,16 +71,16 @@ class KnowledgeTree extends StatelessWidget {
     );
   }
 
-  Widget _buildListView() {
-    categories = Global.get(level.value).where((key, value) => key!= ALL_CATEGORY.toString()).toMap();
-    final keys = categories.keys.toList();
+  Widget _buildListView(MATH_LEVEL level) {
+    categories = Global.get(level.value);
+    final keys = categories.keys.where((key) => key!= ALL_CATEGORY.toString()).toList();
     return ListView.builder(
       shrinkWrap: true,
       itemCount: keys.length + 1,
       itemBuilder: (context, index) {
         if (index == 0) {
           return ListTile(
-            title: Text('初等数学', style: const TextStyle(fontSize: 18)), // 修改：字体加大一号
+            title: Text(level.value, style: const TextStyle(fontSize: 18)), // 修改：字体加大一号
             onTap: () {
               onChangeCategory?.call(ALL_CATEGORY);
             },

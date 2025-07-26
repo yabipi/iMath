@@ -20,7 +20,7 @@ class CategoryPanel extends ConsumerWidget with CategoryMixin {
     Map<String, dynamic> categories = getCategories(ref);
 
     return DefaultTabController(
-      length: categories.length + 1,
+      length: categories.length,
       child: TabBar(
         isScrollable: true,
         tabs: categories.entries.map((entry) {
@@ -33,7 +33,7 @@ class CategoryPanel extends ConsumerWidget with CategoryMixin {
           if (index == 0) {
             onItemTap!(ALL_CATEGORY);
           } else {
-            String categoryId = categories.keys.toList()[index - 1];
+            String categoryId = categories.keys.toList()[index];
             // print('点击${categories[categoryId.toString()]}');
             onItemTap!(int.parse(categoryId));
           }

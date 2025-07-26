@@ -87,6 +87,7 @@ class _QuestionEditViewState extends ConsumerState<QuestionEditView> with Catego
         'type': selectedType,
         'images': _selectedImages.join(','),
       });
+      // 刷新题目列表 - 使用 invalidate 方法
       ref.invalidate(questionsProvider);
       context.go('/questions');
 

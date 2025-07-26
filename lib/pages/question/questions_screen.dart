@@ -66,7 +66,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                   ),
                 ),
               ),
-              KnowledgeTree(level: MATH_LEVEL.Primary)
+              KnowledgeTree()
             ],
           ),
         ),
