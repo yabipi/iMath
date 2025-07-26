@@ -94,7 +94,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> with Category
           style: const TextStyle(color: Colors.white),
           cursorColor: Colors.white,
           decoration: const InputDecoration(
-            hintText: 'Search...',
+            hintText: '搜索...',
             hintStyle: TextStyle(color: Colors.white54),
             border: InputBorder.none,
           ),

@@ -23,15 +23,12 @@ class CategoryPanel extends ConsumerWidget with CategoryMixin {
       length: categories.length + 1,
       child: TabBar(
         isScrollable: true,
-        tabs: [Tab(
-          text: '全部',
-          // onTap: () => onItemTap(entry.key), // Tab 可以直接绑定 onTap
-          ), ...categories.entries.map((entry) {
+        tabs: categories.entries.map((entry) {
           return Tab(
             text: entry.value,
             // onTap: () => onItemTap(entry.key), // Tab 可以直接绑定 onTap
           );
-        }).toList()],
+        }).toList(),
         onTap: (int index) {
           if (index == 0) {
             onItemTap!(ALL_CATEGORY);

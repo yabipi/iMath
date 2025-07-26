@@ -70,7 +70,7 @@ class KnowledgeTree extends StatelessWidget {
   }
 
   Widget _buildListView() {
-    categories = Global.get(level.value);
+    categories = Global.get(level.value).where((key, value) => key!= ALL_CATEGORY.toString()).toMap();
     final keys = categories.keys.toList();
     return ListView.builder(
       shrinkWrap: true,

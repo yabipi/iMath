@@ -36,52 +36,53 @@ class _LoginPageState extends State<PhoneLoginPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               // 第一行：国家/地区选择
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    '国家/地区',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () {
-                      // 这里可弹出选择框让用户选择国家/地区代码，示例中简单模拟切换
-                      setState(() {
-                        _countryCode = _countryCode == '+86' ? '+1' : '+86';
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            _countryCode == '+86' ? '中国大陆' : '其他',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          const Icon(
-                            Icons.arrow_drop_down,
-                            size: 16,
-                            color: Colors.grey,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     Text(
+              //       '国家/地区',
+              //       style: TextStyle(
+              //         fontSize: 16,
+              //         color: Colors.grey[700],
+              //       ),
+              //     ),
+              //     const SizedBox(width: 8),
+              //     GestureDetector(
+              //       onTap: () {
+              //         // 这里可弹出选择框让用户选择国家/地区代码，示例中简单模拟切换
+              //         setState(() {
+              //           _countryCode = _countryCode == '+86' ? '+1' : '+86';
+              //         });
+              //       },
+              //       child: Container(
+              //         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              //         height: 56,
+              //         decoration: BoxDecoration(
+              //           border: Border.all(color: Colors.grey.shade300),
+              //           // borderRadius: BorderRadius.circular(6),
+              //         ),
+              //         child: Row(
+              //           mainAxisSize: MainAxisSize.min,
+              //           children: [
+              //             Text(
+              //               _countryCode == '+86' ? '中国大陆' : '其他',
+              //               style: const TextStyle(
+              //                 fontSize: 14,
+              //                 fontWeight: FontWeight.w500,
+              //               ),
+              //             ),
+              //             const SizedBox(width: 4),
+              //             const Icon(
+              //               Icons.arrow_drop_down,
+              //               size: 16,
+              //               color: Colors.grey,
+              //             ),
+              //           ],
+              //         ),
+              //       ),
+              //     ),
+              //   ],
+              // ),
               const SizedBox(height: 16),
 
               // 第二行：区号 + 手机号输入框
@@ -90,14 +91,14 @@ class _LoginPageState extends State<PhoneLoginPage> {
                 children: [
                   // 区号框
                   Container(
-                    height: 56, // 固定高度，与输入框保持一致
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    height: 55, // 固定高度，与输入框保持一致
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        bottomLeft: Radius.circular(12),
-                      ),
+                      // borderRadius: const BorderRadius.only(
+                      //   topLeft: Radius.circular(12),
+                      //   bottomLeft: Radius.circular(12),
+                      // ),
                       color: Colors.grey.shade50,
                     ),
                     child: Center(
@@ -110,34 +111,32 @@ class _LoginPageState extends State<PhoneLoginPage> {
                         ),
                       ),
                     ),
+
                   ),
                   // 手机号输入框
-                  SizedBox(
+                  Container(
+                    height: 56,
                     width: MediaQuery.of(context).size.width * 0.8 - 80, // 减去区号框的宽度
+                    padding: const EdgeInsets.symmetric(horizontal: 1),
+
                     child: TextField(
                       controller: _phoneController,
                       decoration: InputDecoration(
                         hintText: '请输入手机号',
                         hintStyle: TextStyle(color: Colors.grey.shade400),
                         border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(12),
-                            bottomRight: Radius.circular(12),
-                          ),
+                          // borderRadius: BorderRadius.only(
+                          //   topRight: Radius.circular(12),
+                          //   bottomRight: Radius.circular(12),
+                          // ),
                           borderSide: BorderSide(color: Colors.grey),
                         ),
-                        enabledBorder: const OutlineInputBorder(
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(12),
-                            bottomRight: Radius.circular(12),
-                          ),
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
+
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(12),
-                            bottomRight: Radius.circular(12),
-                          ),
+                          // borderRadius: const BorderRadius.only(
+                          //   topRight: Radius.circular(12),
+                          //   bottomRight: Radius.circular(12),
+                          // ),
                           borderSide: BorderSide(color: Colors.blue.shade400, width: 2),
                         ),
                         filled: true,
