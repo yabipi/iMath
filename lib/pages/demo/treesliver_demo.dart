@@ -6,7 +6,8 @@ class CustomTreeNode {
   final List<CustomTreeNode> children;
   bool isExpanded;
 
-  CustomTreeNode(this.data, {this.children = const [], this.isExpanded = false});
+  CustomTreeNode(this.data,
+      {this.children = const [], this.isExpanded = false});
 
   CustomTreeNode copyWith({
     String? data,
@@ -23,9 +24,9 @@ class CustomTreeNode {
 
 /// 拖拽位置类型
 enum DragPosition {
-  child,    // 作为子节点
-  siblingAbove,  // 作为兄弟节点，位于上方
-  siblingBelow,  // 作为兄弟节点，位于下方
+  child, // 作为子节点
+  siblingAbove, // 作为兄弟节点，位于上方
+  siblingBelow, // 作为兄弟节点，位于下方
 }
 
 /// Flutter code sample for [TreeSliver] with intelligent drag and drop functionality.
@@ -54,7 +55,7 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
   CustomTreeNode? _dragTargetNode;
   DragPosition? _dragPosition;
   final GlobalKey _listKey = GlobalKey();
-  
+
   final List<CustomTreeNode> _tree = <CustomTreeNode>[
     CustomTreeNode('First'),
     CustomTreeNode(
@@ -99,24 +100,28 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
     });
   }
 
-  void _onDragUpdate(DragTargetDetails<CustomTreeNode> details, CustomTreeNode targetNode) {
+  void _onDragUpdate(
+      DragTargetDetails<CustomTreeNode> details, CustomTreeNode targetNode) {
     setState(() {
       _dragTargetNode = targetNode;
       _dragPosition = _calculateDragPosition(details, targetNode);
-      
+
       // 调试信息
       final targetLevel = _getNodeLevel(targetNode, _tree);
       final targetLeft = 16.0 + (targetLevel * 20.0);
       final textWidth = targetNode.data.length * 10.0 + 20.0 + 16.0;
       final targetRight = targetLeft + textWidth;
-      
-      print('拖拽调试: dragLeft=${details.offset.dx}, targetRight=$targetRight, 目标节点="${targetNode.data}", 层级=$targetLevel');
+
+      print(
+          '拖拽调试: dragLeft=${details.offset.dx}, targetRight=$targetRight, 目标节点="${targetNode.data}", 层级=$targetLevel');
     });
   }
 
-  DragPosition _calculateDragPosition(DragTargetDetails<CustomTreeNode> details, CustomTreeNode targetNode) {
+  DragPosition _calculateDragPosition(
+      DragTargetDetails<CustomTreeNode> details, CustomTreeNode targetNode) {
     // 获取目标节点的渲染对象
-    final RenderBox? renderBox = _listKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? renderBox =
+        _listKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return DragPosition.child;
 
     // 获取目标节点在列表中的位置
@@ -129,20 +134,20 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
     final targetTop = padding + (targetIndex * nodeHeight);
     final targetCenter = targetTop + (nodeHeight / 2);
     final targetBottom = targetTop + nodeHeight;
-    
+
     // 获取拖拽位置
     final dragTop = details.offset.dy;
     final dragLeft = details.offset.dx;
-    
+
     // 计算目标节点的水平位置（根据层级缩进）
     final targetLevel = _getNodeLevel(targetNode, _tree);
     final targetLeft = padding + (targetLevel * 20.0); // 每层缩进20px
-    
+
     // 估算目标节点文本的右边缘位置
     // 文本宽度 = 文本长度 * 字符宽度(约10px) + 图标宽度(20px) + 间距(16px) + 缩进(level * 20)
     final textWidth = targetNode.data.length * 10.0 + 20.0 + 16.0;
     final targetRight = targetLeft + textWidth;
-    
+
     // 判断逻辑：首先检查水平位置
     if (dragLeft > targetRight) {
       // 源节点左边缘超过目标节点右边缘，成为子节点
@@ -157,20 +162,23 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
     }
   }
 
-  int _findNodeIndex(CustomTreeNode node, List<CustomTreeNode> tree, [int currentIndex = 0]) {
+  int _findNodeIndex(CustomTreeNode node, List<CustomTreeNode> tree,
+      [int currentIndex = 0]) {
     for (int i = 0; i < tree.length; i++) {
       if (tree[i] == node) {
         return currentIndex + i;
       }
       if (tree[i].isExpanded) {
-        final childIndex = _findNodeIndex(node, tree[i].children, currentIndex + i + 1);
+        final childIndex =
+            _findNodeIndex(node, tree[i].children, currentIndex + i + 1);
         if (childIndex != -1) return childIndex;
       }
     }
     return -1;
   }
 
-  int _getNodeLevel(CustomTreeNode targetNode, List<CustomTreeNode> tree, [int level = 0]) {
+  int _getNodeLevel(CustomTreeNode targetNode, List<CustomTreeNode> tree,
+      [int level = 0]) {
     for (final node in tree) {
       if (node == targetNode) {
         return level;
@@ -185,16 +193,16 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
 
   void _onDragAccepted(CustomTreeNode draggedNode, CustomTreeNode targetNode) {
     if (_dragPosition == null) return;
-    
+
     setState(() {
       // 检查是否试图拖拽到自己或自己的子节点
       if (_isDescendant(draggedNode, targetNode)) {
         return;
       }
-      
+
       // 从原位置移除节点
       _removeNodeFromTree(draggedNode, _tree);
-      
+
       switch (_dragPosition!) {
         case DragPosition.child:
           _addAsChild(draggedNode, targetNode);
@@ -215,28 +223,29 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
       ...targetNode.children,
       draggedNode,
     ];
-    
+
     // 创建新的节点来替换原节点
     final newTargetNode = targetNode.copyWith(
       children: newChildren,
       isExpanded: true,
     );
-    
+
     // 替换原节点
     _replaceNodeInTree(targetNode, newTargetNode, _tree);
   }
 
-  void _addAsSibling(CustomTreeNode draggedNode, CustomTreeNode targetNode, {required bool above}) {
+  void _addAsSibling(CustomTreeNode draggedNode, CustomTreeNode targetNode,
+      {required bool above}) {
     // 找到目标节点的父节点
     final parent = _findParentNode(targetNode, _tree);
-    
+
     if (parent != null) {
       // 作为兄弟节点添加到父节点
       final parentChildren = List<CustomTreeNode>.from(parent.children);
       final targetIndex = parentChildren.indexOf(targetNode);
       final insertIndex = above ? targetIndex : targetIndex + 1;
       parentChildren.insert(insertIndex, draggedNode);
-      
+
       final newParent = parent.copyWith(children: parentChildren);
       _replaceNodeInTree(parent, newParent, _tree);
     } else {
@@ -265,7 +274,8 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
     }
   }
 
-  void _replaceNodeInTree(CustomTreeNode oldNode, CustomTreeNode newNode, List<CustomTreeNode> tree) {
+  void _replaceNodeInTree(CustomTreeNode oldNode, CustomTreeNode newNode,
+      List<CustomTreeNode> tree) {
     for (int i = 0; i < tree.length; i++) {
       if (tree[i] == oldNode) {
         tree[i] = newNode;
@@ -275,7 +285,8 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
     }
   }
 
-  CustomTreeNode? _findParentNode(CustomTreeNode targetNode, List<CustomTreeNode> tree) {
+  CustomTreeNode? _findParentNode(
+      CustomTreeNode targetNode, List<CustomTreeNode> tree) {
     for (final node in tree) {
       if (node.children.contains(targetNode)) {
         return node;
@@ -313,7 +324,8 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 上方横线指示器（当拖拽到上方兄弟节点时）
-        if (_dragTargetNode == node && _dragPosition == DragPosition.siblingAbove)
+        if (_dragTargetNode == node &&
+            _dragPosition == DragPosition.siblingAbove)
           Container(
             height: 3,
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -322,7 +334,7 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-        
+
         // 节点本身
         GestureDetector(
           onTap: () {
@@ -340,7 +352,8 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
             feedback: Material(
               elevation: 8.0,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: Colors.blue.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(6),
@@ -348,7 +361,8 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.drag_handle, color: Colors.white, size: 18),
+                    const Icon(Icons.drag_handle,
+                        color: Colors.white, size: 18),
                     const SizedBox(width: 6),
                     Text(
                       node.data,
@@ -369,8 +383,8 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
             onDragEnd: (_) => _onDragEnd(),
             child: DragTarget<CustomTreeNode>(
               onWillAcceptWithDetails: (details) {
-                return details.data != node && 
-                       !_isDescendant(details.data, node);
+                return details.data != node &&
+                    !_isDescendant(details.data, node);
               },
               onAcceptWithDetails: (details) {
                 _onDragAccepted(details.data, node);
@@ -380,12 +394,12 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
               },
               builder: (context, candidateData, rejectedData) {
                 Widget result = _buildNodeContent(node, level);
-                
+
                 // 拖拽悬停效果
                 if (candidateData.isNotEmpty) {
                   Color borderColor = Colors.blue;
                   Color backgroundColor = Colors.blue.withValues(alpha: 0.1);
-                  
+
                   // 根据拖拽位置显示不同的视觉效果
                   if (_dragTargetNode == node && _dragPosition != null) {
                     switch (_dragPosition!) {
@@ -403,7 +417,7 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
                         break;
                     }
                   }
-                  
+
                   result = Container(
                     decoration: BoxDecoration(
                       border: Border.all(
@@ -416,7 +430,7 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
                     child: result,
                   );
                 }
-                
+
                 // 选中状态
                 if (_selectedNode == node) {
                   result = Container(
@@ -427,7 +441,7 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
                     child: result,
                   );
                 }
-                
+
                 // 拖拽状态
                 if (_draggedNode == node) {
                   result = Opacity(
@@ -435,15 +449,16 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
                     child: result,
                   );
                 }
-                
+
                 return result;
               },
             ),
           ),
         ),
-        
+
         // 下方横线指示器（当拖拽到下方兄弟节点时）
-        if (_dragTargetNode == node && _dragPosition == DragPosition.siblingBelow)
+        if (_dragTargetNode == node &&
+            _dragPosition == DragPosition.siblingBelow)
           Container(
             height: 3,
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -452,13 +467,15 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-        
+
         // 子节点
         if (node.isExpanded && node.children.isNotEmpty)
           Padding(
             padding: EdgeInsets.only(left: 20.0),
             child: Column(
-              children: node.children.map((child) => _buildTreeNode(child, level + 1)).toList(),
+              children: node.children
+                  .map((child) => _buildTreeNode(child, level + 1))
+                  .toList(),
             ),
           ),
       ],
@@ -528,20 +545,22 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
                   const Spacer(),
                   if (_dragTargetNode != null && _dragPosition != null)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: _getPositionColor(_dragPosition!),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         _getPositionText(_dragPosition!),
-                        style: const TextStyle(fontSize: 12, color: Colors.white),
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.white),
                       ),
                     ),
                 ],
               ),
             ),
-          
+
           // 操作说明
           Container(
             width: double.infinity,
@@ -564,7 +583,7 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
               ],
             ),
           ),
-          
+
           // 树形结构
           Expanded(
             child: ListView.builder(
@@ -582,6 +601,7 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
+            heroTag: 'add_node',
             onPressed: _addNewNode,
             backgroundColor: Colors.green,
             tooltip: '添加新节点',
@@ -589,6 +609,7 @@ class _TreeSliverExampleState extends State<TreeSliverExample> {
           ),
           const SizedBox(height: 16),
           FloatingActionButton(
+            heroTag: 'expand_all',
             onPressed: () {
               setState(() {
                 for (final node in _tree) {

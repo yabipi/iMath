@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:imath/pages/demo/draggable_tree_demo.dart';
+import 'package:imath/pages/demo/draggable_tree_screen.dart';
 import 'package:imath/pages/demo/easy_refresh_list.dart';
 import 'package:imath/pages/demo/simple_list_view.dart';
 import 'package:imath/pages/question/slide_question.dart';
@@ -22,49 +24,75 @@ class TestFunctionsPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "功能测试区",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
+            // 第一行按钮
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildTestButton(context, "题库播放", () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SlideQuestion(),
-                    ),
-                  );
-                }),
-                _buildTestButton(context, "下拉刷新", () {
-                  // TODO: 下拉刷新逻辑
-                }),
-                _buildTestButton(context, "布局管理", () {
-                  // TODO: 布局管理逻辑
-                }),
-                _buildTestButton(context, "无限下拉列表", () {
-                  // TODO: 布局管理逻辑
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EasyRefreshListScreen(),
-                    ),
-                  );
-                  // context.go('/pageview');
-                  //
-                }),
-                _buildTestButton(context, "ListView", () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SimpleListView(),
-                    ),
-                  );
-                }),
+                Expanded(
+                  child: _buildTestButton(context, "题库播放", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SlideQuestion(),
+                      ),
+                    );
+                  }),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildTestButton(context, "下拉刷新", () {
+                    // TODO: 下拉刷新逻辑
+                  }),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // 第二行按钮
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTestButton(context, "可拖放节点树", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DraggableTreeScreen(),
+                      ),
+                    );
+                  }),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildTestButton(context, "布局管理", () {
+                    // TODO: 布局管理逻辑
+                  }),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // 第三行按钮
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTestButton(context, "无限下拉列表", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EasyRefreshListScreen(),
+                      ),
+                    );
+                  }),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildTestButton(context, "ListView", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SimpleListView(),
+                      ),
+                    );
+                  }),
+                ),
               ],
             ),
           ],
@@ -75,12 +103,19 @@ class TestFunctionsPage extends StatelessWidget {
 
   Widget _buildTestButton(
       BuildContext context, String title, VoidCallback onPressed) {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        child: ElevatedButton(
-          onPressed: onPressed,
-          child: Text(title),
+    return Container(
+      height: 60,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: Text(
+          title,
+          style: const TextStyle(fontSize: 16),
+          textAlign: TextAlign.center,
         ),
       ),
     );
