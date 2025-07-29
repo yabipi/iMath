@@ -10,7 +10,6 @@ import '../question/add_question.dart';
 import '../knowledge/add_knowledge.dart';
 import '../culture/mathematician_add.dart';  // 新增导入
 
-import 'package:imath/pages/demo/draggable_tree_screen.dart';
 import 'package:imath/pages/demo/treesliver_drag_demo.dart';
 
 import 'package:imath/pages/admin/test_functions.dart';
@@ -85,19 +84,6 @@ class AdminScreen extends StatelessWidget {
             },
           ),
           const Divider(),
-          ListTile(
-            leading: const Icon(Icons.account_tree),
-            title: const Text('知识点树'),
-            subtitle: const Text('管理知识点树结构'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const DraggableTreeScreen(),
-                ),
-              );
-            },
-          ),
           ListTile(
             leading: const Icon(Icons.drag_handle),
             title: const Text('TreeSliver拖拽演示'),

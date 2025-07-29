@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import '../../widgets/draggable_tree.dart';
-import '../../widgets/draggable_tree_controller.dart';
+import 'package:imath/widgets/draggable_tree.dart';
+import 'package:imath/widgets/draggable_tree_controller.dart';
+
 
 /// 可拖拽树组件演示页面
 class DraggableTreeDemo extends StatefulWidget {
@@ -14,6 +17,8 @@ class DraggableTreeDemo extends StatefulWidget {
 class _DraggableTreeDemoState extends State<DraggableTreeDemo> {
   late DraggableTreeController _controller;
   final TextEditingController _nodeNameController = TextEditingController();
+  bool _showJsonData = false; // 新增：控制是否显示JSON数据
+  bool _jsonDataUpdated = false; // 新增：标记JSON数据是否已更新
 
   @override
   void initState() {
@@ -22,7 +27,13 @@ class _DraggableTreeDemoState extends State<DraggableTreeDemo> {
 
     // 设置回调函数
     _controller.onTreeChanged = () {
-      setState(() {});
+      setState(() {
+        _jsonDataUpdated = true;
+      });
+      // 如果JSON数据区域是显示的，可以在这里添加一些视觉反馈
+      if (_showJsonData) {
+        // 可以添加一个短暂的闪烁效果来提示数据已更新
+      }
     };
 
     _controller.onNodeSelected = (node) {
@@ -35,6 +46,15 @@ class _DraggableTreeDemoState extends State<DraggableTreeDemo> {
 
     _controller.onDragEnded = () {
       setState(() {});
+      // 拖放结束后，如果JSON数据区域是显示的，可以添加提示
+      if (_showJsonData) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('树结构已更新，JSON数据已刷新'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
     };
 
     // 加载示例数据
@@ -176,6 +196,18 @@ class _DraggableTreeDemoState extends State<DraggableTreeDemo> {
               tooltip: '删除选中节点',
             ),
           IconButton(
+            icon: Icon(_showJsonData ? Icons.code_off : Icons.code),
+            onPressed: () {
+              setState(() {
+                _showJsonData = !_showJsonData;
+                if (_showJsonData) {
+                  _jsonDataUpdated = false; // 重置更新标记
+                }
+              });
+            },
+            tooltip: _showJsonData ? '隐藏JSON数据' : '显示JSON数据',
+          ),
+          IconButton(
             icon: const Icon(Icons.code),
             onPressed: _showTreeData,
             tooltip: '查看JSON数据',
@@ -221,41 +253,6 @@ class _DraggableTreeDemoState extends State<DraggableTreeDemo> {
               ),
             ),
 
-          // 操作说明
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            color: Colors.grey[100],
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  '操作说明:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                const Text('• 点击箭头: 展开/折叠子节点'),
-                const Text('• 点击节点: 选中节点'),
-                const Text('• 长按节点: 开始拖拽'),
-                const Text('• 拖拽到节点右侧: 成为子节点（绿色边框）'),
-                const Text('• 拖拽到节点上方: 成为上方兄弟节点（蓝色横线）'),
-                const Text('• 拖拽到节点下方: 成为下方兄弟节点（蓝色横线）'),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Container(width: 16, height: 16, color: Colors.green),
-                    const SizedBox(width: 8),
-                    const Text('子节点', style: TextStyle(fontSize: 12)),
-                    const SizedBox(width: 16),
-                    Container(width: 16, height: 16, color: Colors.blue),
-                    const SizedBox(width: 8),
-                    const Text('兄弟节点', style: TextStyle(fontSize: 12)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
           // 添加节点区域
           Container(
             padding: const EdgeInsets.all(16),
@@ -293,14 +290,114 @@ class _DraggableTreeDemoState extends State<DraggableTreeDemo> {
 
           // 树形结构
           Expanded(
-            child: DraggableTree(
-              controller: _controller,
-              nodeHeight: 48.0,
-              indentWidth: 20.0,
-              showDragIndicator: true,
-              showSelection: true,
-              selectedColor: Colors.purple[100],
-              dragIndicatorColor: Colors.blue,
+            child: Column(
+              children: [
+                // 树形结构
+                Expanded(
+                  child: DraggableTree(
+                    controller: _controller,
+                    nodeHeight: 48.0,
+                    indentWidth: 20.0,
+                    showDragIndicator: true,
+                    showSelection: true,
+                    selectedColor: Colors.purple[100],
+                    dragIndicatorColor: Colors.blue,
+                  ),
+                ),
+                
+                // JSON数据显示区域
+                if (_showJsonData) ...[
+                  const Divider(height: 1),
+                  Container(
+                    height: 200,
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      border: Border(
+                        top: BorderSide(color: Colors.grey[300]!),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                                                 Row(
+                           children: [
+                             Row(
+                               children: [
+                                 const Text(
+                                   'JSON数据:',
+                                   style: TextStyle(
+                                     fontWeight: FontWeight.bold,
+                                     fontSize: 14,
+                                   ),
+                                 ),
+                                 if (_jsonDataUpdated) ...[
+                                   const SizedBox(width: 8),
+                                   Container(
+                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                     decoration: BoxDecoration(
+                                       color: Colors.green,
+                                       borderRadius: BorderRadius.circular(8),
+                                     ),
+                                     child: const Text(
+                                       '已更新',
+                                       style: TextStyle(
+                                         color: Colors.white,
+                                         fontSize: 10,
+                                         fontWeight: FontWeight.bold,
+                                       ),
+                                     ),
+                                   ),
+                                 ],
+                               ],
+                             ),
+                            const Spacer(),
+                            IconButton(
+                              icon: const Icon(Icons.copy, size: 16),
+                              onPressed: () {
+                                final jsonData = _controller.getTreeData();
+                                final formattedJson = _formatJson(jsonData);
+                                Clipboard.setData(ClipboardData(text: formattedJson));
+                                setState(() {
+                                  _jsonDataUpdated = false; // 重置更新标记
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('格式化JSON数据已复制到剪贴板'),
+                                    duration: Duration(seconds: 1),
+                                  ),
+                                );
+                              },
+                              tooltip: '复制格式化JSON数据',
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Expanded(
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: SingleChildScrollView(
+                              child: SelectableText(
+                                _formatJson(_controller.getTreeData()),
+                                style: const TextStyle(
+                                  fontFamily: 'monospace',
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
         ],
@@ -347,6 +444,19 @@ class _DraggableTreeDemoState extends State<DraggableTreeDemo> {
         return '作为兄弟节点(上方)';
       case DragPosition.siblingBelow:
         return '作为兄弟节点(下方)';
+    }
+  }
+
+  // 格式化JSON字符串，使其更易读
+  String _formatJson(String jsonString) {
+    try {
+      // 解析JSON并重新格式化
+      final jsonData = json.decode(jsonString);
+      const encoder = JsonEncoder.withIndent('  ');
+      return encoder.convert(jsonData);
+    } catch (e) {
+      // 如果解析失败，返回原始字符串
+      return jsonString;
     }
   }
 }

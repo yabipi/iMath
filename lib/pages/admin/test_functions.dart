@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imath/pages/demo/draggable_tree_demo.dart';
-import 'package:imath/pages/demo/draggable_tree_screen.dart';
+
 import 'package:imath/pages/demo/easy_refresh_list.dart';
 import 'package:imath/pages/demo/simple_list_view.dart';
 import 'package:imath/pages/question/slide_question.dart';
@@ -55,7 +55,7 @@ class TestFunctionsPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const DraggableTreeScreen(),
+                        builder: (context) => const DraggableTreeDemo(),
                       ),
                     );
                   }),
