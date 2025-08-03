@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 
-class LatexTestScreen extends StatefulWidget {
-  const LatexTestScreen({super.key});
+class LatexRenderScreen extends StatefulWidget {
+  const LatexRenderScreen({super.key});
 
   @override
-  State<LatexTestScreen> createState() => _LatexTestScreenState();
+  State<LatexRenderScreen> createState() => _LatexRenderScreenState();
 }
 
-class _LatexTestScreenState extends State<LatexTestScreen> {
+class _LatexRenderScreenState extends State<LatexRenderScreen> {
   final TextEditingController _latexController = TextEditingController();
   String _currentLatex = r'\begin{matrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{matrix}';
 
@@ -35,6 +36,45 @@ class _LatexTestScreenState extends State<LatexTestScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Html(
+                data: r"""<tex>i\hbar\frac{\partial}{\partial t}\Psi(\vec x,t) = -\frac{\hbar}{2m}\nabla^2\Psi(\vec x,t)+ V(\vec x)\Psi(\vec x,t)</tex>""",
+                extensions: [
+                  TagExtension(
+                      tagsToExtend: {"tex"},
+                      builder: (extensionContext) {
+                        return Math.tex(
+                          extensionContext.innerHtml,
+                          mathStyle: MathStyle.display,
+                          textStyle: extensionContext.styledElement?.style.generateTextStyle(),
+                          onErrorFallback: (FlutterMathException e) {
+                            //optionally try and correct the Tex string here
+                            return Text(e.message);
+                          },
+                        );
+                      }
+                  ),
+                ],
+            ),
+            Html(
+              data: r"""<tex>\zeta(s) = \frac{1}{1^s} + \frac{1}{2^s} + \frac{1}{3^s} + \frac{1}{4^s} + \cdots。</tex>
+                非平凡零点（在此情况下是指 \s  不为 \(-2, -4, -6\cdots\) 等点的值）的实数部分是 <tex>\frac{1}{2}</tex>""",
+              extensions: [
+                TagExtension(
+                    tagsToExtend: {"tex"},
+                    builder: (extensionContext) {
+                      return Math.tex(
+                        extensionContext.innerHtml,
+                        mathStyle: MathStyle.display,
+                        textStyle: extensionContext.styledElement?.style.generateTextStyle(),
+                        onErrorFallback: (FlutterMathException e) {
+                          //optionally try and correct the Tex string here
+                          return Text(e.message);
+                        },
+                      );
+                    }
+                ),
+              ],
+            ),
             const Text(
               '预设矩阵示例:',
               style: TextStyle(

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imath/config/constants.dart';
+import 'package:imath/config/icons.dart';
 import 'package:imath/http/article.dart';
 import 'package:imath/models/article.dart';
 import 'package:imath/utils/data_util.dart';
@@ -11,8 +12,8 @@ import 'package:imath/widgets/refresh/constructor.dart';
 import 'package:imath/widgets/refresh/paging_mixin.dart';
 
 class ArticleRefreshListScreen extends StatefulWidget {
-  ArticleRefreshListScreen({super.key, ArticleType articleType = ArticleType.normal});
-  ArticleType? articleType;
+  ArticleRefreshListScreen({super.key, required this.articleType});
+  final ArticleType articleType;
 
   @override
   State<ArticleRefreshListScreen> createState() => _ArticleRefreshListScreenState();
@@ -21,90 +22,6 @@ class ArticleRefreshListScreen extends StatefulWidget {
 class _ArticleRefreshListScreenState extends State<ArticleRefreshListScreen> {
   final ScrollController _scrollController = ScrollController();
   late PagingMixin<Article> _controller;
-
-  // 定义20个数学相关的图标和对应的渐变色
-  final List<Map<String, dynamic>> _mathIconSet = [
-    {
-      'icon': Icons.calculate,
-      'colors': [Colors.blue.shade300, Colors.blue.shade500],
-    },
-    {
-      'icon': Icons.functions,
-      'colors': [Colors.purple.shade300, Colors.purple.shade500],
-    },
-    {
-      'icon': Icons.timeline,
-      'colors': [Colors.green.shade300, Colors.green.shade500],
-    },
-    {
-      'icon': Icons.analytics,
-      'colors': [Colors.orange.shade300, Colors.orange.shade500],
-    },
-    {
-      'icon': Icons.pie_chart,
-      'colors': [Colors.red.shade300, Colors.red.shade500],
-    },
-    {
-      'icon': Icons.trending_up,
-      'colors': [Colors.teal.shade300, Colors.teal.shade500],
-    },
-    {
-      'icon': Icons.data_usage,
-      'colors': [Colors.indigo.shade300, Colors.indigo.shade500],
-    },
-    {
-      'icon': Icons.science,
-      'colors': [Colors.cyan.shade300, Colors.cyan.shade500],
-    },
-    {
-      'icon': Icons.school,
-      'colors': [Colors.pink.shade300, Colors.pink.shade500],
-    },
-    {
-      'icon': Icons.psychology,
-      'colors': [Colors.amber.shade300, Colors.amber.shade500],
-    },
-    {
-      'icon': Icons.account_balance,
-      'colors': [Colors.lime.shade300, Colors.lime.shade500],
-    },
-    {
-      'icon': Icons.architecture,
-      'colors': [Colors.brown.shade300, Colors.brown.shade500],
-    },
-    {
-      'icon': Icons.auto_graph,
-      'colors': [Colors.deepPurple.shade300, Colors.deepPurple.shade500],
-    },
-    {
-      'icon': Icons.bar_chart,
-      'colors': [Colors.deepOrange.shade300, Colors.deepOrange.shade500],
-    },
-    {
-      'icon': Icons.candlestick_chart,
-      'colors': [Colors.lightBlue.shade300, Colors.lightBlue.shade500],
-    },
-    {
-      'icon': Icons.currency_exchange,
-      'colors': [Colors.lightGreen.shade300, Colors.lightGreen.shade500],
-    },
-    {
-      'icon': Icons.engineering,
-      'colors': [Colors.teal.shade400, Colors.teal.shade600],
-    },
-    {
-      'icon': Icons.fact_check,
-      'colors': [Colors.blueGrey.shade300, Colors.blueGrey.shade500],
-    },
-    {
-      'icon': Icons.graphic_eq,
-      'colors': [Colors.yellow.shade300, Colors.yellow.shade500],
-    },
-    {
-      'icon': Icons.insights,
-      'colors': [Colors.grey.shade300, Colors.grey.shade500],
-    },
-  ];
 
   void initState() {
     super.initState();
@@ -115,12 +32,12 @@ class _ArticleRefreshListScreenState extends State<ArticleRefreshListScreen> {
   // 根据文章ID获取对应的图标和颜色
   Map<String, dynamic> _getIconForArticle(int? articleId) {
     if (articleId == null) {
-      return _mathIconSet[0]; // 默认返回第一个图标
+      return mathIconSet[0]; // 默认返回第一个图标
     }
     
     // 使用文章ID的哈希值来选择图标，确保同一篇文章总是显示相同的图标
-    final index = articleId.abs() % _mathIconSet.length;
-    return _mathIconSet[index];
+    final index = articleId.abs() % mathIconSet.length;
+    return mathIconSet[index];
   }
 
   @override
@@ -326,12 +243,12 @@ class User {
 }
 
 class ArticleListController with PagingMixin<Article> {
-  ArticleListController({this.articleType});
-  final ArticleType? articleType;
+  ArticleListController({required this.articleType});
+  final ArticleType articleType;
 
   @override
   FutureOr fecthData(int page) async {
-    final result = await ArticleHttp.loadArticles(articleType: articleType??ArticleType.normal); // 假设接口支持 pageNo 参数
+    final result = await ArticleHttp.loadArticles(articleType: this.articleType); // 假设接口支持 pageNo 参数
     final articles = DataUtils.dataAsList(result['data'], Article.fromJson);
     endLoad(articles, maxCount:result['total']);
   }

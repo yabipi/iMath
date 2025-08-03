@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
+import 'package:imath/http/article.dart';
 import 'package:imath/http/knowledge.dart';
+import 'package:imath/models/article.dart';
 import 'package:imath/models/knowledges.dart';
+import 'package:imath/utils/string_util.dart';
 
 class KnowledgeDetailScreen extends StatefulWidget {
   final int knowledgeId;
@@ -14,7 +17,7 @@ class KnowledgeDetailScreen extends StatefulWidget {
 }
 
 class _KnowledgeDetailScreenState extends State<KnowledgeDetailScreen> {
-  late Knowledge knowledge;
+  late Article knowledge;
   late Future _future;
 
   @override
@@ -24,9 +27,12 @@ class _KnowledgeDetailScreenState extends State<KnowledgeDetailScreen> {
   }
 
   Future<void> _fetchKnowledge() async {
-    final response = await KnowledgeHttp.loadKnowledge(widget.knowledgeId);
-    knowledge = Knowledge.fromJson(response['know_item']);
-    print('');
+    final response = await ArticleHttp.loadArticle(widget.knowledgeId);
+    knowledge = Article.fromJson(response);
+    // knowledge = StringUtil.firstNonEmptyString(article['markdown'],
+    //     [article['html'], article['lake'], article['markdown']]);
+    //knowledge = Knowledge.fromJson(response['know_item']);
+
   }
 
   @override
@@ -47,7 +53,7 @@ class _KnowledgeDetailScreenState extends State<KnowledgeDetailScreen> {
                   child: SizedBox(
                     width: double.infinity,
                     child: GptMarkdown(
-                      knowledge.content,
+                      knowledge.markdown,
                       style: const TextStyle(color: Colors.black),
                     ),
                   ),

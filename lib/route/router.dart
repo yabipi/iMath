@@ -25,6 +25,7 @@ import 'package:imath/pages/knowledge/add_knowledge.dart';
 import 'package:imath/pages/knowledge/edit_knowledge.dart';
 import 'package:imath/pages/knowledge/knowledge_detail.dart';
 import 'package:imath/pages/knowledge/knowledge_screen.dart';
+
 import 'package:imath/pages/paper/add_paper_screen.dart';
 import 'package:imath/pages/question/add_question.dart';
 import 'package:imath/pages/question/edit_question.dart';
@@ -53,7 +54,7 @@ final router = GoRouter(
     ),
     GoRoute(
       path: '/knowledge',
-      builder: (context, state) => const KnowledgeScreen(),
+      builder: (context, state) => KnowledgeScreen(),
     ),
     GoRoute(
       path: '/mathematician',

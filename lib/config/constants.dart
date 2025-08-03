@@ -97,15 +97,24 @@ enum PaperViewMode {
 
 // 文章类型
 enum ArticleType {
-  normal(0, '普通文章'), // 普通文章
+  normal(0, '知识点'), // 知识点
   hot(1, '热门文章'), // 热门文章
   experience(2, '治学经验'), // 治学经验
   story(3, '人物故事'), // 人物故事
-  problem(4, '难题欣赏'); // 难题欣赏
+  problem(4, '难题欣赏'),// 难题欣赏
+  trends(5, '前沿动态');
 
   final int value;
   final String label;
   const ArticleType(this.value, this.label);
+}
+
+// 内容格式
+enum ContentFormat {
+  plain,
+  html,
+  markdown,
+  lake;
 }
 
 class ApiCode {

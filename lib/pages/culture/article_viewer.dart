@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html_math/flutter_html_math.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imath/http/article.dart';
 import 'package:imath/utils/device_util.dart';
+import 'package:imath/utils/string_util.dart';
 // import 'package:webview_flutter/webview_flutter.dart';
 // import 'package:flutter_linux_webview/flutter_linux_webview.dart';
 // Import for Android features.
@@ -43,7 +45,8 @@ class ArticleViewerState extends State<ArticleViewer> {
     // 假设延迟2秒模拟网络请求
     // await Future.delayed(Duration(seconds: 2));
     final article = await ArticleHttp.loadArticle(widget.articleId);
-    content = article['content'];
+    content = StringUtil.firstNonEmptyString(article['html'],
+        [article['content'], article['lake'], article['markdown']]);
   }
 
   /// 根据平台和设备类型获取合适的字体大小
@@ -98,6 +101,15 @@ class ArticleViewerState extends State<ArticleViewer> {
               return SingleChildScrollView(
                 padding: EdgeInsets.all(16.0),
                 child: Html(
+                  extensions: [
+                    MathHtmlExtension(
+                        onMathErrorBuilder: (tex, exception, exceptionWithType) {
+                          print(exception);
+                          //optionally try and correct the Tex string here
+                          return Text(exception);
+                        }
+                    ),
+                  ],
                   data: content,
                   style: {
                     'body': Style(

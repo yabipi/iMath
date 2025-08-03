@@ -34,7 +34,13 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
           HOME_COLUMN.EXPERIENCE.value,
           textAlign: TextAlign.center,
         ),
-        centerTitle: true, // 确保标题居中
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            context.pop();
+          },
+        ),// 确保标题居中
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

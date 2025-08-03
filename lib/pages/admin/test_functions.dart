@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:imath/pages/demo/draggable_tree_demo.dart';
 
 import 'package:imath/pages/demo/easy_refresh_list.dart';
+import 'package:imath/pages/demo/html_editor_demo.dart';
+import 'package:imath/pages/demo/html_tex_screen.dart';
+import 'package:imath/pages/demo/latex_test_screen.dart';
 import 'package:imath/pages/demo/simple_list_view.dart';
 import 'package:imath/pages/question/slide_question.dart';
 
@@ -22,83 +25,107 @@ class TestFunctionsPage extends StatelessWidget {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
+        padding: const EdgeInsets.only(left: 16.0),
+        child: Wrap(
+          spacing: 12,
+          runSpacing: 8,
           children: [
-            // 第一行按钮
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTestButton(context, "题库播放", () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SlideQuestion(),
-                      ),
-                    );
-                  }),
+            _buildTestButton(context, "题库播放", () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SlideQuestion(),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildTestButton(context, "下拉刷新", () {
-                    // TODO: 下拉刷新逻辑
-                  }),
+              );
+            }),
+            _buildTestButton(context, "下拉刷新", () {
+              // TODO: 下拉刷新逻辑
+            }),
+            _buildTestButton(context, "可拖放节点树", () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DraggableTreeDemo(),
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // 第二行按钮
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTestButton(context, "可拖放节点树", () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DraggableTreeDemo(),
-                      ),
-                    );
-                  }),
+              );
+            }),
+            _buildTestButton(context, "布局管理", () {
+              // TODO: 布局管理逻辑
+            }),
+            _buildTestButton(context, "无限下拉列表", () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EasyRefreshListScreen(),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildTestButton(context, "布局管理", () {
-                    // TODO: 布局管理逻辑
-                  }),
+              );
+            }),
+            _buildTestButton(context, "ListView", () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SimpleListView(),
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // 第三行按钮
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTestButton(context, "无限下拉列表", () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EasyRefreshListScreen(),
-                      ),
-                    );
-                  }),
+              );
+            }),
+            _buildTestButton(context, "数学公式渲染", () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LatexRenderScreen(),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildTestButton(context, "ListView", () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SimpleListView(),
-                      ),
-                    );
-                  }),
+              );
+            }),
+            _buildTestButton(context, "Html Math", () {
+              // TODO: 布局管理逻辑
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HtmlTexScreen(),
                 ),
-              ],
-            ),
-          ],
-        ),
+              );
+            }),
+            _buildTestButton(context, "Html编辑器", () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HtmlEditorExample(title: 'Html编辑器'),
+                ),
+              );
+              //
+            }),
+            _buildTestButton(context, "待实现", () {
+              // TODO: 布局管理逻辑
+            }),
+            _buildTestButton(context, "待实现", () {
+              // TODO: 布局管理逻辑
+            }),_buildTestButton(context, "待实现", () {
+              // TODO: 布局管理逻辑
+            }),
+            _buildTestButton(context, "待实现", () {
+              // TODO: 布局管理逻辑
+            }),_buildTestButton(context, "待实现", () {
+              // TODO: 布局管理逻辑
+            }),
+            _buildTestButton(context, "待实现", () {
+              // TODO: 布局管理逻辑
+            }),_buildTestButton(context, "待实现", () {
+              // TODO: 布局管理逻辑
+            }),
+            _buildTestButton(context, "待实现", () {
+              // TODO: 布局管理逻辑
+            }),_buildTestButton(context, "待实现", () {
+              // TODO: 布局管理逻辑
+            }),
+            _buildTestButton(context, "待实现", () {
+              // TODO: 布局管理逻辑
+            }),
+            //
+        ],
       ),
+      )
     );
+
   }
 
   Widget _buildTestButton(

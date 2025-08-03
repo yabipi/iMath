@@ -33,7 +33,17 @@ class _ProblemsScreenState extends State<ProblemsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(HOME_COLUMN.PROBLEMS.value),
+        title: Text(
+            HOME_COLUMN.PROBLEMS.value,
+            textAlign: TextAlign.center
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            context.pop();
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
