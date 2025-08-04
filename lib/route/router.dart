@@ -7,11 +7,11 @@ import 'package:imath/pages/admin/admin_screen.dart';
 import 'package:imath/pages/admin/camera_screen.dart';
 import 'package:imath/pages/admin/pdf_uploader.dart';
 import 'package:imath/pages/admin/test_functions.dart';
-import 'package:imath/pages/culture/article_add.dart';
+import 'package:imath/pages/article/article_add.dart';
 import 'package:imath/pages/culture/mathematician_add.dart';
-import 'package:imath/pages/culture/article_viewer.dart';
-import 'package:imath/pages/culture/culture_screen.dart';
-import 'package:imath/pages/culture/article_edit.dart';
+import 'package:imath/pages/article/article_viewer.dart';
+
+import 'package:imath/pages/article/article_edit.dart';
 import 'package:imath/pages/culture/mathematician_edit.dart';
 import 'package:imath/pages/culture/experience_screen.dart';
 import 'package:imath/pages/culture/mathematician_listview.dart';
@@ -24,6 +24,7 @@ import 'package:imath/pages/home/news_detail.dart';
 import 'package:imath/pages/knowledge/add_knowledge.dart';
 import 'package:imath/pages/knowledge/edit_knowledge.dart';
 import 'package:imath/pages/knowledge/knowledge_detail.dart';
+import 'package:imath/pages/knowledge/knowledge_listview.dart';
 import 'package:imath/pages/knowledge/knowledge_screen.dart';
 
 import 'package:imath/pages/paper/add_paper_screen.dart';
@@ -54,7 +55,7 @@ final router = GoRouter(
     ),
     GoRoute(
       path: '/knowledge',
-      builder: (context, state) => KnowledgeScreen(),
+      builder: (context, state) => KnowledgeListView(),
     ),
     GoRoute(
       path: '/mathematician',

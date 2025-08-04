@@ -62,12 +62,12 @@ Future<void> initMathData() async {
     Map<String, String> primary_categories = {ALL_CATEGORY.toString(): '全部分支'};
     Map<String, String> advanced_categories = {ALL_CATEGORY.toString(): '全部分支'};
     for (var item in categories) {
-      _categories[item['ID'].toString()] = item['CategoryName'];
+      _categories[item['id'].toString()] = item['categoryName'];
       if (item['level'] == MATH_LEVEL.Primary.value) {
-        primary_categories[item['ID'].toString()] = item['CategoryName'];
+        primary_categories[item['id'].toString()] = item['categoryName'];
       }
       if (item['level'] == MATH_LEVEL.Advanced.value) {
-        advanced_categories[item['ID'].toString()] = item['CategoryName'];
+        advanced_categories[item['id'].toString()] = item['categoryName'];
       }
     }
     Global.set(MATH_LEVEL.Primary.value, primary_categories);

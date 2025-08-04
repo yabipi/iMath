@@ -27,12 +27,7 @@ class _KnowledgeDetailScreenState extends State<KnowledgeDetailScreen> {
   }
 
   Future<void> _fetchKnowledge() async {
-    final response = await ArticleHttp.loadArticle(widget.knowledgeId);
-    knowledge = Article.fromJson(response);
-    // knowledge = StringUtil.firstNonEmptyString(article['markdown'],
-    //     [article['html'], article['lake'], article['markdown']]);
-    //knowledge = Knowledge.fromJson(response['know_item']);
-
+    final knowledge = await ArticleHttp.loadArticle(widget.knowledgeId);
   }
 
   @override

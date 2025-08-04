@@ -5,7 +5,7 @@ import 'package:imath/config/config.dart';
 
 import 'package:imath/pages/common/bottom_navigation_bar.dart';
 import '../../models/mathematician.dart';
-import 'article_listview.dart';
+import '../article/article_listview.dart';
 import 'mathematician_detail_screen.dart';
 import 'mathematician_listview.dart';
 

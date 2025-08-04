@@ -31,9 +31,9 @@ class _EditArticlePageState extends State<EditArticlePage> {
     // 假设延迟2秒模拟网络请求
     // await Future.delayed(Duration(seconds: 2));
     final article = await ArticleHttp.loadArticle(widget.articleId);
-    _titleController.text = article['title'];
+    _titleController.text = article.title;
     // Load document
-    _controller.content = article['content'];
+    _controller.content = article.content;
     // return article;
   }
 
