@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:imath/config/api_config.dart';
 import 'package:imath/config/constants.dart';
+import 'package:imath/models/article.dart';
 import 'init.dart';
 
 class ArticleHttp {
@@ -14,11 +15,12 @@ class ArticleHttp {
     return response.data;
   }
 
-  static Future loadArticle(int? articleId) async {
+  static Future<Article> loadArticle(int? articleId) async {
     final response = await Request().get(
       '${ApiConfig.SERVER_BASE_URL}/api/article/${articleId}',
     );
-    return response.data;
+    Article article = Article.fromJson(response.data);
+    return article;
   }
 
   static Future updateArticle(int? articleId, params) async {
@@ -30,9 +32,21 @@ class ArticleHttp {
     return response.data;
   }
 
-  static Future loadArticles({ArticleType articleType = ArticleType.normal, int pageNo = 1, int pageSize = 10}) async {
+  static Future loadArticles({
+                ArticleType articleType = ArticleType.normal,
+                String level = '',
+                String branch = '',
+                int pageNo = 1,
+                int pageSize = 10}) async {
     final response = await Request().get(
-        '${ApiConfig.SERVER_BASE_URL}/api/article?pageNo=${pageNo}&pageSize=${pageSize}&type=${articleType.value}'
+        '${ApiConfig.SERVER_BASE_URL}/api/article?&type=${articleType.value}&level=${level}&branch=${branch}&pageNo=${pageNo}&pageSize=${pageSize}'
+    );
+    return response.data;
+  }
+
+  static Future loadKnowledges({ArticleType articleType = ArticleType.normal, required String level, required String branch}) async {
+    final response = await Request().get(
+        '${ApiConfig.SERVER_BASE_URL}/api/article?type=${articleType}&level=${level}&branch=${branch}'
     );
     return response.data;
   }

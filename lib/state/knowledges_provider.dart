@@ -1,9 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imath/config/api_config.dart';
 import 'package:imath/config/constants.dart';
+import 'package:imath/http/article.dart';
 import 'package:imath/http/init.dart';
-import 'package:imath/http/knowledge.dart';
-import 'package:imath/models/knowledges.dart';
+
+import 'package:imath/models/article.dart';
+
+import 'package:imath/state/global_state.dart';
 import 'package:imath/utils/data_util.dart';
 
 import 'settings_provider.dart';
@@ -11,9 +14,9 @@ import 'settings_provider.dart';
 // 分类ID提供者
 final knowledgeCategoryProvider = StateProvider<int>((ref) => ALL_CATEGORY);
 
-class KnowledgesNotifier extends AsyncNotifier<List<Knowledge>>{
+class KnowledgesNotifier extends AsyncNotifier<List<Article>>{
   @override
-  Future<List<Knowledge>> build() async {
+  Future<List<Article>> build() async {
     final MATH_LEVEL level = ref.watch(mathLevelProvider);
     final categoryId = ref.watch(knowledgeCategoryProvider);
     final knowledges = await fetchKnowledges(level, categoryId);
@@ -34,10 +37,12 @@ class KnowledgesNotifier extends AsyncNotifier<List<Knowledge>>{
   }
 }
 
-final knowledgesProvider = AsyncNotifierProvider<KnowledgesNotifier, List<Knowledge>>(KnowledgesNotifier.new);
+final knowledgesProvider = AsyncNotifierProvider<KnowledgesNotifier, List<Article>>(KnowledgesNotifier.new);
 
-Future<List<Knowledge>> fetchKnowledges(MATH_LEVEL level, int category) async {
-  final result = await KnowledgeHttp.listKnowledges(level, category);
-  final items = DataUtils.dataAsList(result['data'], Knowledge.fromJson);
+Future<List<Article>> fetchKnowledges(MATH_LEVEL level, int category) async {
+  final categories = GlobalState.get(CATEGORIES_KEY);
+  String branch = categories[category];
+  final result = await ArticleHttp.loadKnowledges(level: level.value, branch: branch);
+  final items = DataUtils.dataAsList(result['data'], Article.fromJson);
   return items;
 }

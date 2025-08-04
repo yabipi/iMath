@@ -1,271 +1,272 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:go_router/go_router.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'package:imath/mixins/category_mixin.dart';
-import 'package:imath/models/knowledges.dart';
-import 'package:imath/pages/common/category_panel.dart';
-
-import 'package:imath/config/api_config.dart';
 import 'package:imath/config/constants.dart';
+import 'package:imath/config/icons.dart';
+import 'package:imath/http/article.dart';
+import 'package:imath/models/article.dart';
 import 'package:imath/pages/common/bottom_navigation_bar.dart';
-import 'package:imath/state/knowledges_provider.dart';
+import 'package:imath/pages/common/category_panel.dart';
+import 'package:imath/utils/data_util.dart';
+import 'package:imath/utils/date_util.dart';
+import 'package:imath/widgets/refresh/constructor.dart';
+import 'package:imath/widgets/refresh/paging_mixin.dart';
 
-
-class KnowledgeScreen extends ConsumerStatefulWidget {
-  const KnowledgeScreen({super.key});
+class KnowledgeScreen extends StatefulWidget {
+  KnowledgeScreen({super.key});
 
   @override
-  _KnowledgeScreenState createState() => _KnowledgeScreenState();
+  State<KnowledgeScreen> createState() => _KnowledgeRefreshListScreenState();
 }
 
-class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> with CategoryMixin {
-  late Map<String, String> categories;
-  
-  // 定义10个不同的图标和对应的渐变色
-  final List<Map<String, dynamic>> _iconSet = [
-    {
-      'icon': Icons.school,
-      'colors': [Colors.deepPurple.shade300, Colors.purple.shade400],
-    },
-    {
-      'icon': Icons.science,
-      'colors': [Colors.blue.shade300, Colors.blue.shade500],
-    },
-    {
-      'icon': Icons.calculate,
-      'colors': [Colors.green.shade300, Colors.green.shade500],
-    },
-    {
-      'icon': Icons.functions,
-      'colors': [Colors.orange.shade300, Colors.orange.shade500],
-    },
-    {
-      'icon': Icons.timeline,
-      'colors': [Colors.red.shade300, Colors.red.shade500],
-    },
-    {
-      'icon': Icons.analytics,
-      'colors': [Colors.teal.shade300, Colors.teal.shade500],
-    },
-    {
-      'icon': Icons.pie_chart,
-      'colors': [Colors.indigo.shade300, Colors.indigo.shade500],
-    },
-    {
-      'icon': Icons.trending_up,
-      'colors': [Colors.cyan.shade300, Colors.cyan.shade500],
-    },
-    {
-      'icon': Icons.data_usage,
-      'colors': [Colors.pink.shade300, Colors.pink.shade500],
-    },
-    {
-      'icon': Icons.psychology,
-      'colors': [Colors.amber.shade300, Colors.amber.shade500],
-    },
-  ];
+class _KnowledgeRefreshListScreenState extends State<KnowledgeScreen> {
+  final ScrollController _scrollController = ScrollController();
+  late PagingMixin<Article> _controller;
+
+  void initState() {
+    super.initState();
+    _controller = KnowledgeListController(articleType: ArticleType.normal);
+    _controller.initPaging();
+  }
+
+  // 根据文章ID获取对应的图标和颜色
+  Map<String, dynamic> _getIconForArticle(int? articleId) {
+    if (articleId == null) {
+      return mathIconSet[0]; // 默认返回第一个图标
+    }
+
+    // 使用文章ID的哈希值来选择图标，确保同一篇文章总是显示相同的图标
+    final index = articleId.abs() % mathIconSet.length;
+    return mathIconSet[index];
+  }
 
   @override
-  void initState(){
-    super.initState();
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+
   }
 
   @override
   Widget build(BuildContext context) {
-    categories = getCategories(ref);
-    List<Knowledge> knowledges = ref.watch(knowledgesProvider).value ?? [];
-
     return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purple.shade300],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+        appBar: AppBar(
+          title: TextField(
+            // controller: _searchController,
+            style: const TextStyle(color: Colors.white),
+            cursorColor: Colors.white,
+            decoration: const InputDecoration(
+              hintText: '搜索...',
+              hintStyle: TextStyle(color: Colors.white54),
+              border: InputBorder.none,
             ),
-          ),
-        ),
-        title: TextField(
-          // controller: _searchController,
-          style: const TextStyle(color: Colors.white),
-          cursorColor: Colors.white,
-          decoration: const InputDecoration(
-            hintText: '搜索...',
-            hintStyle: TextStyle(color: Colors.white54),
-            border: InputBorder.none,
-          ),
-          onChanged: (value) {
-            // Perform search functionality here
-          },
-        ),
-      ),
-      // appBar: AppBar(
-      //   // title: const Text(''),
-      //   // centerTitle: true, // 确保标题居中
-      //   flexibleSpace: Row(
-      //     mainAxisAlignment: MainAxisAlignment.center,
-      //     children: [
-      //       Spacer(),
-      //       SizedBox(
-      //         width: 0.5.sw, // 使用屏幕宽度的70%
-      //         child: TextField(
-      //           decoration: InputDecoration(
-      //             hintText: '搜索...',
-      //             prefixIcon: Icon(Icons.search, size: 20.sp),
-      //             border: OutlineInputBorder(
-      //               borderRadius: BorderRadius.circular(24.r),
-      //             ),
-      //             contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      //           ),
-      //           onChanged: (value) {
-      //             // 在这里处理搜索逻辑
-      //           },
-      //         )
-      //       ),
-      //       Spacer(),
-      //     ],
-      //   ),
-      // ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.push('/admin/addknow');
-        },
-        child: const Icon(Icons.add),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // 分类标签区域
-            CategoryPanel(onItemTap: (int categoryId) {onChangeCategory(categoryId);}),
-            Expanded(
-                child: ListView.builder(
-                    padding: const EdgeInsets.all(8),
-                    itemCount: knowledges.length,
-                    itemBuilder: (BuildContext context, int index){
-                      if (knowledges.length > 0) {
-                        return _buildKnowItem(knowledges[index]);
-                      } else {
-                        return const Card(
-                          margin: EdgeInsets.all(8),
-                          child: ListTile(
-                            title: Text('暂无知识点数据'),
-                            leading: Icon(Icons.info_outline, color: Colors.grey),
-                          ),
-                        );
-                      }
-                    }
-                )
-            ),
-          ],
-        )
-      ),
-
-      bottomNavigationBar: CustomBottomNavigationBar(),
-    );
-  }
-
-  /**
-   * 此处items不能用List<Map<String, dynamic>>声明
-   */
-  Widget _buildKnowItem(Knowledge item) {
-    // 根据知识点ID选择图标，确保同一个知识点总是显示相同的图标
-    final iconData = _getIconForKnowledge(item.id);
-    
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: iconData['colors'],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: iconData['colors'][0].withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Icon(
-            iconData['icon'],
-            color: Colors.white,
-            size: 24,
-          ),
-        ),
-        title: Text(
-          item.title,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: Colors.black87,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Text(
-              item.subtitle ?? '',
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-        trailing: Container(
-          decoration: BoxDecoration(
-            color: Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: IconButton(
-            icon: const Icon(
-              Icons.edit_outlined,
-              color: Colors.deepPurple,
-            ),
-            onPressed: () {
-              context.push('/admin/editknow?knowledgeId=${item.id}');
+            onChanged: (value) {
+              // Perform search functionality here
             },
           ),
         ),
-        onTap: () {
-          context.push('/knowdetail?knowledgeId=${item.id}');
-        },
-      ),
+        body: SafeArea(
+          child: Column(
+              children: [
+                // 分类标签区域
+                CategoryPanel(onItemTap: (int categoryId) {
+                  // onChangeCategory(categoryId);
+                }),
+                Expanded(
+                    child:SpeedyPagedList<Article>.separated(
+                      controller: _controller,
+                      itemBuilder: (context, index, item) {
+                        return GestureDetector(
+                          onTap: () {
+                            context.push("/article", extra: item);
+                          },
+                          child: Card(
+                            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  // 数学相关图标
+                                  Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: _getIconForArticle(item.id)['colors'],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: _getIconForArticle(item.id)['colors'][0].withOpacity(0.3),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Icon(
+                                      _getIconForArticle(item.id)['icon'],
+                                      color: Colors.white,
+                                      size: 24,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  // 文章内容
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.title,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Row(
+                                          children: [
+                                            // 日期
+                                            Expanded(
+                                              child: Text(
+                                                DateUtil.formatDate(item.date) ?? '',
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ),
+                                            // 三个精美图标
+                                            Row(
+                                              children: [
+                                                // 点赞图标
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.red.shade50,
+                                                    borderRadius: BorderRadius.circular(12),
+                                                    border: Border.all(color: Colors.red.shade200, width: 1),
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.favorite,
+                                                        size: 16,
+                                                        color: Colors.red.shade400,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      Text(
+                                                        '${(item.id ?? 0) % 100 + 10}', // 模拟点赞数
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.red.shade600,
+                                                          fontWeight: FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                // 阅览数图标
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.blue.shade50,
+                                                    borderRadius: BorderRadius.circular(12),
+                                                    border: Border.all(color: Colors.blue.shade200, width: 1),
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.visibility,
+                                                        size: 16,
+                                                        color: Colors.blue.shade400,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      Text(
+                                                        '${(item.id ?? 0) % 500 + 50}', // 模拟阅览数
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.blue.shade600,
+                                                          fontWeight: FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                // 收藏图标
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.amber.shade50,
+                                                    borderRadius: BorderRadius.circular(12),
+                                                    border: Border.all(color: Colors.amber.shade200, width: 1),
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.bookmark,
+                                                        size: 16,
+                                                        color: Colors.amber.shade400,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      Text(
+                                                        '${(item.id ?? 0) % 30 + 5}', // 模拟收藏数
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.amber.shade600,
+                                                          fontWeight: FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      scrollController: _scrollController,
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const SizedBox.shrink(); // 移除分隔线，使用卡片间距
+                      },
+                    )
+                ),
+              ])),
+        bottomNavigationBar: CustomBottomNavigationBar(),
     );
   }
-
-  // 根据知识点ID获取对应的图标和颜色
-  Map<String, dynamic> _getIconForKnowledge(int? knowledgeId) {
-    if (knowledgeId == null) {
-      return _iconSet[0]; // 默认返回第一个图标
-    }
-    
-    // 使用知识点ID的哈希值来选择图标，确保同一个知识点总是显示相同的图标
-    final index = knowledgeId.abs() % _iconSet.length;
-    return _iconSet[index];
-  }
-
-  void onChangeCategory(int categoryId) {
-    ref.read(knowledgesProvider.notifier).onChangeCategory(categoryId);
-  }
-
 }
 
+class KnowledgeListController with PagingMixin<Article> {
+  KnowledgeListController({required this.articleType});
+  final ArticleType articleType;
+
+  @override
+  FutureOr fecthData(int page) async {
+    final result = await ArticleHttp.loadArticles(articleType: this.articleType); // 假设接口支持 pageNo 参数
+    final articles = DataUtils.dataAsList(result['data'], Article.fromJson);
+    endLoad(articles, maxCount:result['total']);
+  }
+}

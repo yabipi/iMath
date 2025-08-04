@@ -15,6 +15,9 @@ class EditorController {
         config: QuillControllerConfig(
           clipboardConfig: QuillClipboardConfig(
             enableExternalRichPaste: true,
+            onClipboardPaste: () async {
+              return true;
+            },
             onImagePaste: (imageBytes) async {
               if (kIsWeb) {
                 // Dart IO is unsupported on the web.

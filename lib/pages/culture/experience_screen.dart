@@ -3,11 +3,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imath/config/config.dart';
 import 'package:imath/config/constants.dart';
+import 'package:imath/pages/article/article_refresh_list.dart';
 
 import 'package:imath/pages/common/bottom_navigation_bar.dart';
-import 'package:imath/pages/culture/article_refresh_list.dart';
+
 import '../../models/mathematician.dart';
-import 'article_listview.dart';
+import '../article/article_listview.dart';
 import 'mathematician_detail_screen.dart';
 import 'mathematician_listview.dart';
 
@@ -34,7 +35,13 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
           HOME_COLUMN.EXPERIENCE.value,
           textAlign: TextAlign.center,
         ),
-        centerTitle: true, // 确保标题居中
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            context.pop();
+          },
+        ),// 确保标题居中
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

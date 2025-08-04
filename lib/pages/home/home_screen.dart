@@ -275,16 +275,16 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () {
         switch(item) {
           case HOME_COLUMN.BOOKS:
-            context.go('/booklist');
+            context.push('/booklist');
             break;
           case HOME_COLUMN.PEOPLE:
-            context.go('/mathematician');
+            context.push('/mathematician');
             break;
           case HOME_COLUMN.EXPERIENCE:
-            context.go('/experience');
+            context.push('/experience');
             break;
           case HOME_COLUMN.PROBLEMS:
-            context.go('/problems');
+            context.push('/problems');
             break;
           default:
             break;

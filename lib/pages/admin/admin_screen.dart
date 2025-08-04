@@ -74,29 +74,8 @@ class AdminScreen extends StatelessWidget {
               context.go("/admin/addQuestion");
             },
           ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.science),
-            title: const Text('LaTeX测试'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
 
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.drag_handle),
-            title: const Text('TreeSliver拖拽演示'),
-            subtitle: const Text('TreeSliver组件的拖拽功能'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const TreeSliverDragDemo(),
-                ),
-              );
-            },
-          ),
+
           ListTile(
             leading: const Icon(Icons.assignment),
             title: const Text('测试试卷'),
