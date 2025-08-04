@@ -12,7 +12,6 @@ class PhoneLoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<PhoneLoginPage> {
   final TextEditingController _phoneController = TextEditingController();
-  String _countryCode = '+86'; // 默认国家/地区代码，这里以中国为例
   bool _agreedToTerms = false; // 是否同意协议
 
   @override
@@ -85,69 +84,37 @@ class _LoginPageState extends State<PhoneLoginPage> {
               // ),
               const SizedBox(height: 16),
 
-              // 第二行：区号 + 手机号输入框
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // 区号框
-                  Container(
-                    height: 55, // 固定高度，与输入框保持一致
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      // borderRadius: const BorderRadius.only(
-                      //   topLeft: Radius.circular(12),
-                      //   bottomLeft: Radius.circular(12),
-                      // ),
-                      color: Colors.grey.shade50,
+              // 手机号输入框
+              Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: TextField(
+                  controller: _phoneController,
+                  decoration: InputDecoration(
+                    hintText: '请输入手机号',
+                    hintStyle: TextStyle(color: Colors.grey.shade400),
+                    border: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey),
                     ),
-                    child: Center(
-                      child: Text(
-                        _countryCode,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black87,
-                        ),
-                      ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue.shade400, width: 2),
                     ),
-
+                    filled: true,
+                    fillColor: Colors.grey.shade50,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    isDense: true, // 减少内部间距
                   ),
-                  // 手机号输入框
-                  Container(
-                    height: 56,
-                    width: MediaQuery.of(context).size.width * 0.8 - 80, // 减去区号框的宽度
-                    padding: const EdgeInsets.symmetric(horizontal: 1),
-
-                    child: TextField(
-                      controller: _phoneController,
-                      decoration: InputDecoration(
-                        hintText: '请输入手机号',
-                        hintStyle: TextStyle(color: Colors.grey.shade400),
-                        border: const OutlineInputBorder(
-                          // borderRadius: BorderRadius.only(
-                          //   topRight: Radius.circular(12),
-                          //   bottomRight: Radius.circular(12),
-                          // ),
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-
-                        focusedBorder: OutlineInputBorder(
-                          // borderRadius: const BorderRadius.only(
-                          //   topRight: Radius.circular(12),
-                          //   bottomRight: Radius.circular(12),
-                          // ),
-                          borderSide: BorderSide(color: Colors.blue.shade400, width: 2),
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey.shade50,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        isDense: true, // 减少内部间距
-                      ),
-                      keyboardType: TextInputType.phone,
-                    ),
-                  ),
-                ],
+                  keyboardType: TextInputType.phone,
+                ),
+              ),
+              
+              // 手机号说明文字
+              const SizedBox(height: 8),
+              Text(
+                '当前仅支持中国大陆手机号注册',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade500,
+                ),
               ),
               const SizedBox(height: 24),
 
@@ -229,7 +196,9 @@ class _LoginPageState extends State<PhoneLoginPage> {
                     // 这里可处理登录逻辑，比如校验手机号、调用接口等
                     String phoneNumber = _phoneController.text.trim();
                     if (phoneNumber.isNotEmpty) {
-                      // debugPrint('点击了立即登录，手机号：$_countryCode$phoneNumber');
+                      // 手动添加+86前缀
+                      String fullPhoneNumber = '+86$phoneNumber';
+                      // debugPrint('点击了立即登录，手机号：$fullPhoneNumber');
                       AuthHttp.sendCaptcha(phoneNumber);
                       context.go('/verifycode?phone=${phoneNumber}');
                       SmartDialog.showToast('验证码已发送');
