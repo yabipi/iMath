@@ -92,9 +92,22 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^6.0.0
   flutter_native_splash: ^2.4.6
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true
   assets:
     - assets/images/
-    - assets/icons/ 
+    - assets/icons/
+
+# 应用图标配置
+flutter_launcher_icons:
+  # 为 Android 配置图标
+  android: true
+  # 为 iOS 配置图标
+  ios: true
+  # 指定图标图片路径
+  image_path: "assets/icons/math.png"
+  # android min sdk min:16, default 21
+  # min_sdk_android: 21
+

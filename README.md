@@ -11,6 +11,10 @@ _loadMoreQuestions(categoryId: widget.categoryId);
 # Run
 Android studio里设置additional run args: --dart-define-from-file=.env/dev.json
 
+## 图标和启动图
+flutter pub run flutter_launcher_icons
+flutter pub run flutter_native_splash:create
+
 # 构建
 flutter run --flavor staging --dart-define=HOST="test"
 flutter run --flavor staging --dart-define-from-file=.staging.json
