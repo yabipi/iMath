@@ -2,6 +2,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imath/models/article.dart';
 import 'package:imath/models/knowledges.dart';
+import 'package:imath/models/question.dart';
 import 'package:imath/models/user.dart';
 import 'package:imath/pages/admin/admin_screen.dart';
 import 'package:imath/pages/admin/camera_screen.dart';
@@ -32,6 +33,7 @@ import 'package:imath/pages/question/add_question.dart';
 import 'package:imath/pages/question/edit_question.dart';
 import 'package:imath/pages/question/questions_main.dart';
 import 'package:imath/pages/question/questions_screen.dart';
+import 'package:imath/pages/question/answer_view.dart';
 import 'package:imath/pages/user/about_me.dart';
 import 'package:imath/pages/user/avatar_edit.dart';
 import 'package:imath/pages/user/login_screen.dart';
@@ -39,15 +41,16 @@ import 'package:imath/pages/user/phone_login.dart';
 import 'package:imath/pages/user/pincode_input.dart';
 
 import 'package:imath/pages/user/profile_screen.dart';
+import 'package:imath/pages/user/feedback_screen.dart';
 import 'package:imath/pages/user/register.dart';
 import 'package:imath/pages/user/settings.dart';
 import 'package:imath/pages/user/slider_captcha_client_verify.dart';
 
-
 final router = GoRouter(
   initialLocation: '/home',
   observers: [FlutterSmartDialog.observer],
-  redirect: (context, state) => state.uri.toString() == '/' ? '/knowledge' : null,
+  redirect: (context, state) =>
+      state.uri.toString() == '/' ? '/knowledge' : null,
   routes: [
     GoRoute(
       path: '/home',
@@ -70,12 +73,11 @@ final router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/knowdetail',
-      builder: (context, state) {
-        final knowledgeId = state.uri.queryParameters['knowledgeId'] ?? '0';
-        return KnowledgeDetailScreen(knowledgeId: int.parse(knowledgeId));
-      }
-    ),
+        path: '/knowdetail',
+        builder: (context, state) {
+          final knowledgeId = state.uri.queryParameters['knowledgeId'] ?? '0';
+          return KnowledgeDetailScreen(knowledgeId: int.parse(knowledgeId));
+        }),
     GoRoute(
       path: '/booklist',
       builder: (context, state) => BookListView(),
@@ -99,32 +101,35 @@ final router = GoRouter(
       builder: (context, state) => const QuestionsMain(),
     ),
     GoRoute(
-      path: '/profile',
-      builder: (context, state) {
-        final user = state.extra as User?;
-        return ProfileScreen(user:  user);
-      },
-      routes: <RouteBase>[ // Add child routes
-        GoRoute(
-          path: 'settings',
-          builder: (context, state) => SettingsPage(),
-        ),
-        GoRoute(
-          path: 'about',
-          builder: (context, state) => AboutMePage(),
-        ),
-        GoRoute(
-          path: 'avatarEdit',
-          builder: (context, state) {
-            final user = state.extra as User?;
-            return AvatarEditScreen(
-              currentAvatarBase64: user?.avatar,
-            );
-          },
-        ),
-        
-      ]
-    ),
+        path: '/profile',
+        builder: (context, state) {
+          final user = state.extra as User?;
+          return ProfileScreen(user: user);
+        },
+        routes: <RouteBase>[
+          // Add child routes
+          GoRoute(
+            path: 'settings',
+            builder: (context, state) => SettingsPage(),
+          ),
+          GoRoute(
+            path: 'about',
+            builder: (context, state) => AboutMePage(),
+          ),
+          GoRoute(
+            path: 'avatarEdit',
+            builder: (context, state) {
+              final user = state.extra as User?;
+              return AvatarEditScreen(
+                currentAvatarBase64: user?.avatar,
+              );
+            },
+          ),
+          GoRoute(
+            path: 'feedback',
+            builder: (context, state) => const FeedbackScreen(),
+          ),
+        ]),
 
     // 用户登录管理相关
     GoRoute(
@@ -137,44 +142,47 @@ final router = GoRouter(
     ),
     GoRoute(
       path: '/captcha',
-      builder: (context, state) => SliderCaptchaClientVerify(title: '人机验证',),
+      builder: (context, state) => SliderCaptchaClientVerify(
+        title: '人机验证',
+      ),
     ),
     GoRoute(
       path: '/verifycode',
       builder: (context, state) {
         final String? phone = state.uri.queryParameters['phone'];
-        return PinputScreen(phone:  phone??'');
+        return PinputScreen(phone: phone ?? '');
       },
     ),
     // 管理员入口
     GoRoute(
       path: '/admin',
       builder: (context, state) => AdminScreen(),
-      routes: <RouteBase>[ // Add child routes
-          GoRoute(
-            path: 'addmathematician',
-            builder: (context, state) => AddMathematicianScreen(),
-          ),
-          GoRoute(
-            path: 'addArticle',
-            builder: (context, state) => AddArticlePage(),
-          ),
+      routes: <RouteBase>[
+        // Add child routes
         GoRoute(
-            path: 'editArticle/:articleId',
-            builder: (context, state) {
-              final articleId = state.pathParameters['articleId'];
-              return EditArticlePage(articleId: int.parse(articleId!));
-            },
-          ),
-          GoRoute(
-            path: 'addPaper',
-            builder: (context, state) => AddPaperScreen(),
-          ),
+          path: 'addmathematician',
+          builder: (context, state) => AddMathematicianScreen(),
+        ),
+        GoRoute(
+          path: 'addArticle',
+          builder: (context, state) => AddArticlePage(),
+        ),
+        GoRoute(
+          path: 'editArticle/:articleId',
+          builder: (context, state) {
+            final articleId = state.pathParameters['articleId'];
+            return EditArticlePage(articleId: int.parse(articleId!));
+          },
+        ),
+        GoRoute(
+          path: 'addPaper',
+          builder: (context, state) => AddPaperScreen(),
+        ),
 
-          GoRoute(
-            path: 'addQuestion',
-            builder: (context, state) => AddQuestionScreen(paperId: -1),
-          ),
+        GoRoute(
+          path: 'addQuestion',
+          builder: (context, state) => AddQuestionScreen(paperId: -1),
+        ),
         GoRoute(
           path: 'editknow',
           builder: (context, state) {
@@ -182,47 +190,54 @@ final router = GoRouter(
             return EditKnowledgeView(knowledgeId: int.parse(knowledgeId!));
           },
         ),
-          GoRoute(
-            path: 'editQuestion',
-            builder: (context, state) {
-              final questionId = state.uri.queryParameters['questionId'];
-              return QuestionEditView(questionId: int.parse(questionId!));
-            },
-          ),
-          GoRoute(
-            path: 'editMathematician',
-            builder: (context, state) {
-              final mathematicianId = state.uri.queryParameters['mathematicianId'];
-              return EditMathematicianScreen(mathematicianId: int.parse(mathematicianId!));
-            },
-          ),
-          GoRoute(
-            path: 'addknow',
-            builder: (context, state) => const AddKnowledgeView(),
-          ),
+        GoRoute(
+          path: 'editQuestion',
+          builder: (context, state) {
+            final questionId = state.uri.queryParameters['questionId'];
+            return QuestionEditView(questionId: int.parse(questionId!));
+          },
+        ),
+        GoRoute(
+          path: 'viewAnswer',
+          builder: (context, state) {
+            final question = state.extra as Question;
+            return AnswerView(question: question);
+          },
+        ),
+        GoRoute(
+          path: 'editMathematician',
+          builder: (context, state) {
+            final mathematicianId =
+                state.uri.queryParameters['mathematicianId'];
+            return EditMathematicianScreen(
+                mathematicianId: int.parse(mathematicianId!));
+          },
+        ),
+        GoRoute(
+          path: 'addknow',
+          builder: (context, state) => const AddKnowledgeView(),
+        ),
 
-          GoRoute(
-            path: 'addByOCR',
-            builder: (context, state) => const CameraScreen(),
-          ),
-          GoRoute(
-            path: 'addByPDF',
-            builder: (context, state) => PdfUploader(),
-          ),
-          // 测试页面
-          GoRoute(
-            path: 'test',
-            builder: (context, state) => TestFunctionsPage(),
-          ),
+        GoRoute(
+          path: 'addByOCR',
+          builder: (context, state) => const CameraScreen(),
+        ),
+        GoRoute(
+          path: 'addByPDF',
+          builder: (context, state) => PdfUploader(),
+        ),
+        // 测试页面
+        GoRoute(
+          path: 'test',
+          builder: (context, state) => TestFunctionsPage(),
+        ),
 
         //
-        ],
-
+      ],
     ),
     GoRoute(
       path: '/pageview',
       builder: (context, state) => PageViewDemo(),
     ),
-
   ],
 );

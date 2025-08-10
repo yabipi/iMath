@@ -24,6 +24,11 @@ flutter_native_splash:
   # The image parameter allows you to specify an image used in the splash screen.  It must be a
   # png file and should be sized for 4x pixel density.
   image: "assets/splash.png"
+  
+  # 设置图片填充模式，确保满屏显示
+  android_gravity: fill
+  ios_content_mode: scaleAspectFill
+  web_image_mode: cover
 
   # The branding property allows you to specify an image used as branding in the splash screen.
   # It must be a png file. It is supported for Android, iOS and the Web.  For Android 12,

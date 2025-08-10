@@ -43,23 +43,24 @@ class ProfileScreen extends ConsumerWidget {
     if (this.user == null) {
       this.user = GlobalState.currentUser;
     }
-    if(this.user == null)
+    if (this.user == null)
       return PhoneLoginPage();
-    else return Scaffold(
-      appBar: AppBar(
-        title: const Text('个人中心'),
-        actions: [
-          // IconButton(
-          //   icon: const Icon(Icons.logout),
-          //   onPressed: () => _logout(context),
-          // ),
-        ],
-      ),
-      body: buildProfilePanel(context),
-      bottomNavigationBar: CustomBottomNavigationBar(),
-    );
+    else
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('个人中心'),
+          actions: [
+            // IconButton(
+            //   icon: const Icon(Icons.logout),
+            //   onPressed: () => _logout(context),
+            // ),
+          ],
+        ),
+        body: buildProfilePanel(context),
+        bottomNavigationBar: CustomBottomNavigationBar(),
+      );
   }
-  
+
   Widget buildProfilePanel(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
@@ -80,9 +81,10 @@ class ProfileScreen extends ConsumerWidget {
                     children: [
                       CircleAvatar(
                         radius: 40,
-                        backgroundImage: user?.avatar != null && user!.avatar!.length > 0
-                            ? MemoryImage(base64Decode(user!.avatar!))
-                            : null,
+                        backgroundImage:
+                            user?.avatar != null && user!.avatar!.length > 0
+                                ? MemoryImage(base64Decode(user!.avatar!))
+                                : null,
                         child: user?.avatar == null || user!.avatar!.length == 0
                             ? const Icon(Icons.person, size: 40)
                             : null,
@@ -122,13 +124,25 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      // ID号
-                      Text(
-                        'ID号: ${user?.id ?? 'N/A'}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.white70,
-                        ),
+                      // ID号和等级分
+                      Row(
+                        children: [
+                          Text(
+                            'ID号: ${user?.id ?? 'N/A'}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.white70,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Text(
+                            '等级分: 1000',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -156,7 +170,6 @@ class ProfileScreen extends ConsumerWidget {
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
               // 导航到学习历史页面
-
             },
           ),
           ListTile(
@@ -178,10 +191,11 @@ class ProfileScreen extends ConsumerWidget {
           ),
           ListTile(
             leading: const Icon(Icons.help),
-            title: const Text('帮助与反馈'),
+            title: const Text('意见反馈'),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
-              // 导航到帮助页面
+              // 导航到意见反馈页面
+              context.push('/profile/feedback');
             },
           ),
           ListTile(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:imath/config/constants.dart';
 import 'package:imath/core/context.dart';
 import 'package:imath/pages/common/bottom_navigation_bar.dart';
@@ -43,6 +44,24 @@ class _QuestionsMainState extends ConsumerState<QuestionsMain> {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
+        actions: [
+          // 考试图标
+          IconButton(
+            icon: const Icon(Icons.quiz),
+            onPressed: () {
+              // TODO: 实现考试功能
+            },
+            tooltip: '开始考试',
+          ),
+          // 编辑图标
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              context.push('/admin/addQuestion');
+            },
+            tooltip: '添加题目',
+          ),
+        ],
       ),
       body: QuestionListview(),
       bottomNavigationBar: CustomBottomNavigationBar(),
