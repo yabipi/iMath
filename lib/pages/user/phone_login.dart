@@ -137,7 +137,7 @@ class _LoginPageState extends State<PhoneLoginPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 4), // 减少间距，让勾选框离文字更近
                   GestureDetector(
                     onTap: () {
                       setState(() {
@@ -158,6 +158,7 @@ class _LoginPageState extends State<PhoneLoginPage> {
                               child: Text(
                                 '《用户协议》',
                                 style: TextStyle(
+                                  fontSize: 14, // 统一字体大小为14
                                   color: Colors.blue.shade400,
                                   decoration: TextDecoration.underline,
                                 ),
@@ -171,6 +172,7 @@ class _LoginPageState extends State<PhoneLoginPage> {
                               child: Text(
                                 '《隐私政策》',
                                 style: TextStyle(
+                                  fontSize: 14, // 统一字体大小为14
                                   color: Colors.blue.shade400,
                                   decoration: TextDecoration.underline,
                                 ),
