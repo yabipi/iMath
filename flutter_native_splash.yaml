@@ -27,7 +27,7 @@ flutter_native_splash:
   
   # 设置图片填充模式，确保满屏显示
   android_gravity: fill
-  ios_content_mode: scaleAspectFill
+  ios_content_mode: scaleToFill
   web_image_mode: cover
 
   # The branding property allows you to specify an image used as branding in the splash screen.
@@ -51,7 +51,7 @@ flutter_native_splash:
   #color_dark: "#042a49"
   #background_image_dark: "assets/dark-background.png"
   #image_dark: assets/splash-invert.png
-  #branding_dark: assets/dart_dark.png
+  #branding: assets/dart_dark.png
 
   # From Android 12 onwards, the splash screen is handled differently than in previous versions.
   # Please visit https://developer.android.com/guide/topics/ui/splash-screen
@@ -75,7 +75,7 @@ flutter_native_splash:
     icon_background_color: "#ffffff"
 
   # The branding property allows you to specify an image used as branding in the splash screen.
-  #branding: assets/dart.png
+  branding: assets/images/dart.png
 
   # The image_dark, color_dark, icon_background_color_dark, and branding_dark set values that
   # apply when the device is in dark mode. If they are not specified, the app will use the
@@ -108,7 +108,7 @@ flutter_native_splash:
   #background_image_android: "assets/background-android.png"
   #background_image_dark_android: "assets/dark-background-android.png"
   #background_image_ios: "assets/background-ios.png"
-  #background_image_dark_ios: "assets/dark-background-ios.png"
+  #background_image_dark_ios: "assets/dark-background-android.png"
   #background_image_web: "assets/background-web.png"
   #background_image_dark_web: "assets/dark-background-web.png"
   #branding_android: assets/brand-android.png

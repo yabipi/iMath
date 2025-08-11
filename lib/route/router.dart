@@ -22,6 +22,7 @@ import 'package:imath/pages/demo/pageview_demo.dart';
 import 'package:imath/pages/home/book_listview.dart';
 import 'package:imath/pages/home/home_screen.dart';
 import 'package:imath/pages/home/news_detail.dart';
+import 'package:imath/pages/home/splash_screen.dart';
 import 'package:imath/pages/knowledge/add_knowledge.dart';
 import 'package:imath/pages/knowledge/edit_knowledge.dart';
 import 'package:imath/pages/knowledge/knowledge_detail.dart';
@@ -47,11 +48,16 @@ import 'package:imath/pages/user/settings.dart';
 import 'package:imath/pages/user/slider_captcha_client_verify.dart';
 
 final router = GoRouter(
-  initialLocation: '/home',
+  initialLocation: '/splash',
   observers: [FlutterSmartDialog.observer],
   redirect: (context, state) =>
       state.uri.toString() == '/' ? '/knowledge' : null,
   routes: [
+    // SplashScreen
+    GoRoute(
+      path: '/splash',
+      builder: (context, state) => SplashScreen(),
+    ),
     GoRoute(
       path: '/home',
       builder: (context, state) => HomeScreen(),

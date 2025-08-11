@@ -11,6 +11,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter/material.dart';
 
 import 'package:imath/models/user.dart';
+import 'package:imath/pages/home/splash_view.dart';
 import 'package:imath/route/router.dart';
 import 'package:imath/services/connectivity_service.dart';
 import 'package:imath/state/global_state.dart';
@@ -115,6 +116,7 @@ Future<void> initializeApp() async {
 
 
 void main() async {
+  // runApp(SplashView()); // 启动加载页，此方法不灵
   WidgetsFlutterBinding.ensureInitialized();
   await GStorage.init();
 
