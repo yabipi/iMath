@@ -200,6 +200,15 @@ class ProfileScreen extends ConsumerWidget {
           ),
           ListTile(
             leading: const Icon(Icons.info),
+            title: const Text('使用帮助'),
+            trailing: const Icon(Icons.arrow_forward_ios),
+            onTap: () {
+              // 导航到关于页面
+              context.go('/profile/help');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.info),
             title: const Text('关于我们'),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {

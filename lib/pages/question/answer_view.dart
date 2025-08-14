@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imath/models/question.dart';
-import 'package:imath/components/math_cell.dart';
+import 'package:imath/math/math_cell.dart';
 
 class AnswerView extends StatelessWidget {
   final Question question;

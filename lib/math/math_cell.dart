@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
-import 'package:imath/utils/math_parser.dart';
+import 'package:imath/math/math_parser.dart';
 
 class MathCell extends StatelessWidget {
   final String? title;
   final String? content;
+  final TextStyle? textStyle;
 
   const MathCell({
     super.key,
     this.title,
     this.content,
+    this.textStyle
   });
 
   @override
@@ -35,7 +37,7 @@ class MathCell extends StatelessWidget {
           widgets.add(
             Math.tex(
               formula,
-              textStyle: const TextStyle(fontSize: 16),
+              textStyle: this.textStyle ?? const TextStyle(fontSize: 16),
               mathStyle: MathStyle.display,
             ),
           );
@@ -44,7 +46,7 @@ class MathCell extends StatelessWidget {
           widgets.add(
             Math.tex(
               formula,
-              textStyle: const TextStyle(fontSize: 16),
+              textStyle: this.textStyle ?? const TextStyle(fontSize: 16),
               mathStyle:
                   content.isDisplayMode ? MathStyle.display : MathStyle.text,
             ),
@@ -70,7 +72,7 @@ class MathCell extends StatelessWidget {
         widgets.add(
           Text(
             content.content,
-            style: TextStyle(
+            style: this.textStyle ?? TextStyle(
               fontSize: 16,
               decoration:
                   content.hasUnderline ? TextDecoration.underline : null,

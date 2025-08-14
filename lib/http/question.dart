@@ -6,6 +6,7 @@ import 'package:imath/config/api_config.dart';
 import 'package:imath/config/constants.dart';
 import 'package:imath/models/question.dart';
 import 'package:imath/models/quiz.dart';
+import 'package:imath/state/global_state.dart';
 
 import 'init.dart';
 
@@ -15,7 +16,13 @@ class QuestionHttp {
   }
 
   static Future loadQuestions({int? categoryId=ALL_CATEGORY, int? pageNo=1, int? pageSize=10, String? level}) async {
-    final url = '${ApiConfig.SERVER_BASE_URL}/api/question/list?categoryId=${categoryId}&pageNo=$pageNo&pageSize=$pageSize&level=${level}';
+    final categories = GlobalState.get(CATEGORIES_KEY);
+    String branch = categories[categoryId.toString()];
+    if (categoryId == ALL_CATEGORY) {
+      branch = "";
+    }
+
+    final url = '${ApiConfig.SERVER_BASE_URL}/api/question/list?branch=${branch}&pageNo=$pageNo&pageSize=$pageSize&level=${level}';
     final response = await Request().get(url);
     return response.data;
   }

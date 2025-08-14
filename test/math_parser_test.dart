@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:imath/utils/math_parser.dart';
+import 'package:imath/math/math_parser.dart';
 
 void main() {
   group('MathParser', () {

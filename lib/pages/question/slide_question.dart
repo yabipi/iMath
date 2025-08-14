@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:imath/components/math_cell.dart';
+import 'package:imath/math/math_cell.dart';
 import 'package:imath/services/question_service.dart';
 
 class SlideQuestion extends StatefulWidget {

@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import 'package:imath/models/question.dart';
-import 'package:imath/components/math_cell.dart';
+import 'package:imath/math/math_cell.dart';
 
 import 'package:imath/state/questions_provider.dart';
 import 'package:imath/utils/device_util.dart';
 
 class QuestionListview extends ConsumerStatefulWidget {
   // int? categoryId = ALL_CATEGORY;
-  const QuestionListview({super.key});
+  final Function(Question?)? onCurrentQuestionChanged; // 新增：当前题目变化回调
+
+  const QuestionListview({
+    super.key,
+    this.onCurrentQuestionChanged,
+  });
 
   @override
   ConsumerState<QuestionListview> createState() => _QuestionListviewState();
@@ -21,7 +25,6 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
   // List<Question> _questions = <Question>[];
 
   late PageController _pageController; // 新增：用于监听 PageView 滑动事件
-  bool _isPanelExpanded = true; // 新增：控制功能条展开/折叠状态
   bool _isControllerReady = false; // 新增：标记controller是否准备就绪
 
   @override
@@ -89,71 +92,53 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
     List<String> imageUrls = _parseImageUrls(question.images);
     bool isChoiceQuestion = _isChoiceQuestion(question);
 
-    return SizedBox(
-      height: MediaQuery.of(context).size.height,
-      child: Stack(
-        children: [
-          // 底层：题目内容（可滚动）
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 8),
-                  // 题目内容
-                  MathCell(
-                    content: question.content ?? '',
-                  ),
-                  const SizedBox(height: 8),
-                  // 图片位置：选择题放在题干和选项之间，非选择题放在题目下方
-                  if (imageUrls.isNotEmpty && isChoiceQuestion) ...[
-                    _buildQuestionImages(imageUrls),
-                    const SizedBox(height: 8),
-                  ],
-                  // 选项内容（如果有的话）
-                  if (question.options != null &&
-                      question.options!.isNotEmpty) ...[
-                    MathCell(
-                      content: question.options!,
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                  // 图片位置：非选择题放在题目下方
-                  if (imageUrls.isNotEmpty && !isChoiceQuestion) ...[
-                    _buildQuestionImages(imageUrls),
-                    const SizedBox(height: 8),
-                  ],
-                ],
-              ),
+    return SingleChildScrollView(
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        child: // Text('第${content}题')
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          // children: List.generate(
+          //   50, // 重复次数
+          //       (index) => MathCell(content: question.title ?? ''), // 要重复的组件
+          // ),
+          children: [
+            MathCell(
+                content: question.title ?? '',
+                textStyle:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            // Text(question.content ?? ''),
+            // 题目内容
+            MathCell(
+              content: question.content ?? '',
             ),
-          ),
-          // 上层：右侧功能条
-          Positioned(
-            right: 20,
-            top: 0,
-            bottom: 0,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                // 计算右箭头中心位置：屏幕高度的一半
-                final arrowCenterY = constraints.maxHeight / 2;
-                // 右箭头高度的一半：24像素
-                final arrowHalfHeight = 24;
-                // 4像素间距
-                final spacing = 4;
-                // 功能条顶部位置：右箭头底部 + 间距
-                // 右箭头底部 = 中心Y + 高度的一半
-                final arrowBottomY = arrowCenterY + arrowHalfHeight;
-                final panelTopY = arrowBottomY + spacing;
+            const SizedBox(height: 8),
+            // 图片位置：选择题放在题干和选项之间，非选择题放在题目下方
+            if (imageUrls.isNotEmpty && isChoiceQuestion)
+              _buildQuestionImages(imageUrls),
+              const SizedBox(height: 8),
 
-                return Transform.translate(
-                  offset: Offset(0, panelTopY),
-                  child: _buildCollapsiblePanel(question),
-                );
-              },
-            ),
-          ),
-        ],
+            // 选项内容（如果有的话）
+            if (question.options != null && question.options!.isNotEmpty)
+              MathCell(
+                content: question.options!,
+              ),
+
+            // if (question.options != null && question.options!.isNotEmpty) ...[
+            //   MathCell(
+            //     content: question.options!,
+            //   ),
+            //   const SizedBox(height: 8),
+            // ],
+            // 图片位置：非选择题放在题目下方
+            const SizedBox(height: 8),
+            if (imageUrls.isNotEmpty && !isChoiceQuestion)
+              _buildQuestionImages(imageUrls),
+            // Spacer(),
+          ],
+        ),
       ),
     );
   }
@@ -178,232 +163,68 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
     return false;
   }
 
-  // 构建可折叠的功能条
-  Widget _buildCollapsiblePanel(Question question) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 12,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 折叠/展开按钮（带横线）
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _isPanelExpanded = !_isPanelExpanded;
-              });
-            },
-            child: Container(
-              width: 48,
-              height: 32,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.95),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey[300]!),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    spreadRadius: 1,
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // 横线
-                  Container(
-                    width: 16,
-                    height: 2,
-                    color: Colors.grey[600],
-                  ),
-                  const SizedBox(height: 2),
-                  // 箭头图标
-                  Icon(
-                    _isPanelExpanded
-                        ? Icons.keyboard_arrow_up
-                        : Icons.keyboard_arrow_down,
-                    size: 14,
-                    color: Colors.grey[600],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          // 功能条内容
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: _isPanelExpanded
-                ? _buildPanel(question)
-                : const SizedBox.shrink(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 新增：右侧操作面板
-  Widget _buildPanel(Question question) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 点赞
-          _buildActionItem(
-            icon: Icons.thumb_up_outlined,
-            count: 0, // TODO: 从数据库获取点赞数
-            onTap: () {
-              // TODO: 实现点赞功能
-            },
-          ),
-          const SizedBox(height: 8),
-          // 收藏
-          _buildActionItem(
-            icon: Icons.bookmark_outline,
-            count: 0, // TODO: 从数据库获取收藏数
-            onTap: () {
-              // TODO: 实现收藏功能
-            },
-          ),
-          const SizedBox(height: 8),
-          // 评论
-          _buildActionItem(
-            icon: Icons.comment_outlined,
-            count: 0, // TODO: 从数据库获取评论数
-            onTap: () {
-              // TODO: 实现评论功能
-            },
-          ),
-          const SizedBox(height: 8),
-          // 答案
-          _buildActionItem(
-            icon: Icons.lightbulb_outline,
-            count: 0, // 答案不显示数量
-            onTap: () {
-              context.push('/admin/viewAnswer', extra: question);
-            },
-            isAnswer: true,
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 构建操作项
-  Widget _buildActionItem({
-    required IconData icon,
-    required int count,
-    required VoidCallback onTap,
-    bool isAnswer = false,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 24,
-            color: isAnswer ? Colors.orange : Colors.grey[600],
-          ),
-          if (!isAnswer) ...[
-            const SizedBox(height: 4),
-            Text(
-              count.toString(),
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
   Widget _buildQuestionsPageView(List<Question> questions) {
-    return Column(
-      children: [
-        Expanded(
-          child: Stack(
-            children: [
-              PageView.builder(
-                controller: _pageController, // 使用自定义的 PageController
-                physics: DeviceUtil.isMobile
-                    ? const ClampingScrollPhysics()
-                    : const PageScrollPhysics(), // desktop模式下使用PageScrollPhysics支持鼠标拖拽
-                scrollDirection: Axis.horizontal,
-                itemCount: questions.length,
-                onPageChanged: (int page) {
-                  try {
-                    // 验证页面索引的有效性
-                    if (page >= 0 && page < questions.length) {
-                      // 可以在这里添加页面变化的日志
-                      debugPrint('页面切换到: $page');
-                    } else {
-                      debugPrint('无效的页面索引: $page, 总页数: ${questions.length}');
-                    }
-                  } catch (e) {
-                    debugPrint('页面变化处理失败: $e');
-                  }
-                  // 当滑动到倒数第二个页面时，开始加载更多数据
-                },
-                itemBuilder: (context, index) {
-                  return _buildQuestionCard(questions[index], index);
-                },
-              ),
-              // 左右导航箭头 - 仅在desktop模式下显示
-              if (!DeviceUtil.isMobile) ...[
-                // 左箭头
-                if (_shouldShowLeftArrow(questions))
-                  Positioned(
-                    left: 20,
-                    top: 0,
-                    bottom: 0,
-                    child: Center(
-                      child: _buildNavigationArrow(
-                        icon: Icons.chevron_left,
-                        onTap: () => _previousPage(),
-                        isLeft: true,
-                      ),
+    return PageView.builder(
+      controller: _pageController,
+      physics: DeviceUtil.isMobile
+          ? const ClampingScrollPhysics()
+          : const PageScrollPhysics(),
+      scrollDirection: Axis.horizontal,
+      itemCount: questions.length,
+      onPageChanged: (int page) {
+        try {
+          if (page >= 0 && page < questions.length) {
+            debugPrint('页面切换到: $page');
+            if (widget.onCurrentQuestionChanged != null) {
+              final currentQuestion = questions[page];
+              widget.onCurrentQuestionChanged!(currentQuestion);
+            }
+          } else {
+            debugPrint('无效的页面索引: $page, 总页数: ${questions.length}');
+          }
+        } catch (e) {
+          debugPrint('页面变化处理失败: $e');
+        }
+      },
+      itemBuilder: (context, index) {
+        return Stack(
+          children: [
+            // 底层：题目内容
+            _buildQuestionCard(questions[index], index),
+            // 上层：导航箭头（仅在desktop模式下显示）
+            if (!DeviceUtil.isMobile) ...[
+              // 左箭头
+              if (_shouldShowLeftArrow(questions))
+                Positioned(
+                  left: 20,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: _buildNavigationArrow(
+                      icon: Icons.chevron_left,
+                      onTap: () => _previousPage(),
+                      isLeft: true,
                     ),
                   ),
-                // 右箭头
-                if (_shouldShowRightArrow(questions))
-                  Positioned(
-                    right: 20,
-                    top: 0,
-                    bottom: 0,
-                    child: Center(
-                      child: _buildNavigationArrow(
-                        icon: Icons.chevron_right,
-                        onTap: () => _nextPage(),
-                        isLeft: false,
-                      ),
+                ),
+              // 右箭头
+              if (_shouldShowRightArrow(questions))
+                Positioned(
+                  right: 20,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: _buildNavigationArrow(
+                      icon: Icons.chevron_right,
+                      onTap: () => _nextPage(),
+                      isLeft: false,
                     ),
                   ),
-              ],
+                ),
             ],
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 
@@ -513,9 +334,34 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
     return ref.read(questionsProvider).value ?? [];
   }
 
+  // 获取当前题目
+  Question? getCurrentQuestion() {
+    try {
+      if (!_pageController.hasClients || _pageController.positions.isEmpty) {
+        return null;
+      }
+
+      final currentPage = _pageController.page;
+      if (currentPage == null) return null;
+
+      final questions = _getCurrentQuestions();
+      final pageIndex = currentPage.round();
+
+      if (pageIndex >= 0 && pageIndex < questions.length) {
+        return questions[pageIndex];
+      }
+
+      return null;
+    } catch (e) {
+      debugPrint('获取当前题目失败: $e');
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final questions = ref.watch(questionsProvider).value ?? [];
+    // widget.onCurrentQuestionChanged?.call(questions[0]);
     // 监听分类变化和加载状态
     ref.watch(categoryChangeProvider);
     ref.watch(pageChangeProvider);
@@ -553,7 +399,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
                 child: CircularProgressIndicator(),
               ),
             // 显示无数据提示
-            if (questions.isEmpty)
+            if (!isLoading && questions.isEmpty)
               const Center(
                 child: Text('暂无数据'),
               ),
@@ -608,20 +454,21 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
           )
         else
           // 多张图片时使用垂直列表布局，确保每张图片都能完整显示
-          Expanded(
-            child: ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: imageUrls.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 8),
-              itemBuilder: (context, index) {
-                return SizedBox(
-                  height: 120, // 固定高度确保图片不会被裁剪
-                  child: _buildImageItem(imageUrls[index]),
-                );
-              },
-            ),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: imageUrls.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 8),
+            itemBuilder: (context, index) {
+              return SizedBox(
+                height: 120, // 固定高度确保图片不会被裁剪
+                child: _buildImageItem(imageUrls[index]),
+              );
+            },
           ),
+          // Expanded(
+          //
+          // ),
       ],
     );
   }
@@ -821,10 +668,11 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
       // // 安全地检查页面状态
       // if (_pageController.positions.isEmpty) return false;
 
-      final currentPage = _pageController.page;
-      if (currentPage == null) return false;
-
-      return currentPage > 0 && currentPage < questions.length;
+      // final currentPage = _pageController.page;
+      // if (currentPage == null) return false;
+      //
+      // return currentPage > 0 && currentPage < questions.length;
+      return true;
     } catch (e) {
       debugPrint('检查左箭头显示状态失败: $e');
       return false;

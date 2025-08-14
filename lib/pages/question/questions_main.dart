@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imath/config/constants.dart';
 import 'package:imath/core/context.dart';
+import 'package:imath/models/question.dart'; // 新增：导入Question类
 import 'package:imath/pages/common/bottom_navigation_bar.dart';
 import 'package:imath/pages/common/knowledge_tree.dart';
 import 'package:imath/state/global_state.dart';
@@ -20,10 +21,22 @@ class QuestionsMain extends ConsumerStatefulWidget {
 
 class _QuestionsMainState extends ConsumerState<QuestionsMain> {
   int? _categoryId = ALL_CATEGORY;
+  Question? _currentQuestion; // 新增：当前题目
 
   @override
   void initState() {
     super.initState();
+  }
+
+  // 显示当前题目答案
+  void _showCurrentQuestionAnswer() {
+    if (_currentQuestion == null) {
+      final questions = ref.watch(questionsProvider).value ?? [];
+      _currentQuestion = questions[0];
+    }
+
+    // 跳转到答案页面
+    context.push('/admin/viewAnswer', extra: _currentQuestion);
   }
 
   @override
@@ -45,6 +58,12 @@ class _QuestionsMainState extends ConsumerState<QuestionsMain> {
           ),
         ),
         actions: [
+          // 答案图标
+          IconButton(
+            icon: const Icon(Icons.question_answer_rounded),
+            onPressed: _showCurrentQuestionAnswer, // 修改：连接到答案查看方法
+            tooltip: '查看答案',
+          ),
           // 考试图标
           IconButton(
             icon: const Icon(Icons.quiz),
@@ -63,7 +82,13 @@ class _QuestionsMainState extends ConsumerState<QuestionsMain> {
           ),
         ],
       ),
-      body: QuestionListview(),
+      body: QuestionListview(
+        onCurrentQuestionChanged: (Question? question) {
+          setState(() {
+            _currentQuestion = question;
+          });
+        },
+      ),
       bottomNavigationBar: CustomBottomNavigationBar(),
       // 新增：侧边栏 Drawer
       drawer: Drawer(
@@ -82,10 +107,12 @@ class _QuestionsMainState extends ConsumerState<QuestionsMain> {
                 ),
               ),
             ),
-            KnowledgeTree(onChangeCategory: (categoryId){
+            KnowledgeTree(onChangeCategory: (categoryId) {
               setState(() {
                 this._categoryId = categoryId;
-                ref.read(questionsProvider.notifier).onChangeCategory(categoryId);
+                ref
+                    .read(questionsProvider.notifier)
+                    .onChangeCategory(categoryId);
                 Navigator.pop(context); // 关闭drawer
               });
             })

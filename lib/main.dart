@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -175,8 +176,10 @@ class MyApp extends StatelessWidget {
   Widget _buildRouterApp(BuildContext context) {
     return MaterialApp.router(
       title: '数学宝典',
+      // scrollBehavior: MyBehavior(),
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
+        scaffoldBackgroundColor: Colors.white,
+        //colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         textTheme: TextTheme(
             bodyLarge: TextStyle(
               fontSize: DeviceUtil.isWeb ? 16.0 : 20.0, // Web平台稍大
@@ -219,5 +222,11 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
+class MyBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+  };
+}
 

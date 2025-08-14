@@ -15,7 +15,7 @@ import 'package:imath/pages/article/article_viewer.dart';
 import 'package:imath/pages/article/article_edit.dart';
 import 'package:imath/pages/culture/mathematician_edit.dart';
 import 'package:imath/pages/culture/experience_screen.dart';
-import 'package:imath/pages/culture/mathematician_listview.dart';
+
 import 'package:imath/pages/culture/mathematician_screen.dart';
 import 'package:imath/pages/culture/problems_screen.dart';
 import 'package:imath/pages/demo/pageview_demo.dart';
@@ -33,10 +33,11 @@ import 'package:imath/pages/paper/add_paper_screen.dart';
 import 'package:imath/pages/question/add_question.dart';
 import 'package:imath/pages/question/edit_question.dart';
 import 'package:imath/pages/question/questions_main.dart';
-import 'package:imath/pages/question/questions_screen.dart';
+
 import 'package:imath/pages/question/answer_view.dart';
 import 'package:imath/pages/user/about_me.dart';
 import 'package:imath/pages/user/avatar_edit.dart';
+import 'package:imath/pages/user/help.dart';
 import 'package:imath/pages/user/login_screen.dart';
 import 'package:imath/pages/user/phone_login.dart';
 import 'package:imath/pages/user/pincode_input.dart';
@@ -121,6 +122,10 @@ final router = GoRouter(
           GoRoute(
             path: 'about',
             builder: (context, state) => AboutMePage(),
+          ),
+          GoRoute(
+            path: 'help',
+            builder: (context, state) => HelpPage(),
           ),
           GoRoute(
             path: 'avatarEdit',

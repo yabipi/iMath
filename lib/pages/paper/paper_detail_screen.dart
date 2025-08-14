@@ -3,13 +3,13 @@ import 'package:flutter_math_fork/flutter_math.dart';
 // import 'package:flutter_tex/flutter_tex.dart';
 // import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:http/http.dart' as http;
-import 'package:imath/components/math_cell.dart';
+import 'package:imath/math/math_cell.dart';
 import 'package:imath/models/question.dart';
 import 'dart:convert';
 import '../../config/api_config.dart';
 import '../../http/init.dart';
 import '../../models/quiz.dart';
-import '../../utils/math_parser.dart';
+import '../../math/math_parser.dart';
 import '../question/add_question.dart';
 
 
