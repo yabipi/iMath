@@ -21,6 +21,12 @@ class Question {
     this.images
   });
 
+  factory Question.empty() {
+    return Question(
+      id: 0,
+    );
+  }
+
   factory Question.fromJson(Map<String, dynamic> json) {
     return Question(
       id: json['id'] ?? 0,

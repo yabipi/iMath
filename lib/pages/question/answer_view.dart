@@ -20,7 +20,11 @@ class AnswerView extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: question.id == 0 ?
+          const Center(
+            child: Text('当前题目为空'),
+          )
+          : Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 题目内容

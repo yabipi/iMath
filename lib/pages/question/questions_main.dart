@@ -9,7 +9,7 @@ import 'package:imath/pages/common/knowledge_tree.dart';
 import 'package:imath/state/global_state.dart';
 import 'package:imath/state/questions_provider.dart';
 import 'package:imath/state/settings_provider.dart';
-import '../paper/paper_listview.dart';
+
 import 'question_listview.dart';
 
 class QuestionsMain extends ConsumerStatefulWidget {
@@ -21,7 +21,7 @@ class QuestionsMain extends ConsumerStatefulWidget {
 
 class _QuestionsMainState extends ConsumerState<QuestionsMain> {
   int? _categoryId = ALL_CATEGORY;
-  Question? _currentQuestion; // 新增：当前题目
+  // Question? _currentQuestion; // 新增：当前题目
 
   @override
   void initState() {
@@ -30,11 +30,7 @@ class _QuestionsMainState extends ConsumerState<QuestionsMain> {
 
   // 显示当前题目答案
   void _showCurrentQuestionAnswer() {
-    if (_currentQuestion == null) {
-      final questions = ref.watch(questionsProvider).value ?? [];
-      _currentQuestion = questions[0];
-    }
-
+    Question? _currentQuestion = ref.watch(currentQuestionProvider);
     // 跳转到答案页面
     context.push('/admin/viewAnswer', extra: _currentQuestion);
   }
@@ -47,10 +43,30 @@ class _QuestionsMainState extends ConsumerState<QuestionsMain> {
     } else {
       title = GlobalState.get(CATEGORIES_KEY)[_categoryId.toString()];
     }
+    final total = ref.watch(questionsTotalProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              "共收录${total}道题",
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ),
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu),
@@ -82,13 +98,7 @@ class _QuestionsMainState extends ConsumerState<QuestionsMain> {
           ),
         ],
       ),
-      body: QuestionListview(
-        onCurrentQuestionChanged: (Question? question) {
-          setState(() {
-            _currentQuestion = question;
-          });
-        },
-      ),
+      body: QuestionListview(),
       bottomNavigationBar: CustomBottomNavigationBar(),
       // 新增：侧边栏 Drawer
       drawer: Drawer(

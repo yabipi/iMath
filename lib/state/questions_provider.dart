@@ -1,12 +1,17 @@
+import 'dart:ffi';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:imath/config/constants.dart';
 import 'package:imath/http/question.dart';
 import 'package:imath/models/question.dart';
-import 'package:imath/models/quiz.dart';
 import 'package:imath/state/settings_provider.dart';
 
 // 分类ID提供者
 final categoryIdProvider = StateProvider<int>((ref) => ALL_CATEGORY);
+// 当前分类总题目数量提供者
+final questionsTotalProvider = StateProvider<int>((ref) => 0);
+// 当前显示的题目
+final currentQuestionProvider = StateProvider<Question>((ref) => Question.empty());
 
 // 页码提供者
 final pageNoProvider = StateProvider<int>((ref) => 1);
@@ -23,6 +28,7 @@ class QuestionsNotifier extends AsyncNotifier<List<Question>> {
   Future<List<Question>> build() async {
     MATH_LEVEL level = ref.watch(mathLevelProvider);
     final newQuestions = await loadMoreQuestions(ALL_CATEGORY, 1, level.value);
+    ref.read(currentQuestionProvider.notifier).state = newQuestions.first;
     return newQuestions;
   }
 
@@ -37,6 +43,11 @@ class QuestionsNotifier extends AsyncNotifier<List<Question>> {
     // state.value?.addAll(newQuestions);
 
     state = AsyncValue.data(newQuestions);
+    if (!newQuestions.isEmpty) {
+      ref.read(currentQuestionProvider.notifier).state = newQuestions.first;
+    } else {
+      ref.read(currentQuestionProvider.notifier).state = Question.empty();
+    }
     // await future;
   }
 
@@ -48,6 +59,7 @@ class QuestionsNotifier extends AsyncNotifier<List<Question>> {
     ref.read(pageNoProvider.notifier).state = newPageNo;
     state = AsyncValue.data([...?state.value, ...newQuestions]);
     // state = AsyncValue.data(questions);
+
   }
 
   // 新增：刷新题目列表的方法
@@ -60,32 +72,32 @@ class QuestionsNotifier extends AsyncNotifier<List<Question>> {
     int categoryId = ref.read(categoryIdProvider);
     final newQuestions = await loadMoreQuestions(categoryId, 1, ref.watch(mathLevelProvider).value);
     state = AsyncValue.data(newQuestions);
+    ref.read(currentQuestionProvider.notifier).state = newQuestions.first;
+  }
+
+  Future loadMoreQuestions(int categoryId, int pageNo, String level) async {
+    // 调用API加载数据
+    final response = await QuestionHttp.loadQuestions(
+      categoryId: categoryId,
+      pageNo: pageNo,
+      pageSize: 10,
+      level: level,
+    );
+
+    final content = response['data'] ?? [];
+    ref.read(questionsTotalProvider.notifier).state = response['total'];
+    final newQuestions = content.map<Question?>((json) {
+      try {
+        return Question.fromJson(json);
+      } catch (e) {
+        return null;
+      }
+    }).whereType<Question>().toList();
+    return newQuestions;
   }
 }
 
 final questionsProvider = AsyncNotifierProvider<QuestionsNotifier, List<Question>>(QuestionsNotifier.new);
-
-Future loadMoreQuestions(int categoryId, int pageNo, String level) async {
-  // 重新加载第一页数据
-
-  // 调用API加载数据
-  final response = await QuestionHttp.loadQuestions(
-    categoryId: categoryId,
-    pageNo: pageNo,
-    pageSize: 10,
-    level: level,
-  );
-
-  final content = response['data'] ?? [];
-  final newQuestions = content.map<Question?>((json) {
-    try {
-      return Question.fromJson(json);
-    } catch (e) {
-      return null;
-    }
-  }).whereType<Question>().toList();
-  return newQuestions;
-}
 
 // 自动触发的FutureProvider（可选）
 final autoQuestionsFutureProvider = FutureProvider.autoDispose<void>((ref) async {

@@ -10,11 +10,10 @@ import 'package:imath/utils/device_util.dart';
 
 class QuestionListview extends ConsumerStatefulWidget {
   // int? categoryId = ALL_CATEGORY;
-  final Function(Question?)? onCurrentQuestionChanged; // 新增：当前题目变化回调
+  // final Function(Question?)? onCurrentQuestionChanged; // 新增：当前题目变化回调
 
   const QuestionListview({
     super.key,
-    this.onCurrentQuestionChanged,
   });
 
   @override
@@ -175,10 +174,8 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
         try {
           if (page >= 0 && page < questions.length) {
             debugPrint('页面切换到: $page');
-            if (widget.onCurrentQuestionChanged != null) {
-              final currentQuestion = questions[page];
-              widget.onCurrentQuestionChanged!(currentQuestion);
-            }
+            ref.read(currentQuestionProvider.notifier).state = questions[page];
+
           } else {
             debugPrint('无效的页面索引: $page, 总页数: ${questions.length}');
           }

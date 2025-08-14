@@ -107,7 +107,7 @@ flutter_launcher_icons:
   # 为 iOS 配置图标
   ios: true
   # 指定图标图片路径
-  image_path: "assets/icons/splash_math.png"
+  image_path: "assets/images/math-logo.png"
   # android min sdk min:16, default 21
   # min_sdk_android: 21
 

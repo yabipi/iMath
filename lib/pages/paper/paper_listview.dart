@@ -3,9 +3,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../config/api_config.dart';
 import '../../models/paper.dart';
-import 'add_paper_screen.dart';
-
-import '../question/add_question.dart';
 import 'paper_detail_screen.dart';
 
 class PaperListView extends StatefulWidget {
