@@ -3,13 +3,18 @@ import 'package:go_router/go_router.dart';
 import 'package:imath/models/question.dart';
 import 'package:imath/math/math_cell.dart';
 
-class AnswerView extends StatelessWidget {
+import 'image_viewer.dart';
+import 'question_mixin.dart';
+
+class AnswerView extends StatelessWidget with ImageViewerMixin, QuestionMixin{
   final Question question;
 
-  const AnswerView({super.key, required this.question});
+  AnswerView({super.key, required this.question});
 
   @override
   Widget build(BuildContext context) {
+    this.context = context;
+    List<String> imageUrls = parseImageUrls(question.aImages);
     return Scaffold(
       appBar: AppBar(
         title: const Text('题目答案'),
@@ -57,6 +62,9 @@ class AnswerView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
+            if (imageUrls.isNotEmpty)
+              buildQuestionImages(imageUrls),
+            const SizedBox(height: 4),
             MathCell(
               title: '',
               content: question.answer ?? '暂无答案',
@@ -68,4 +76,5 @@ class AnswerView extends StatelessWidget {
       ),
     );
   }
+
 }

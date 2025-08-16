@@ -8,6 +8,9 @@ import 'package:imath/math/math_cell.dart';
 import 'package:imath/state/questions_provider.dart';
 import 'package:imath/utils/device_util.dart';
 
+import 'image_viewer.dart';
+import 'question_mixin.dart';
+
 class QuestionListview extends ConsumerStatefulWidget {
   // int? categoryId = ALL_CATEGORY;
   // final Function(Question?)? onCurrentQuestionChanged; // 新增：当前题目变化回调
@@ -20,7 +23,7 @@ class QuestionListview extends ConsumerStatefulWidget {
   ConsumerState<QuestionListview> createState() => _QuestionListviewState();
 }
 
-class _QuestionListviewState extends ConsumerState<QuestionListview> {
+class _QuestionListviewState extends ConsumerState<QuestionListview> with ImageViewerMixin, QuestionMixin {
   // List<Question> _questions = <Question>[];
 
   late PageController _pageController; // 新增：用于监听 PageView 滑动事件
@@ -88,8 +91,8 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
       );
     }
 
-    List<String> imageUrls = _parseImageUrls(question.images);
-    bool isChoiceQuestion = _isChoiceQuestion(question);
+    List<String> imageUrls = parseImageUrls(question.qImages);
+    bool isChoice = isChoiceQuestion(question);
 
     return SingleChildScrollView(
       child: Container(
@@ -115,8 +118,8 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
             ),
             const SizedBox(height: 8),
             // 图片位置：选择题放在题干和选项之间，非选择题放在题目下方
-            if (imageUrls.isNotEmpty && isChoiceQuestion)
-              _buildQuestionImages(imageUrls),
+            if (imageUrls.isNotEmpty && isChoice)
+              buildQuestionImages(imageUrls),
               const SizedBox(height: 8),
 
             // 选项内容（如果有的话）
@@ -133,8 +136,8 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
             // ],
             // 图片位置：非选择题放在题目下方
             const SizedBox(height: 8),
-            if (imageUrls.isNotEmpty && !isChoiceQuestion)
-              _buildQuestionImages(imageUrls),
+            if (imageUrls.isNotEmpty && !isChoice)
+              buildQuestionImages(imageUrls),
             // Spacer(),
           ],
         ),
@@ -142,25 +145,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
     );
   }
 
-  // 判断是否为选择题
-  bool _isChoiceQuestion(Question question) {
-    // 根据题目类型或选项内容判断是否为选择题
-    if (question.type != null) {
-      final type = question.type!.toLowerCase();
-      return type.contains('选择') ||
-          type.contains('choice') ||
-          type.contains('select');
-    }
 
-    // 如果类型字段为空，根据选项内容判断
-    if (question.options != null && question.options!.isNotEmpty) {
-      final options = question.options!;
-      // 检查是否包含选项标识符（A、B、C、D等）
-      return RegExp(r'[A-D][\s\.、]').hasMatch(options);
-    }
-
-    return false;
-  }
 
   Widget _buildQuestionsPageView(List<Question> questions) {
     return PageView.builder(
@@ -357,6 +342,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
 
   @override
   Widget build(BuildContext context) {
+    this.context = context;
     final questions = ref.watch(questionsProvider).value ?? [];
     // widget.onCurrentQuestionChanged?.call(questions[0]);
     // 监听分类变化和加载状态
@@ -420,240 +406,6 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> {
     await Future.delayed(const Duration(milliseconds: 500));
   }
 
-  // 解析图片URL字符串，返回URL列表
-  List<String> _parseImageUrls(String? imagesString) {
-    if (imagesString == null || imagesString.trim().isEmpty) {
-      return [];
-    }
-
-    // 按逗号分割，并去除空白字符
-    return imagesString
-        .split(',')
-        .map((url) => url.trim())
-        .where((url) => url.isNotEmpty)
-        .toList();
-  }
-
-  // 构建题目图片显示组件
-  Widget _buildQuestionImages(List<String> imageUrls) {
-    if (imageUrls.isEmpty) {
-      return const SizedBox.shrink();
-    }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const SizedBox(height: 8),
-        if (imageUrls.length == 1)
-          SizedBox(
-            height: 140,
-            child: _buildImageItem(imageUrls.first),
-          )
-        else
-          // 多张图片时使用垂直列表布局，确保每张图片都能完整显示
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: imageUrls.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 8),
-            itemBuilder: (context, index) {
-              return SizedBox(
-                height: 120, // 固定高度确保图片不会被裁剪
-                child: _buildImageItem(imageUrls[index]),
-              );
-            },
-          ),
-          // Expanded(
-          //
-          // ),
-      ],
-    );
-  }
-
-  // 构建单个图片项
-  Widget _buildImageItem(String imageUrl) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: GestureDetector(
-          onTap: () => _showImageDialog(imageUrl),
-          child: Stack(
-            children: [
-              // 使用 Center 包装确保图片居中显示
-              Center(
-                child: Image.network(
-                  imageUrl,
-                  width: double.infinity,
-                  height: double.infinity,
-                  fit: BoxFit.contain, // 保持宽高比，确保图片完整显示
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      color: Colors.grey[200],
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                        ),
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: Icon(
-                          Icons.broken_image,
-                          color: Colors.grey,
-                          size: 40,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              // 添加点击提示
-              Positioned(
-                top: 4,
-                right: 4,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.6),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Icon(
-                    Icons.zoom_in,
-                    size: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // 显示图片放大对话框
-  void _showImageDialog(String imageUrl) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Stack(
-            children: [
-              // 背景遮罩
-              GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  color: Colors.black.withOpacity(0.8),
-                ),
-              ),
-              // 图片内容
-              Center(
-                child: Container(
-                  margin: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      imageUrl,
-                      fit: BoxFit.contain,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
-                          width: 300,
-                          height: 300,
-                          color: Colors.white,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                  : null,
-                            ),
-                          ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          width: 300,
-                          height: 300,
-                          color: Colors.white,
-                          child: const Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.broken_image,
-                                  color: Colors.grey,
-                                  size: 60,
-                                ),
-                                SizedBox(height: 16),
-                                Text(
-                                  '图片加载失败',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
-              // 关闭按钮
-              Positioned(
-                top: 40,
-                right: 20,
-                child: GestureDetector(
-                  onTap: () => Navigator.of(context).pop(),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
   // 判断是否显示左箭头
   bool _shouldShowLeftArrow(List<Question> questions) {

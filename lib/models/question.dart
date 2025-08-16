@@ -7,7 +7,8 @@ class Question {
   final String? content;
   final String? options;
   final String? answer;
-  final String? images;
+  final String? qImages;
+  final String? aImages;
 
   Question({
     required this.id,
@@ -18,7 +19,8 @@ class Question {
     this.content,
     this.options,
     this.answer,
-    this.images
+    this.qImages,
+    this.aImages,
   });
 
   factory Question.empty() {
@@ -37,7 +39,8 @@ class Question {
       content: json['content'] as String?,
       options: json['options'] as String?,
       answer: json['answer'] as String?,
-      images: json['images'] as String?,
+      qImages: json['qImages'] as String?,
+      aImages: json['aImages'] as String?,
     );
   }
 }

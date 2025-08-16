@@ -68,7 +68,7 @@ class _QuestionEditViewState extends ConsumerState<QuestionEditView> with Catego
         selectedBranch = question.categoryId ?? ALL_CATEGORY;
 
         selectedType = (question.type??'').isEmpty ? QuestionTypes[0] : question.type!;
-        _selectedImages = question.images?.split(',') ?? [];
+        _selectedImages = question.qImages?.split(',') ?? [];
       }
       loaded = true;
     } catch (e) {

@@ -47,25 +47,12 @@ class _QuestionsMainState extends ConsumerState<QuestionsMain> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              "共收录${total}道题",
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
-            ),
-          ],
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         leading: Builder(
           builder: (context) => IconButton(
@@ -98,7 +85,44 @@ class _QuestionsMainState extends ConsumerState<QuestionsMain> {
           ),
         ],
       ),
-      body: QuestionListview(),
+      body: Column(
+        children: [
+          // 页面指示器行
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 12.0),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+            ),
+            child: Consumer(
+              builder: (context, ref, child) {
+                final currentQuestion = ref.watch(currentQuestionProvider);
+                final questions = ref.watch(questionsProvider).value ?? [];
+                int currentIndex = 0;
+
+                if (currentQuestion != null && questions.isNotEmpty) {
+                  currentIndex =
+                      questions.indexWhere((q) => q.id == currentQuestion.id);
+                  if (currentIndex == -1) currentIndex = 0;
+                }
+
+                return Text(
+                  "第${currentIndex + 1}题/共${total}题",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black87,
+                  ),
+                );
+              },
+            ),
+          ),
+          // 题目内容
+          Expanded(
+            child: QuestionListview(),
+          ),
+        ],
+      ),
       bottomNavigationBar: CustomBottomNavigationBar(),
       // 新增：侧边栏 Drawer
       drawer: Drawer(
