@@ -79,7 +79,8 @@ class _QuestionsMainState extends ConsumerState<QuestionsMain> {
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              context.push('/admin/addQuestion');
+              Question? _currentQuestion = ref.watch(currentQuestionProvider);
+              context.push('/admin/editQuestion?questionId=${_currentQuestion?.id!}');
             },
             tooltip: '添加题目',
           ),

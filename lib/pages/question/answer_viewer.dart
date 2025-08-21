@@ -6,10 +6,10 @@ import 'package:imath/math/math_cell.dart';
 import 'image_viewer.dart';
 import 'question_mixin.dart';
 
-class AnswerView extends StatelessWidget with ImageViewerMixin, QuestionMixin{
+class AnswerViewer extends StatelessWidget with ImageViewerMixin, QuestionMixin{
   final Question question;
 
-  AnswerView({super.key, required this.question});
+  AnswerViewer({super.key, required this.question});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class AnswerView extends StatelessWidget with ImageViewerMixin, QuestionMixin{
       appBar: AppBar(
         title: const Text('题目答案'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.close),
           onPressed: () => context.pop(),
         ),
       ),

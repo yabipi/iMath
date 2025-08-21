@@ -58,7 +58,6 @@ class ArticleViewerState extends State<ArticleViewer> {
         _article?.lake ?? '',
         _article?.markdown ?? ''
       ]);
-      print('');
     }
   }
 
@@ -154,12 +153,11 @@ class ArticleViewerState extends State<ArticleViewer> {
                 padding: EdgeInsets.all(16.0),
                 child: _article!.format == ContentFormat.markdown
                     ? SizedBox(
-                      width: double.infinity,
-                      child:  GptMarkdown(
-                        _content!,
-                        style: const TextStyle(color: Colors.black),
-                      )
-                    )
+                        width: double.infinity,
+                        child: GptMarkdown(
+                          _content!,
+                          style: const TextStyle(color: Colors.black),
+                        ))
                     : Html(
                         extensions: [
                           TagExtension(
@@ -168,14 +166,15 @@ class ArticleViewerState extends State<ArticleViewer> {
                                 return Math.tex(
                                   extensionContext.innerHtml,
                                   mathStyle: MathStyle.display,
-                                  textStyle: extensionContext.styledElement?.style.generateTextStyle(),
+                                  textStyle: extensionContext
+                                      .styledElement?.style
+                                      .generateTextStyle(),
                                   onErrorFallback: (FlutterMathException e) {
                                     //optionally try and correct the Tex string here
                                     return Text(e.message);
                                   },
                                 );
-                              }
-                          ),
+                              }),
                           // MathHtmlExtension(onMathErrorBuilder:
                           //     (tex, exception, exceptionWithType) {
                           //   // debugPrint(exception.toString());

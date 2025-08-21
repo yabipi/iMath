@@ -1,6 +1,7 @@
 class MathContent {
   final String content;
   final bool isMath;
+  final bool? isHtml;
   final String? environment;
   final bool hasUnderline;
   final bool isDisplayMode;
@@ -11,6 +12,7 @@ class MathContent {
   MathContent({
     required this.content,
     required this.isMath,
+    this.isHtml,
     this.environment,
     this.hasUnderline = false,
     this.isDisplayMode = false,
@@ -28,6 +30,7 @@ class MathParser {
     while (currentIndex < text.length) {
       // 查找下一个数学公式的开始标记
       int nextMathStart = text.indexOf('\\(', currentIndex);
+      int nextHtmlStart = text.indexOf('<html>', currentIndex);
       int nextDisplayMathStart = text.indexOf('\\[', currentIndex);
       int nextDollarStart = text.indexOf('\$', currentIndex);
       int nextBeginStart = text.indexOf('\\begin', currentIndex);
@@ -43,6 +46,11 @@ class MathParser {
           (nextStart == -1 || nextMathStart < nextStart)) {
         nextStart = nextMathStart;
         startMarker = '\\(';
+      }
+      if (nextHtmlStart != -1 &&
+          (nextStart == -1 || nextHtmlStart < nextStart)) {
+        nextStart = nextHtmlStart;
+        startMarker = '<html>';
       }
       if (nextDisplayMathStart != -1 &&
           (nextStart == -1 || nextDisplayMathStart < nextStart)) {
@@ -281,6 +289,35 @@ class MathParser {
           spacingCount: startMarker == '\\qquad' ? 2 : 1,
         ));
         currentIndex = nextStart + (startMarker == '\\qquad' ? 7 : 5);
+      } else if (startMarker == '<html>') {
+        // 处理HTML内容
+        int endIndex = text.indexOf('</html>', nextStart + 6);
+        if (endIndex == -1) {
+          // 如果没有找到结束标记，尝试查找下一个开始标记
+          int nextHtmlStart2 = text.indexOf('<html>', nextStart + 6);
+          if (nextHtmlStart2 != -1) {
+            // 如果找到下一个开始标记，将当前内容作为普通文本处理
+            result.add(MathContent(
+              content: text.substring(nextStart, nextHtmlStart2),
+              isMath: false,
+            ));
+            currentIndex = nextHtmlStart2;
+            continue;
+          } else {
+            // 如果没有找到下一个开始标记，将剩余内容作为普通文本
+            result.add(MathContent(
+              content: text.substring(nextStart),
+              isMath: false,
+            ));
+            break;
+          }
+        }
+        result.add(MathContent(
+          content: text.substring(nextStart + 6, endIndex),
+          isMath: false,
+          isHtml: true,
+        ));
+        currentIndex = endIndex + 7;
       }
     }
 
@@ -291,20 +328,20 @@ class MathParser {
     List<MathContent> result = [];
     for (int i = 0; i < items.length; i++) {
       MathContent item = items[i];
-      
+
       // 如果不包含换行符，直接添加
       if (!item.content.contains('\n')) {
         result.add(item);
         continue;
       }
-      
+
       // 拆分换行符
       List<String> lines = item.content.split('\n');
-      
+
       // 将每个拆分项添加到结果中
       for (int j = 0; j < lines.length; j++) {
         String line = lines[j];
-        
+
         // 如果是空行，添加一个换行标记
         if (line.isEmpty) {
           result.add(MathContent(
@@ -314,7 +351,7 @@ class MathParser {
           ));
           continue;
         }
-        
+
         // 添加普通文本或数学公式
         result.add(MathContent(
           content: line,
@@ -323,7 +360,7 @@ class MathParser {
           hasUnderline: item.hasUnderline,
           isDisplayMode: item.isDisplayMode,
         ));
-        
+
         // 如果不是最后一行，在行末添加换行标记
         if (j < lines.length - 1) {
           result.add(MathContent(

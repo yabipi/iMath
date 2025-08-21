@@ -120,7 +120,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> with ImageV
             // 图片位置：选择题放在题干和选项之间，非选择题放在题目下方
             if (imageUrls.isNotEmpty && isChoice)
               buildQuestionImages(imageUrls),
-              const SizedBox(height: 8),
+            const SizedBox(height: 8),
 
             // 选项内容（如果有的话）
             if (question.options != null && question.options!.isNotEmpty)

@@ -34,11 +34,11 @@ import 'package:imath/pages/question/add_question.dart';
 import 'package:imath/pages/question/edit_question.dart';
 import 'package:imath/pages/question/questions_main.dart';
 
-import 'package:imath/pages/question/answer_view.dart';
+import 'package:imath/pages/question/answer_viewer.dart';
 import 'package:imath/pages/user/about_me.dart';
 import 'package:imath/pages/user/avatar_edit.dart';
 import 'package:imath/pages/user/help.dart';
-import 'package:imath/pages/user/login_screen.dart';
+
 import 'package:imath/pages/user/phone_login.dart';
 import 'package:imath/pages/user/pincode_input.dart';
 
@@ -212,7 +212,7 @@ final router = GoRouter(
           path: 'viewAnswer',
           builder: (context, state) {
             final question = state.extra as Question;
-            return AnswerView(question: question);
+            return AnswerViewer(question: question);
           },
         ),
         GoRoute(
