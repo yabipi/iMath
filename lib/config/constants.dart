@@ -139,6 +139,8 @@ class ApiCode {
   static const int SERVICE_UNAVAILABLE = 503;
   static const int GATEWAY_TIMEOUT = 504;
 
+  // 用户模块
+  static const int NEW_USER = 101;
   // 自定义业务错误码（可根据实际后端定义调整）
   static const int CUSTOM_ERROR_START = 600;
 

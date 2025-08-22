@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:dio/dio.dart';
 import 'package:imath/config/constants.dart';
 
-import 'package:imath/core/context.dart';
 import 'package:imath/http/auth.dart';
 import 'package:imath/state/global_state.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -154,7 +152,7 @@ class AuthService extends ApiService {
   Future<void> signin(String username, String password) async {
     try {
       final result = await AuthHttp.signIn(username, password);
-      _saveUser(result);
+      saveUser(result);
     } catch (err, _) {
       rethrow;
     }
@@ -163,12 +161,12 @@ class AuthService extends ApiService {
   /**
    * 手机验证码登录
    */
-  static Future<bool> signinWithPhone(String phone, String pincode) async {
+  static Future<bool> signinWithPhone(String phone, String pincode, String? password) async {
     try {
-      final result = await AuthHttp.verifyCaptcha(phone, pincode);
+      final result = await AuthHttp.verifyCaptcha(phone, pincode, password);
       if (result['code'] == ApiCode.SUCCESS) {
         // SmartDialog.showToast('验证码正确');
-        _saveUser(result);
+        saveUser(result);
         return true;
       } else {
         return false;
@@ -178,7 +176,7 @@ class AuthService extends ApiService {
     }
   }
 
-  static void _saveUser(result) {
+  static void saveUser(result) {
     final user = User.fromJson(result[Constants.USER_KEY]);
     String token = result[Constants.USER_TOKEN];
 

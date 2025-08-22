@@ -11,7 +11,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 class PinputScreen extends StatefulWidget {
   final String phone;
-  const PinputScreen({Key? key, required this.phone}) : super(key: key);
+  final String? password;
+  const PinputScreen({Key? key, required this.phone, this.password}) : super(key: key);
 
   @override
   State<PinputScreen> createState() => _PinputScreenState();
@@ -123,7 +124,7 @@ class _PinputScreenState extends State<PinputScreen> {
                         },
                         hapticFeedbackType: HapticFeedbackType.lightImpact,
                         onCompleted: (pin) async {
-                          final result = await AuthService.signinWithPhone(widget.phone, pin);
+                          final result = await AuthService.signinWithPhone(widget.phone, pin, widget.password);
                           if (result) {
                             context.go('/profile');
                           } else {

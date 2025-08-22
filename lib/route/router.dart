@@ -27,7 +27,6 @@ import 'package:imath/pages/knowledge/add_knowledge.dart';
 import 'package:imath/pages/knowledge/edit_knowledge.dart';
 import 'package:imath/pages/knowledge/knowledge_detail.dart';
 import 'package:imath/pages/knowledge/knowledge_listview.dart';
-import 'package:imath/pages/knowledge/knowledge_screen.dart';
 
 import 'package:imath/pages/paper/add_paper_screen.dart';
 import 'package:imath/pages/question/add_question.dart';
@@ -161,7 +160,8 @@ final router = GoRouter(
       path: '/verifycode',
       builder: (context, state) {
         final String? phone = state.uri.queryParameters['phone'];
-        return PinputScreen(phone: phone ?? '');
+        final String? password = state.uri.queryParameters['password'];
+        return PinputScreen(phone: phone ?? '', password: password ?? '');
       },
     ),
     // 管理员入口

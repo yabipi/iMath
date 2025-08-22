@@ -10,14 +10,14 @@ class AuthHttp {
       options: Options(contentType: Headers.jsonContentType),
       data: {'phone': phoneNumber},
     );
-    return response;
+    return response.data;
   }
 
-  static Future verifyCaptcha(String phone, String captcha) async {
+  static Future verifyCaptcha(String phone, String captcha, String? password) async {
     final response = await Request().post(
         '${ApiConfig.SERVER_BASE_URL}/api/user/verifyCaptcha',
       options: Options(contentType: Headers.jsonContentType),
-      data: {'captcha': captcha, 'phone':  phone},
+      data: {'captcha': captcha, 'phone':  phone, 'password': password},
     );
     return response.data;
   }

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:imath/config/constants.dart';
 import 'package:imath/http/auth.dart';
 import 'package:go_router/go_router.dart';
+import 'package:imath/services/auth_service.dart';
+import 'package:imath/utils/phone_validator.dart';
 
 class PhoneLoginPage extends StatefulWidget {
   const PhoneLoginPage({Key? key}) : super(key: key);
@@ -12,13 +15,14 @@ class PhoneLoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<PhoneLoginPage> {
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwdController = TextEditingController();
   bool _agreedToTerms = false; // 是否同意协议
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('手机号登录'),
+        title: const Text('用户登录'),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -106,11 +110,34 @@ class _LoginPageState extends State<PhoneLoginPage> {
                   keyboardType: TextInputType.phone,
                 ),
               ),
-              
+              const SizedBox(height: 12),
+              // 密码输入框
+              Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: TextField(
+                  controller: _passwdController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    hintText: '请输入密码',
+                    hintStyle: TextStyle(color: Colors.grey.shade400),
+                    border: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue.shade400, width: 2),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey.shade50,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    isDense: true, // 减少内部间距
+                  ),
+                  keyboardType: TextInputType.phone,
+                ),
+              ),
               // 手机号说明文字
               const SizedBox(height: 8),
               Text(
-                '当前仅支持中国大陆手机号注册',
+                '当前仅支持中国大陆手机号登录，新用户首次验证通过后即自动完成注册',
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey.shade500,
@@ -137,7 +164,7 @@ class _LoginPageState extends State<PhoneLoginPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 4), // 减少间距，让勾选框离文字更近
+                  const SizedBox(width: 2), // 减少间距，让勾选框离文字更近
                   GestureDetector(
                     onTap: () {
                       setState(() {
@@ -194,16 +221,31 @@ class _LoginPageState extends State<PhoneLoginPage> {
                   minHeight: 48,
                 ),
                 child: ElevatedButton(
-                  onPressed: _agreedToTerms ? () {
+                  onPressed: _agreedToTerms ? () async {
                     // 这里可处理登录逻辑，比如校验手机号、调用接口等
                     String phoneNumber = _phoneController.text.trim();
+                    String passwd = _passwdController.text.trim();
                     if (phoneNumber.isNotEmpty) {
+                      if(!PhoneValidator.isValid(phoneNumber)) {
+                        SmartDialog.showToast('请输入合法的手机号码!');
+                        return;
+                      }
                       // 手动添加+86前缀
-                      String fullPhoneNumber = '+86$phoneNumber';
+                      // String fullPhoneNumber = '+86$phoneNumber';
                       // debugPrint('点击了立即登录，手机号：$fullPhoneNumber');
-                      AuthHttp.sendCaptcha(phoneNumber);
-                      context.go('/verifycode?phone=${phoneNumber}');
-                      SmartDialog.showToast('验证码已发送');
+                      final res = await AuthHttp.signIn(phoneNumber, passwd) as Map;
+                      if (res['code'] == ApiCode.NEW_USER) {
+                        // 新用户需要验证手机号是否合法
+                        await AuthHttp.sendCaptcha(phoneNumber);
+                        SmartDialog.showToast('验证码已发送');
+                        context.go('/verifycode?phone=${phoneNumber}&password=${passwd}');
+                      } else if (res['code'] == ApiCode.INTERNAL_SERVER_ERROR) {
+                        SmartDialog.showToast(res['message']);
+                      } else if (res['code'] == ApiCode.SUCCESS){
+                        AuthService.saveUser(res);
+                        // 登录成功，跳转到用户中心
+                        context.go('/profile');
+                      }
                     } else {
                       SmartDialog.showToast('请输入手机号');
                     }
@@ -218,7 +260,7 @@ class _LoginPageState extends State<PhoneLoginPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                   ),
                   child: const Text(
-                    '获取验证码',
+                    '登录',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
