@@ -130,18 +130,18 @@ class _QuestionsMainState extends ConsumerState<QuestionsMain> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Text(
-                '知识树',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
+            // const DrawerHeader(
+            //   decoration: BoxDecoration(
+            //     color: Colors.blue,
+            //   ),
+            //   child: Text(
+            //     '知识树',
+            //     style: TextStyle(
+            //       color: Colors.white,
+            //       fontSize: 24,
+            //     ),
+            //   ),
+            // ),
             KnowledgeTree(onChangeCategory: (categoryId) {
               setState(() {
                 this._categoryId = categoryId;

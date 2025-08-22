@@ -39,20 +39,27 @@ class _KnowledgeListViewState extends ConsumerState<KnowledgeListView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: TextField(
-          controller: _searchController,
-          style: const TextStyle(color: Colors.white),
-          cursorColor: Colors.white,
-          decoration: const InputDecoration(
-            hintText: '搜索...',
-            hintStyle: TextStyle(color: Colors.white54),
-            border: InputBorder.none,
+        title: Text(
+          ref.watch(mathLevelProvider).value,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
-          onChanged: (value) {
-            // TODO: 实现搜索功能
-            debugPrint('搜索: $value');
-          },
         ),
+        // title: TextField(
+        //   controller: _searchController,
+        //   style: const TextStyle(color: Colors.white),
+        //   cursorColor: Colors.white,
+        //   decoration: const InputDecoration(
+        //     hintText: '搜索...',
+        //     hintStyle: TextStyle(color: Colors.white54),
+        //     border: InputBorder.none,
+        //   ),
+        //   onChanged: (value) {
+        //     // TODO: 实现搜索功能
+        //     debugPrint('搜索: $value');
+        //   },
+        // ),
       ),
       body: SafeArea(
         child: Column(
@@ -66,35 +73,35 @@ class _KnowledgeListViewState extends ConsumerState<KnowledgeListView> {
               },
             ),
             // 数学级别显示区域
-            Container(
-              padding: const EdgeInsets.all(8),
-              color: Colors.blue[50],
-              child: Row(
-                children: [
-                  const Icon(Icons.school, size: 16, color: Colors.blue),
-                  const SizedBox(width: 8),
-                  Text(
-                    '当前级别: ${currentMathLevel.value}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      // 切换数学级别
-                      final newLevel = currentMathLevel == MATH_LEVEL.Primary
-                          ? MATH_LEVEL.Advanced
-                          : MATH_LEVEL.Primary;
-                      ref.read(mathLevelProvider.notifier).state = newLevel;
-                    },
-                    child: const Text('切换级别', style: TextStyle(fontSize: 12)),
-                  ),
-                ],
-              ),
-            ),
+            // Container(
+            //   padding: const EdgeInsets.all(8),
+            //   color: Colors.blue[50],
+            //   child: Row(
+            //     children: [
+            //       const Icon(Icons.school, size: 16, color: Colors.blue),
+            //       const SizedBox(width: 8),
+            //       Text(
+            //         '当前级别: ${currentMathLevel.value}',
+            //         style: const TextStyle(
+            //           fontSize: 14,
+            //           fontWeight: FontWeight.w500,
+            //           color: Colors.blue,
+            //         ),
+            //       ),
+            //       const Spacer(),
+            //       TextButton(
+            //         onPressed: () {
+            //           // 切换数学级别
+            //           final newLevel = currentMathLevel == MATH_LEVEL.Primary
+            //               ? MATH_LEVEL.Advanced
+            //               : MATH_LEVEL.Primary;
+            //           ref.read(mathLevelProvider.notifier).state = newLevel;
+            //         },
+            //         child: const Text('切换级别', style: TextStyle(fontSize: 12)),
+            //       ),
+            //     ],
+            //   ),
+            // ),
             // 列表区域
             Expanded(
               child: Consumer(
