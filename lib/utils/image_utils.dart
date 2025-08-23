@@ -7,8 +7,6 @@ import 'package:flutter/widgets.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'format_util.dart';
-
 enum ImageFrom { camera, gallery }
 
 enum ImageFormat { png, jpg, gif, webp }
