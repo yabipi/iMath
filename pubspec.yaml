@@ -86,7 +86,8 @@ dependencies:
 ##      url: https://github.com/yabipi/flutter_math.git
 #      # 如果需要特定分支
 #      ref: main
-
+dependency_overrides:
+  sqflite_android: 2.4.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
