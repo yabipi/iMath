@@ -34,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isPortrait = size.height > size.width;
-    
+
     return Scaffold(
       body: Container(
         width: double.infinity,

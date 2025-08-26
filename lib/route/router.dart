@@ -38,20 +38,29 @@ import 'package:imath/pages/user/about_me.dart';
 import 'package:imath/pages/user/avatar_edit.dart';
 import 'package:imath/pages/user/help.dart';
 
-import 'package:imath/pages/user/phone_login.dart';
+import 'package:imath/pages/user/login.dart';
 import 'package:imath/pages/user/pincode_input.dart';
 
 import 'package:imath/pages/user/profile_screen.dart';
 import 'package:imath/pages/user/feedback_screen.dart';
 import 'package:imath/pages/user/register.dart';
+import 'package:imath/pages/user/forgot_password.dart';
+import 'package:imath/pages/user/reset_password.dart';
 import 'package:imath/pages/user/settings.dart';
 import 'package:imath/pages/user/slider_captcha_client_verify.dart';
+import 'package:imath/utils/device_util.dart';
+import 'package:flutter/foundation.dart';
 
 final router = GoRouter(
-  initialLocation: '/splash',
+  initialLocation: kIsWeb ? '/home' : '/splash',
   observers: [FlutterSmartDialog.observer],
-  redirect: (context, state) =>
-      state.uri.toString() == '/' ? '/knowledge' : null,
+  redirect: (context, state) {
+    // 简化重定向逻辑，避免干扰正常跳转
+    if (state.uri.toString() == '/') {
+      return kIsWeb ? '/home' : '/splash';
+    }
+    return null;
+  },
   routes: [
     // SplashScreen
     GoRoute(
@@ -151,6 +160,17 @@ final router = GoRouter(
       builder: (context, state) => RegisterPage(),
     ),
     GoRoute(
+      path: '/forgot-password',
+      builder: (context, state) => ForgotPasswordPage(),
+    ),
+    GoRoute(
+      path: '/reset-password',
+      builder: (context, state) {
+        final String? phone = state.uri.queryParameters['phone'];
+        return ResetPasswordPage(phone: phone ?? '');
+      },
+    ),
+    GoRoute(
       path: '/captcha',
       builder: (context, state) => SliderCaptchaClientVerify(
         title: '人机验证',
@@ -161,7 +181,19 @@ final router = GoRouter(
       builder: (context, state) {
         final String? phone = state.uri.queryParameters['phone'];
         final String? password = state.uri.queryParameters['password'];
-        return PinputScreen(phone: phone ?? '', password: password ?? '');
+        final String? username = state.uri.queryParameters['username'];
+        final bool? isRegister =
+            state.uri.queryParameters['isRegister'] == 'true';
+        final bool? isForgotPassword =
+            state.uri.queryParameters['isForgotPassword'] == 'true';
+
+        return PinputScreen(
+          phone: phone ?? '',
+          password: password ?? '',
+          username: username,
+          isRegister: isRegister,
+          isForgotPassword: isForgotPassword,
+        );
       },
     ),
     // 管理员入口

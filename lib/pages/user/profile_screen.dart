@@ -12,7 +12,7 @@ import '../../controllers/user_controller.dart';
 import 'login_screen.dart';
 import '../admin/camera_screen.dart';
 import '../admin/admin_screen.dart';
-import 'phone_login.dart';
+import 'login.dart';
 
 // extends GetView<LoginController>
 class ProfileScreen extends ConsumerWidget {

@@ -4,7 +4,6 @@ class HttpString {
   static const String baseUrl = 'https://www.icodelib.cn';
   static const String apiBaseUrl = 'https://api.icodelib.cn';
 
-
   static const List<int> validateStatusCodes = [
     302,
     304,
@@ -86,6 +85,7 @@ extension MATH_LEVEL_Extension on MATH_LEVEL {
     }
   }
 }
+
 enum PaperViewMode {
   // 默认
   DefaultMode,
@@ -101,7 +101,7 @@ enum ArticleType {
   hot(1, '热门文章'), // 热门文章
   experience(2, '治学经验'), // 治学经验
   story(3, '人物故事'), // 人物故事
-  problem(4, '难题欣赏'),// 难题欣赏
+  problem(4, '难题欣赏'), // 难题欣赏
   trends(5, '前沿动态');
 
   final int value;
@@ -141,6 +141,7 @@ class ApiCode {
 
   // 用户模块
   static const int NEW_USER = 101;
+  static const int PHONE_REGISTERED_API_CODE = 102;
   // 自定义业务错误码（可根据实际后端定义调整）
   static const int CUSTOM_ERROR_START = 600;
 

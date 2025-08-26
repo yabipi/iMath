@@ -88,26 +88,28 @@ class _LoginPageState extends State<PhoneLoginPage> {
               // ),
               const SizedBox(height: 16),
 
-              // 手机号输入框
+              // 用户名输入框
               Container(
                 width: MediaQuery.of(context).size.width * 0.8,
                 child: TextField(
-                  controller: _phoneController,
+                  controller: _phoneController, // 复用现有的controller，但用于用户名
                   decoration: InputDecoration(
-                    hintText: '请输入手机号',
+                    hintText: '请输入用户名',
                     hintStyle: TextStyle(color: Colors.grey.shade400),
                     border: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue.shade400, width: 2),
+                      borderSide:
+                          BorderSide(color: Colors.blue.shade400, width: 2),
                     ),
                     filled: true,
                     fillColor: Colors.grey.shade50,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
                     isDense: true, // 减少内部间距
                   ),
-                  keyboardType: TextInputType.phone,
+                  keyboardType: TextInputType.text,
                 ),
               ),
               const SizedBox(height: 12),
@@ -124,25 +126,27 @@ class _LoginPageState extends State<PhoneLoginPage> {
                       borderSide: BorderSide(color: Colors.grey),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue.shade400, width: 2),
+                      borderSide:
+                          BorderSide(color: Colors.blue.shade400, width: 2),
                     ),
                     filled: true,
                     fillColor: Colors.grey.shade50,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
                     isDense: true, // 减少内部间距
                   ),
-                  keyboardType: TextInputType.phone,
+                  keyboardType: TextInputType.visiblePassword,
                 ),
               ),
               // 手机号说明文字
-              const SizedBox(height: 8),
-              Text(
-                '当前仅支持中国大陆手机号登录，新用户首次验证通过后即自动完成注册',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade500,
-                ),
-              ),
+              // const SizedBox(height: 8),
+              // Text(
+              //   '当前仅支持中国大陆手机号登录，新用户首次验证通过后即自动完成注册',
+              //   style: TextStyle(
+              //     fontSize: 12,
+              //     color: Colors.grey.shade500,
+              //   ),
+              // ),
               const SizedBox(height: 24),
 
               // 协议勾选选项
@@ -221,35 +225,36 @@ class _LoginPageState extends State<PhoneLoginPage> {
                   minHeight: 48,
                 ),
                 child: ElevatedButton(
-                  onPressed: _agreedToTerms ? () async {
-                    // 这里可处理登录逻辑，比如校验手机号、调用接口等
-                    String phoneNumber = _phoneController.text.trim();
-                    String passwd = _passwdController.text.trim();
-                    if (phoneNumber.isNotEmpty) {
-                      if(!PhoneValidator.isValid(phoneNumber)) {
-                        SmartDialog.showToast('请输入合法的手机号码!');
-                        return;
-                      }
-                      // 手动添加+86前缀
-                      // String fullPhoneNumber = '+86$phoneNumber';
-                      // debugPrint('点击了立即登录，手机号：$fullPhoneNumber');
-                      final res = await AuthHttp.signIn(phoneNumber, passwd) as Map;
-                      if (res['code'] == ApiCode.NEW_USER) {
-                        // 新用户需要验证手机号是否合法
-                        await AuthHttp.sendCaptcha(phoneNumber);
-                        SmartDialog.showToast('验证码已发送');
-                        context.go('/verifycode?phone=${phoneNumber}&password=${passwd}');
-                      } else if (res['code'] == ApiCode.INTERNAL_SERVER_ERROR) {
-                        SmartDialog.showToast(res['message']);
-                      } else if (res['code'] == ApiCode.SUCCESS){
-                        AuthService.saveUser(res);
-                        // 登录成功，跳转到用户中心
-                        context.go('/profile');
-                      }
-                    } else {
-                      SmartDialog.showToast('请输入手机号');
-                    }
-                  } : null, // 如果未同意协议，按钮禁用
+                  onPressed: _agreedToTerms
+                      ? () async {
+                          // 这里可处理登录逻辑，比如校验用户名、调用接口等
+                          String username = _phoneController.text.trim();
+                          String passwd = _passwdController.text.trim();
+                          if (username.isNotEmpty) {
+                            if (username.length < 3) {
+                              SmartDialog.showToast('用户名长度不能少于3位!');
+                              return;
+                            }
+                            // 调用登录接口
+                            final res =
+                                await AuthHttp.signIn(username, passwd) as Map;
+                            if (res['code'] == ApiCode.NEW_USER) {
+                              // 新用户需要验证手机号是否合法
+                              SmartDialog.showToast('用户不存在，请先注册');
+                              context.go('/register');
+                            } else if (res['code'] ==
+                                ApiCode.INTERNAL_SERVER_ERROR) {
+                              SmartDialog.showToast(res['message']);
+                            } else if (res['code'] == ApiCode.SUCCESS) {
+                              AuthService.saveUser(res);
+                              // 登录成功，跳转到用户中心
+                              context.go('/profile');
+                            }
+                          } else {
+                            SmartDialog.showToast('请输入用户名');
+                          }
+                        }
+                      : null, // 如果未同意协议，按钮禁用
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue.shade400,
                     foregroundColor: Colors.white,
@@ -257,7 +262,8 @@ class _LoginPageState extends State<PhoneLoginPage> {
                       borderRadius: BorderRadius.circular(24),
                     ),
                     elevation: 2,
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 12),
                   ),
                   child: const Text(
                     '登录',
@@ -267,6 +273,41 @@ class _LoginPageState extends State<PhoneLoginPage> {
                     ),
                   ),
                 ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // 注册和忘记密码链接
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      context.go('/register');
+                    },
+                    child: Text(
+                      '注册',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.blue.shade400,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      context.go('/forgot-password');
+                    },
+                    child: Text(
+                      '忘记密码',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.blue.shade400,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -285,9 +326,10 @@ class _LoginPageState extends State<PhoneLoginPage> {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Container(
-            height: MediaQuery.of(context).size.height - 
-                   MediaQuery.of(context).padding.top - 
-                   MediaQuery.of(context).padding.bottom - 100, // 减去状态栏和底部导航栏高度
+            height: MediaQuery.of(context).size.height -
+                MediaQuery.of(context).padding.top -
+                MediaQuery.of(context).padding.bottom -
+                100, // 减去状态栏和底部导航栏高度
             width: MediaQuery.of(context).size.width * 0.9,
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -369,9 +411,10 @@ class _LoginPageState extends State<PhoneLoginPage> {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Container(
-            height: MediaQuery.of(context).size.height - 
-                   MediaQuery.of(context).padding.top - 
-                   MediaQuery.of(context).padding.bottom - 100, // 减去状态栏和底部导航栏高度
+            height: MediaQuery.of(context).size.height -
+                MediaQuery.of(context).padding.top -
+                MediaQuery.of(context).padding.bottom -
+                100, // 减去状态栏和底部导航栏高度
             width: MediaQuery.of(context).size.width * 0.9,
             padding: const EdgeInsets.all(20),
             child: Column(

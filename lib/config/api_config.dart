@@ -6,12 +6,11 @@ enum Environment {
   LOCAL,
 }
 
-
 class ApiConfig {
   static const String baseUrl = '';
 
   static const int sessionTimeoutThreshold =
-  0; // Will refresh the access token 5 minutes before it expires
+      0; // Will refresh the access token 5 minutes before it expires
   static const bool loginWithPassword = true; // if false hide the form login
   //if false hide the fields password and confirm password from signup form
   //for security reason and the password generated after verification mail
@@ -25,11 +24,11 @@ class ApiConfig {
         return 'http://math.icodelib.cn';
       case Environment.DEV:
         return 'http://192.168.1.100:8888';
-        // return 'http://math.icodelib.cn';
+      // return 'http://math.icodelib.cn';
       case Environment.LOCAL:
-        return 'http://localhost:8888';
+        return 'http://localhost:8080';
       default:
-        return 'http://localhost:8888';
+        return 'http://localhost:8080';
     }
   }
 
@@ -42,6 +41,5 @@ class ApiConfig {
       default:
         return 'http://localhost:8080';
     }
-
   }
 }
