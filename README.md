@@ -21,6 +21,13 @@ flutter run --flavor staging --dart-define-from-file=.staging.json
 flutter build ios --release --flavor staging --dart-define-from-file=.staging.json
 flutter build apk --release --flavor staging --dart-define-from-file=.staging.json
 
+## 运行
+- flutter run -d web-server
+- flutter run -d web-server --web-port 8080
+- flutter run -d web-server --web-port 8080 --dart-define=ENV=local
+- flutter run -d chrome
+- flutter run -d chrome --release
+
 ## Flutter指引
 
 This project is a starting point for a Flutter application.
