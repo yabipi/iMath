@@ -142,11 +142,12 @@ class ApiCode {
   // 用户模块
   static const int NEW_USER = 101;
   static const int PHONE_REGISTERED_API_CODE = 102;
+  static const int USERNAME_ALREADY_EXISTS = 103;
+  static const int USER_NOT_FOUND = 104;
+  static const int INVALID_CREDENTIALS = 105;
   // 自定义业务错误码（可根据实际后端定义调整）
   static const int CUSTOM_ERROR_START = 600;
 
-  static const int USER_NOT_FOUND = 616;
-  static const int INVALID_CREDENTIALS = 617;
   static const int TOKEN_EXPIRED = 625;
   static const int TOKEN_INVALID = 626;
   static const int PERMISSION_DENIED = 628;

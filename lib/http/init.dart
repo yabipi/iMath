@@ -5,8 +5,7 @@ import 'dart:io';
 import 'dart:math' show Random;
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
-
-
+import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 import 'package:hive/hive.dart';
@@ -45,9 +44,9 @@ class Request {
       cookieManager = CookieManager(cookieJar);
       dio.interceptors.add(cookieManager);
     } else {
+      // Web平台启用cookie支持
       // dio.httpClientAdapter = BrowserHttpClientAdapter(withCredentials: true);
       // dio.options.extra['withCredentials'] = true;
-      // dio.httpClientAdapter = BrowserHttpClientAdapter(withCredentials: true);
     }
 
     // final List<Cookie> cookie = await cookieManager.cookieJar
@@ -85,13 +84,13 @@ class Request {
 
   // 从cookie中获取 csrf token
   // static Future<String> getCsrf() async {
-    // List<Cookie> cookies = await cookieManager.cookieJar
-    //     .loadForRequest(Uri.parse(HttpString.apiBaseUrl));
-    // String token = '';
-    // if (cookies.where((e) => e.name == 'bili_jct').isNotEmpty) {
-    //   token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
-    // }
-    // return token;
+  // List<Cookie> cookies = await cookieManager.cookieJar
+  //     .loadForRequest(Uri.parse(HttpString.apiBaseUrl));
+  // String token = '';
+  // if (cookies.where((e) => e.name == 'bili_jct').isNotEmpty) {
+  //   token = cookies.firstWhere((e) => e.name == 'bili_jct').value;
+  // }
+  // return token;
   // }
 
   // static Future<String> getBuvid() async {
@@ -302,7 +301,7 @@ class Request {
         data: data,
         queryParameters: queryParameters,
         options:
-        options ?? Options(contentType: Headers.formUrlEncodedContentType),
+            options ?? Options(contentType: Headers.formUrlEncodedContentType),
         cancelToken: cancelToken,
       );
       // print('post success: ${response.data}');

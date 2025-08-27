@@ -17,6 +17,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   bool _isLoading = false;
+  bool _agreedToTerms = false; // 是否同意协议
 
   @override
   Widget build(BuildContext context) {
@@ -166,6 +167,76 @@ class _RegisterPageState extends State<RegisterPage> {
                 maxLength: 20,
               ),
 
+              const SizedBox(height: 20),
+
+              // 用户协议勾选选项
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Transform.scale(
+                    scale: 0.9,
+                    child: Checkbox(
+                      value: _agreedToTerms,
+                      onChanged: (value) {
+                        setState(() {
+                          _agreedToTerms = value ?? false;
+                        });
+                      },
+                      activeColor: Colors.blue.shade400,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _agreedToTerms = !_agreedToTerms;
+                      });
+                    },
+                    child: RichText(
+                      text: TextSpan(
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                        children: [
+                          const TextSpan(text: '我已阅读并同意'),
+                          WidgetSpan(
+                            child: GestureDetector(
+                              onTap: () => _showUserAgreementDialog(context),
+                              child: Text(
+                                '《用户协议》',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.blue.shade400,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const TextSpan(text: '和'),
+                          WidgetSpan(
+                            child: GestureDetector(
+                              onTap: () => _showPrivacyPolicyDialog(context),
+                              child: Text(
+                                '《隐私政策》',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.blue.shade400,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
               const SizedBox(height: 40),
 
               // 提交按钮
@@ -270,6 +341,11 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
+    if (!_agreedToTerms) {
+      SmartDialog.showToast('请阅读并同意用户协议和隐私政策');
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -296,6 +372,104 @@ class _RegisterPageState extends State<RegisterPage> {
         _isLoading = false;
       });
     }
+  }
+
+  void _showUserAgreementDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('用户协议'),
+          content: SingleChildScrollView(
+            child: Text(
+              '欢迎使用iMath数学学习应用！\n\n'
+              '1. 服务说明\n'
+              'iMath是一款专为数学学习设计的移动应用，提供数学题目、知识点讲解、文化科普等服务。\n\n'
+              '2. 用户责任\n'
+              '用户应遵守相关法律法规，不得利用本应用进行任何违法活动。\n\n'
+              '3. 知识产权\n'
+              '本应用的所有内容均受知识产权保护，用户不得擅自复制、传播。\n\n'
+              '4. 隐私保护\n'
+              '我们重视用户隐私，具体保护措施请参考《隐私政策》。\n\n'
+              '5. 服务变更\n'
+              '我们保留随时修改或终止服务的权利。\n\n'
+              '6. 免责声明\n'
+              '在法律允许的范围内，我们不承担因使用本应用而产生的任何损失。\n\n'
+              '7. 协议更新\n'
+              '本协议可能会不定期更新，更新后的协议将在应用内公布。\n\n'
+              '8. 联系方式\n'
+              '如有疑问，请联系我们的客服团队。',
+              style: TextStyle(fontSize: 14, height: 1.5),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('关闭'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showPrivacyPolicyDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('隐私政策'),
+          content: SingleChildScrollView(
+            child: Text(
+              '隐私政策\n\n'
+              '1. 信息收集\n'
+              '我们可能收集以下信息：\n'
+              '• 设备信息（设备型号、操作系统版本等）\n'
+              '• 使用数据（学习记录、答题情况等）\n'
+              '• 账户信息（用户名、手机号等）\n\n'
+              '2. 信息使用\n'
+              '收集的信息将用于：\n'
+              '• 提供个性化学习服务\n'
+              '• 改进应用功能和用户体验\n'
+              '• 发送重要通知和更新\n\n'
+              '3. 信息保护\n'
+              '我们采用行业标准的安全措施保护您的信息：\n'
+              '• 数据加密传输和存储\n'
+              '• 访问权限控制\n'
+              '• 定期安全审计\n\n'
+              '4. 信息共享\n'
+              '我们不会向第三方出售、出租或共享您的个人信息，除非：\n'
+              '• 获得您的明确同意\n'
+              '• 法律要求或政府要求\n'
+              '• 保护我们的合法权益\n\n'
+              '5. 您的权利\n'
+              '您有权：\n'
+              '• 访问和更正您的个人信息\n'
+              '• 删除您的账户\n'
+              '• 撤回同意\n'
+              '• 投诉举报\n\n'
+              '6. 儿童隐私\n'
+              '我们不会故意收集13岁以下儿童的个人信息。\n\n'
+              '7. 政策更新\n'
+              '本政策可能会更新，更新后将在应用内通知。\n\n'
+              '8. 联系我们\n'
+              '如有隐私相关问题，请联系我们的隐私保护团队。',
+              style: TextStyle(fontSize: 14, height: 1.5),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('关闭'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

@@ -46,6 +46,7 @@ import 'package:imath/pages/user/feedback_screen.dart';
 import 'package:imath/pages/user/register.dart';
 import 'package:imath/pages/user/forgot_password.dart';
 import 'package:imath/pages/user/reset_password.dart';
+import 'package:imath/pages/user/change_password.dart';
 import 'package:imath/pages/user/settings.dart';
 import 'package:imath/pages/user/slider_captcha_client_verify.dart';
 import 'package:imath/utils/device_util.dart';
@@ -126,6 +127,10 @@ final router = GoRouter(
           GoRoute(
             path: 'settings',
             builder: (context, state) => SettingsPage(),
+          ),
+          GoRoute(
+            path: 'change-password',
+            builder: (context, state) => ChangePasswordPage(),
           ),
           GoRoute(
             path: 'about',

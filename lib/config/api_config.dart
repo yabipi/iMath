@@ -18,6 +18,17 @@ class ApiConfig {
 
   static Environment environment = Environment.PROD;
 
+  static String get AUTH_BASE_URL {
+    switch (environment) {
+      case Environment.PROD:
+        return 'http://auth.icodelib.cn';
+      case Environment.DEV:
+        return 'http://192.168.1.100:5555';
+      case Environment.LOCAL:
+        return 'http://localhost:5555';
+    }
+  }
+
   static String get SERVER_BASE_URL {
     switch (environment) {
       case Environment.PROD:

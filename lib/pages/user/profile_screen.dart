@@ -190,6 +190,15 @@ class ProfileScreen extends ConsumerWidget {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.lock),
+            title: const Text('修改密码'),
+            trailing: const Icon(Icons.arrow_forward_ios),
+            onTap: () {
+              // 导航到修改密码页面
+              context.push('/profile/change-password');
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.help),
             title: const Text('意见反馈'),
             trailing: const Icon(Icons.arrow_forward_ios),

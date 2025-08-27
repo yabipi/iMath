@@ -16,7 +16,6 @@ class PhoneLoginPage extends StatefulWidget {
 class _LoginPageState extends State<PhoneLoginPage> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwdController = TextEditingController();
-  bool _agreedToTerms = false; // 是否同意协议
 
   @override
   Widget build(BuildContext context) {
@@ -149,75 +148,6 @@ class _LoginPageState extends State<PhoneLoginPage> {
               // ),
               const SizedBox(height: 24),
 
-              // 协议勾选选项
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Transform.scale(
-                    scale: 0.9,
-                    child: Checkbox(
-                      value: _agreedToTerms,
-                      onChanged: (value) {
-                        setState(() {
-                          _agreedToTerms = value ?? false;
-                        });
-                      },
-                      activeColor: Colors.blue.shade400,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 2), // 减少间距，让勾选框离文字更近
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _agreedToTerms = !_agreedToTerms;
-                      });
-                    },
-                    child: RichText(
-                      text: TextSpan(
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                        children: [
-                          const TextSpan(text: '我已阅读并同意'),
-                          WidgetSpan(
-                            child: GestureDetector(
-                              onTap: () => _showUserAgreementDialog(context),
-                              child: Text(
-                                '《用户协议》',
-                                style: TextStyle(
-                                  fontSize: 14, // 统一字体大小为14
-                                  color: Colors.blue.shade400,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const TextSpan(text: '和'),
-                          WidgetSpan(
-                            child: GestureDetector(
-                              onTap: () => _showPrivacyPolicyDialog(context),
-                              child: Text(
-                                '《隐私政策》',
-                                style: TextStyle(
-                                  fontSize: 14, // 统一字体大小为14
-                                  color: Colors.blue.shade400,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 32),
-
               // 登录按钮 - 适配字体宽度
               Container(
                 constraints: const BoxConstraints(
@@ -225,36 +155,38 @@ class _LoginPageState extends State<PhoneLoginPage> {
                   minHeight: 48,
                 ),
                 child: ElevatedButton(
-                  onPressed: _agreedToTerms
-                      ? () async {
-                          // 这里可处理登录逻辑，比如校验用户名、调用接口等
-                          String username = _phoneController.text.trim();
-                          String passwd = _passwdController.text.trim();
-                          if (username.isNotEmpty) {
-                            if (username.length < 3) {
-                              SmartDialog.showToast('用户名长度不能少于3位!');
-                              return;
-                            }
-                            // 调用登录接口
-                            final res =
-                                await AuthHttp.signIn(username, passwd) as Map;
-                            if (res['code'] == ApiCode.NEW_USER) {
-                              // 新用户需要验证手机号是否合法
-                              SmartDialog.showToast('用户不存在，请先注册');
-                              context.go('/register');
-                            } else if (res['code'] ==
-                                ApiCode.INTERNAL_SERVER_ERROR) {
-                              SmartDialog.showToast(res['message']);
-                            } else if (res['code'] == ApiCode.SUCCESS) {
-                              AuthService.saveUser(res);
-                              // 登录成功，跳转到用户中心
-                              context.go('/profile');
-                            }
-                          } else {
-                            SmartDialog.showToast('请输入用户名');
-                          }
-                        }
-                      : null, // 如果未同意协议，按钮禁用
+                  onPressed: () async {
+                    // 这里可处理登录逻辑，比如校验用户名、调用接口等
+                    String username = _phoneController.text.trim();
+                    String passwd = _passwdController.text.trim();
+                    if (username.isNotEmpty) {
+                      // 调用登录接口
+                      final res =
+                          await AuthHttp.signIn(username, passwd) as Map;
+                      if (res['code'] == ApiCode.NEW_USER) {
+                        // 新用户需要验证手机号是否合法
+                        SmartDialog.showToast('用户不存在，请先注册');
+                        context.go('/register');
+                      } else if (res['code'] == 104) {
+                        // USER_NOT_FOUND
+                        SmartDialog.showToast('用户名不存在');
+                      } else if (res['code'] == 105) {
+                        // INVALID_CREDENTIALS
+                        SmartDialog.showToast('密码错误');
+                      } else if (res['code'] == ApiCode.INTERNAL_SERVER_ERROR) {
+                        SmartDialog.showToast(res['message']);
+                      } else if (res['code'] == ApiCode.SUCCESS) {
+                        AuthService.saveUser(res);
+                        // 登录成功，跳转到用户中心
+                        context.go('/profile');
+                      } else {
+                        // 处理其他错误情况
+                        SmartDialog.showToast(res['message'] ?? '登录失败，请重试');
+                      }
+                    } else {
+                      SmartDialog.showToast('请输入用户名');
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue.shade400,
                     foregroundColor: Colors.white,
@@ -316,189 +248,10 @@ class _LoginPageState extends State<PhoneLoginPage> {
     );
   }
 
-  // 显示用户协议对话框
-  void _showUserAgreementDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Container(
-            height: MediaQuery.of(context).size.height -
-                MediaQuery.of(context).padding.top -
-                MediaQuery.of(context).padding.bottom -
-                100, // 减去状态栏和底部导航栏高度
-            width: MediaQuery.of(context).size.width * 0.9,
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
-                // 标题栏
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      '用户协议',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
-                ),
-                const Divider(),
-                const SizedBox(height: 16),
-                // 内容区域
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          '欢迎使用iMath数学学习应用！',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          '1. 服务说明\n'
-                          'iMath是一款专为数学学习设计的移动应用，提供数学题目、知识点讲解、文化科普等服务。\n\n'
-                          '2. 用户责任\n'
-                          '用户应遵守相关法律法规，不得利用本应用进行任何违法活动。\n\n'
-                          '3. 知识产权\n'
-                          '本应用的所有内容均受知识产权保护，用户不得擅自复制、传播。\n\n'
-                          '4. 隐私保护\n'
-                          '我们重视用户隐私，具体保护措施请参考《隐私政策》。\n\n'
-                          '5. 服务变更\n'
-                          '我们保留随时修改或终止服务的权利。\n\n'
-                          '6. 免责声明\n'
-                          '在法律允许的范围内，我们不承担因使用本应用而产生的任何损失。\n\n'
-                          '7. 协议更新\n'
-                          '本协议可能会不定期更新，更新后的协议将在应用内公布。\n\n'
-                          '8. 联系方式\n'
-                          '如有疑问，请联系我们的客服团队。',
-                          style: TextStyle(
-                            fontSize: 14,
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  // 显示隐私政策对话框
-  void _showPrivacyPolicyDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Container(
-            height: MediaQuery.of(context).size.height -
-                MediaQuery.of(context).padding.top -
-                MediaQuery.of(context).padding.bottom -
-                100, // 减去状态栏和底部导航栏高度
-            width: MediaQuery.of(context).size.width * 0.9,
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
-                // 标题栏
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      '隐私政策',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
-                ),
-                const Divider(),
-                const SizedBox(height: 16),
-                // 内容区域
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          '隐私政策',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          '1. 信息收集\n'
-                          '我们可能收集以下信息：\n'
-                          '• 设备信息（设备型号、操作系统版本等）\n'
-                          '• 使用数据（学习记录、答题情况等）\n'
-                          '• 账户信息（用户名、手机号等）\n\n'
-                          '2. 信息使用\n'
-                          '收集的信息将用于：\n'
-                          '• 提供个性化学习服务\n'
-                          '• 改进应用功能和用户体验\n'
-                          '• 发送重要通知和更新\n\n'
-                          '3. 信息保护\n'
-                          '我们采用行业标准的安全措施保护您的信息：\n'
-                          '• 数据加密传输和存储\n'
-                          '• 访问权限控制\n'
-                          '• 定期安全审计\n\n'
-                          '4. 信息共享\n'
-                          '我们不会向第三方出售、出租或共享您的个人信息，除非：\n'
-                          '• 获得您的明确同意\n'
-                          '• 法律要求或政府要求\n'
-                          '• 保护我们的合法权益\n\n'
-                          '5. 您的权利\n'
-                          '您有权：\n'
-                          '• 访问和更正您的个人信息\n'
-                          '• 删除您的账户\n'
-                          '• 撤回同意\n'
-                          '• 投诉举报\n\n'
-                          '6. 儿童隐私\n'
-                          '我们不会故意收集13岁以下儿童的个人信息。\n\n'
-                          '7. 政策更新\n'
-                          '本政策可能会更新，更新后将在应用内通知。\n\n'
-                          '8. 联系我们\n'
-                          '如有隐私相关问题，请联系我们的隐私保护团队。',
-                          style: TextStyle(
-                            fontSize: 14,
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _passwdController.dispose();
+    super.dispose();
   }
 }
