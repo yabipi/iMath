@@ -178,14 +178,14 @@ class AuthService extends ApiService {
     }
   }
 
-  static void saveUser(result) {
-    final user = User.fromJson(result[Constants.USER_KEY]);
-    String token = result[Constants.USER_TOKEN];
+  static void saveUser(ResponseData result) {
+    final user = User.fromJson(result.getValue<Map<String, dynamic>>(Constants.USER_KEY) ?? {});
+    String token = result.getValue<String>(Constants.USER_TOKEN) ?? '';
 
     if (token.isNotEmpty) {
       GStorage.userInfo.put(Constants.USER_TOKEN, token);
     }
-    GStorage.userInfo.put(Constants.USER_KEY, result[Constants.USER_KEY]);
+    GStorage.userInfo.put(Constants.USER_KEY, result.getValue<Map<String, dynamic>>(Constants.USER_KEY) ?? {});
     // 刷新当前用户
     GlobalState.currentUser = user;
   }

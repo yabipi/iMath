@@ -108,7 +108,7 @@ class _PinputScreenState extends State<PinputScreen> {
       if (_result != null && (_result.code == SUCCESS)) {
         // SmartDialog.showToast('注册成功');
         // 可选：保存用户并进入个人中心
-        String verification_token = _result.payload['verification_token'];
+        String verification_token = _result.getValue<String>('verification_token') ?? '';
         final ResponseData result = await AuthHttp.register(
             widget.username!,
             widget.phone, // 传递用户名参数
@@ -118,9 +118,9 @@ class _PinputScreenState extends State<PinputScreen> {
         if (result != null && result.code == SUCCESS) {
           // 登录成功
           SmartDialog.showToast('注册成功');
-          // 保存用户信息
-          try {
-            AuthService.saveUser(result.payload);
+                      // 保存用户信息
+            try {
+              AuthService.saveUser(result);
             await Future.delayed(const Duration(milliseconds: 300));
             if (mounted) context.go('/profile');
           } catch (_) {

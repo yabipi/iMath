@@ -167,7 +167,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       final ResponseData res =
                           await AuthHttp.signIn(username, passwd);
                       if (res.code == SUCCESS) {
-                        AuthService.saveUser(res.payload);
+                        AuthService.saveUser(res);
                         ref.read(loggingStateProvider.notifier).state = true;
                         // 登录成功，跳转到用户中心
                         context.go('/profile');
