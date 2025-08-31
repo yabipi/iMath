@@ -1,59 +1,73 @@
 import 'package:dio/dio.dart';
 import 'package:imath/config/api_config.dart';
+import 'package:imath/http/payload.dart';
 import 'init.dart';
 
 class AuthHttp {
-  static Future sendCaptcha(String phoneNumber) async {
+
+  static Future<ResponseData> register(String username, String phoneNumber, String password, String verification_token) async {
+    final response = await Request().post(
+      '${ApiConfig.AUTH_BASE_URL}/api/v1/auth/register',
+      options: Options(contentType: Headers.jsonContentType),
+      data: {
+        'username': username,
+        'phone': phoneNumber,
+        'password': password,
+        'verification_token': verification_token,
+      },
+    );
+    return ResponseData.fromJson(response.data);
+  }
+
+  static Future<ResponseData> sendCaptcha(String phoneNumber) async {
     final response = await Request().post(
       '${ApiConfig.AUTH_BASE_URL}/api/v1/auth/sendCaptcha',
       options: Options(contentType: Headers.jsonContentType),
       data: {'phone': phoneNumber},
     );
-    return response.data;
+    return ResponseData.fromJson(response.data);
   }
 
-  static Future verifyCaptcha(String phone, String captcha, String? password,
-      {String? username}) async {
+  static Future<ResponseData> verifyCaptcha(String phone, String captcha, String type) async {
     final response = await Request().post(
       '${ApiConfig.AUTH_BASE_URL}/api/v1/auth/verifyCaptcha',
       options: Options(contentType: Headers.jsonContentType),
       data: {
-        'captcha': captcha,
         'phone': phone,
-        'password': password,
-        'username': username,
+        'captcha': captcha,
+        'type': type,
       },
     );
-    return response.data;
+    return ResponseData.fromJson(response.data);
   }
 
-  static Future<dynamic> signIn(username, password) async {
+  static Future<ResponseData> signIn(username, password) async {
     final response = await Request().post(
         '${ApiConfig.AUTH_BASE_URL}/api/v1/auth/login',
         options: Options(contentType: Headers.jsonContentType),
         data: {'username': username, 'password': password});
-    return response.data;
+    return ResponseData.fromJson(response.data);
   }
 
-  static Future<dynamic> signOut(username) async {
+  static Future<ResponseData> signOut(username) async {
     final response = await Request().post(
         '${ApiConfig.AUTH_BASE_URL}/api/v1/auth/logout',
         options: Options(contentType: Headers.jsonContentType),
         data: {
           'username': username,
         });
-    return response.data;
+    return ResponseData.fromJson(response.data);
   }
 
-  static Future<dynamic> changePassword(
+  static Future<ResponseData> changePassword(
       String oldPassword, String newPassword) async {
-    final response = await Request().post(
-        '${ApiConfig.AUTH_BASE_URL}/api/v1/auth/changePassword',
-        options: Options(contentType: Headers.jsonContentType),
-        data: {
-          'oldPassword': oldPassword,
-          'newPassword': newPassword,
-        });
-    return response.data;
+      final response = await Request().post(
+          '${ApiConfig.AUTH_BASE_URL}/api/v1/auth/changePassword',
+          options: Options(contentType: Headers.jsonContentType),
+          data: {
+            'oldPassword': oldPassword,
+            'newPassword': newPassword,
+          });
+    return ResponseData.fromJson(response.data);
   }
 }

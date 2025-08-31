@@ -5,24 +5,29 @@ import 'package:dio/dio.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 import 'package:hive/hive.dart';
+import 'package:imath/config/constants.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 import '../db/Storage.dart';
-
+import 'package:imath/route/global_router.dart'; // 添加全局路由管理器
 
 class ApiInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    // print("请求之前");
     // 在请求之前添加头部或认证信息
+    // 跳过部分请求
+    if (options.path.contains("/login")) {
+      handler.next(options);
+      return;
+    }
     // print(options.path);
-    String token = GStorage.userInfo.get('token') ?? '';
+    String token = GStorage.userInfo.get(Constants.USER_TOKEN) ?? '';
 
     if (token.isNotEmpty) {
       try {
         Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
         final role = decodedToken['role'];
-        print('Role: $role');
+        // print('Role: $role');
         final exp = decodedToken['exp'];
         // 格式化 exp 时间戳为可读的日期时间格式
         // final formattedExp = DateTime.fromMillisecondsSinceEpoch(exp * 1000).toString();
@@ -31,17 +36,14 @@ class ApiInterceptor extends Interceptor {
         bool hasExpired = JwtDecoder.isExpired(token);
         if (!hasExpired) {
           options.headers['Authorization'] = 'Bearer $token';
-
         } else {
-          // 刷新token
-          // Get.toNamed('/login');
+          // token过期，跳转到登录页
+          GlobalRouter.goToLogin();
         }
       } catch (e) {
         print('Error decoding token: $e');
       }
-
     }
-
     // options.headers['Content-Type'] = 'application/json';
     handler.next(options);
   }
@@ -129,5 +131,40 @@ class ApiInterceptor extends Interceptor {
     } else {
       return '';
     }
+  }
+}
+
+class AuthInterceptor extends Interceptor {
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    // 获取token
+    String token = GStorage.userInfo.get('token') ?? '';
+    if (token.isNotEmpty) {
+      try {
+        Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+        bool hasExpired = JwtDecoder.isExpired(token);
+        if (!hasExpired) {
+          options.headers['Authorization'] = 'Bearer $token';
+        } else {
+          // token过期，跳转到登录页
+          GlobalRouter.goToLogin();
+        }
+      } catch (e) {
+        print('Error decoding token: $e');
+      }
+    }
+    handler.next(options);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    if (err.response?.statusCode == 401) {
+      // 清除本地token
+      GStorage.userInfo.delete('token');
+
+      // 使用全局路由跳转到登录页
+      GlobalRouter.goToLogin();
+    }
+    handler.next(err);
   }
 }

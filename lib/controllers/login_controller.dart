@@ -89,7 +89,7 @@ class LoginController extends AuthService{
   Future<void> logout() async {
     try {
       await signout();
-      context.go('/login');
+      // context.go('/login');
     } catch (err, _) {
       rethrow;
     }

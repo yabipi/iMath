@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
+import 'package:imath/constant/errors.dart';
 import 'package:imath/http/auth.dart';
+import 'package:imath/http/payload.dart';
 import 'package:imath/utils/phone_validator.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -184,14 +186,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
     try {
       // 调用后台发送验证码
-      final result = await AuthHttp.sendCaptcha(_phoneController.text.trim());
+      final ResponseData result = await AuthHttp.sendCaptcha(_phoneController.text.trim());
       
-      if (result['code'] == 200) {
+      if (result.code == SUCCESS) {
         SmartDialog.showToast('验证码已发送');
         // 跳转到验证码输入界面，标记为忘记密码流程
         context.go('/verifycode?phone=${_phoneController.text.trim()}&isForgotPassword=true');
       } else {
-        SmartDialog.showToast(result['message'] ?? '发送验证码失败');
+        SmartDialog.showToast(result.msg ?? '发送验证码失败');
       }
     } catch (e) {
       SmartDialog.showToast('网络错误，请重试');

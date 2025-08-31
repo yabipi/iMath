@@ -2,11 +2,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:imath/config/constants.dart';
 
 import 'package:imath/controllers/login_controller.dart';
 import 'package:imath/core/context.dart';
+import 'package:imath/db/Storage.dart';
 import 'package:imath/pages/common/bottom_navigation_bar.dart';
 import 'package:imath/state/global_state.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import '../../models/user.dart';
 import '../../controllers/user_controller.dart';
 import 'login_screen.dart';
@@ -14,39 +17,22 @@ import '../admin/camera_screen.dart';
 import '../admin/admin_screen.dart';
 import 'login.dart';
 
-// extends GetView<LoginController>
 class ProfileScreen extends ConsumerWidget {
   late LoginController controller;
-  late User? user;
-  // final _authService = const UserController();
 
   ProfileScreen({
-    super.key,
-    this.user,
+    super.key
   });
-
-  Future<void> _logout(BuildContext context) async {
-    try {
-      await controller.logout();
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('退出登录失败：$e')),
-        );
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    bool isLogged = ref.watch(loggingStateProvider);
+    if (!isLogged)
+      return LoginPage();
     controller = LoginController(context);
-    if (this.user == null) {
-      this.user = GlobalState.currentUser;
-    }
-    if (this.user == null)
-      return PhoneLoginPage();
-    else
-      return Scaffold(
+    final user = GlobalState.currentUser;
+
+    return Scaffold(
         appBar: AppBar(
           title: const Text('个人中心'),
           actions: [
@@ -56,12 +42,13 @@ class ProfileScreen extends ConsumerWidget {
             // ),
           ],
         ),
-        body: buildProfilePanel(context),
+        body: buildProfilePanel(context, ref),
         bottomNavigationBar: CustomBottomNavigationBar(),
       );
   }
 
-  Widget buildProfilePanel(BuildContext context) {
+  Widget buildProfilePanel(BuildContext context, WidgetRef ref) {
+    final user = GlobalState.currentUser;
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -230,10 +217,8 @@ class ProfileScreen extends ConsumerWidget {
             title: const Text('退出登录'),
             trailing: const Icon(Icons.exit_to_app),
             onTap: () {
-              // 导航到关于页面
-              context.go('/profile');
               _logout(context);
-              controller.logout();
+              ref.read(loggingStateProvider.notifier).state = false;
             },
           ),
           // ListTile(
@@ -261,5 +246,17 @@ class ProfileScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    try {
+      await controller.logout();
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('退出登录失败：$e')),
+        );
+      }
+    }
   }
 }

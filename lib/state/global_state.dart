@@ -1,14 +1,26 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:imath/config/constants.dart';
 import 'package:imath/db/Storage.dart';
 import 'package:imath/models/user.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-/**
- * 记录每个用户的全局状态
- */
+
+// 登录状态
+final loggingStateProvider = StateProvider<bool>((ref)  {
+  // 先检测是否已登录过期
+  String token = GStorage.userInfo.get(Constants.USER_TOKEN) ?? '';
+  bool hasExpired = JwtDecoder.isExpired(token);
+  DateTime expiredDate = JwtDecoder.getExpirationDate(token);
+  print(expiredDate);
+  return !hasExpired && GlobalState.currentUser != null;
+});
+
 class GlobalState {
   static final _state = Map<String, dynamic>();
 
   static String? token = null;
   static User? _currentUser;
+
+  static User? get currentUser => _currentUser;
   // 设置键值对
   static void set(String key, dynamic value) {
     _state[key] = value;
@@ -22,6 +34,28 @@ class GlobalState {
   // 删除键值对
   static void remove(String key) {
     _state.remove(key);
+  }
+
+  static set currentUser(User? user) {
+    _currentUser = user;
+  }
+
+  static bool isLogged() {
+    if (token == null || token!.isEmpty) {
+      return false;
+    }
+    bool hasExpired = JwtDecoder.isExpired(token!);
+    if (hasExpired) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  static void logout() {
+    GStorage.userInfo.delete('token');
+    token = null;
+    _currentUser = null;
   }
 
   static void refreshToken() {
@@ -43,25 +77,5 @@ class GlobalState {
     // }
   }
 
-  static User? get currentUser => _currentUser;
 
-  static set currentUser(User? user) {
-    _currentUser = user;
-  }
-
-  bool isLoggedIn() {
-    bool hasExpired = JwtDecoder.isExpired(token!);
-    if (!hasExpired) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-
-  void logout() {
-    GStorage.userInfo.delete('token');
-    token = null;
-    _currentUser = null;
-  }
 }

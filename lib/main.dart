@@ -22,6 +22,8 @@ import 'package:imath/utils/device_util.dart';
 import 'package:imath/http/index.dart';
 
 import 'package:imath/config/api_config.dart';
+import 'package:imath/route/global_router.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 import 'config/constants.dart';
 
@@ -100,7 +102,7 @@ void initWebView() {
 
 Future<void> initializeApp() async {
   // final dio = Dio();
-
+  GlobalRouter.init(router);
   await initMathData();
   if (DeviceUtil.isMobile) {
     // Initialize FFI

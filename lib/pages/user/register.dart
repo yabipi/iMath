@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
+import 'package:imath/constant/errors.dart';
 import 'package:imath/core/context.dart';
 import 'package:imath/http/auth.dart';
+import 'package:imath/http/payload.dart';
 import 'package:imath/utils/phone_validator.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -38,21 +40,8 @@ class _RegisterPageState extends State<RegisterPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 40),
-
+              const SizedBox(height: 10),
               // 标题
-              const Text(
-                '创建新账户',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              const SizedBox(height: 40),
-
               // 用户名输入框
               TextField(
                 controller: _usernameController,
@@ -352,18 +341,18 @@ class _RegisterPageState extends State<RegisterPage> {
 
     try {
       // 调用后台发送验证码
-      final result = await AuthHttp.sendCaptcha(_phoneController.text.trim());
+      final ResponseData result = await AuthHttp.sendCaptcha(_phoneController.text.trim());
 
-      if (result['code'] == 200) {
+      if (result.code == SUCCESS) {
         SmartDialog.showToast('验证码已发送');
         // 跳转到验证码输入界面，传递注册信息
         context.go(
             '/verifycode?phone=${_phoneController.text.trim()}&password=${_passwordController.text}&username=${_usernameController.text.trim()}&isRegister=true');
-      } else if (result['code'] == 102) {
+      } else if (result.code == Errors.PHONE_REGISTERED) {
         // PHONE_REGISTERED_API_CODE
         SmartDialog.showToast('该手机号已被注册');
       } else {
-        SmartDialog.showToast(result['message'] ?? '发送验证码失败');
+        SmartDialog.showToast('发送验证码失败');
       }
     } catch (e) {
       SmartDialog.showToast('网络错误，请重试');

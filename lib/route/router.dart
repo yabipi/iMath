@@ -119,8 +119,7 @@ final router = GoRouter(
     GoRoute(
         path: '/profile',
         builder: (context, state) {
-          final user = state.extra as User?;
-          return ProfileScreen(user: user);
+          return ProfileScreen();
         },
         routes: <RouteBase>[
           // Add child routes
@@ -158,7 +157,7 @@ final router = GoRouter(
     // 用户登录管理相关
     GoRoute(
       path: '/login',
-      builder: (context, state) => PhoneLoginPage(),
+      builder: (context, state) => LoginPage(),
     ),
     GoRoute(
       path: '/register',

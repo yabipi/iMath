@@ -23,7 +23,7 @@ class SqlManager {
     var userRes = await UserRepository.getUserInfoLocal();
     String dbName = _NAME;
     if (userRes != null && userRes.result) {
-      User? user = userRes.data;
+      User? user = userRes.payload;
       if (user != null && user.login != null) {
         dbName = "${user.login!}_$_NAME";
       }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
+import 'package:imath/constant/errors.dart';
 import 'package:imath/http/auth.dart';
+import 'package:imath/http/payload.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({Key? key}) : super(key: key);
@@ -290,19 +292,19 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
     try {
       // 调用后端修改密码接口
-      final result = await AuthHttp.changePassword(
+      final ResponseData result = await AuthHttp.changePassword(
         _oldPasswordController.text,
         _newPasswordController.text,
       );
 
-      if (result['code'] == 200) {
+      if (result.code == SUCCESS) {
         SmartDialog.showToast('密码修改成功');
         // 返回上一页
         if (context.mounted) {
           context.pop();
         }
       } else {
-        SmartDialog.showToast(result['message'] ?? '密码修改失败');
+        SmartDialog.showToast(result.msg ?? '密码修改失败');
       }
     } catch (e) {
       SmartDialog.showToast('网络错误，请重试');

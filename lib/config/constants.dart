@@ -58,7 +58,7 @@ class Constants {
       'https://www.mcbbs.net/template/mcbbs/image/special_photo_bg.png';
 
   static const String USER_KEY = "user";
-  static const String USER_TOKEN = "token";
+  static const String USER_TOKEN = "access_token";
 }
 
 const int ALL_CATEGORY = 0;
@@ -117,52 +117,52 @@ enum ContentFormat {
   lake;
 }
 
-class ApiCode {
-  // 成功
-  static const int SUCCESS = 200;
-
-  // 重定向
-  static const int REDIRECT = 302;
-  static const int NOT_MODIFIED = 304;
-
-  // 客户端错误
-  static const int BAD_REQUEST = 400;
-  static const int UNAUTHORIZED = 401;
-  static const int FORBIDDEN = 403;
-  static const int NOT_FOUND = 404;
-  static const int METHOD_NOT_ALLOWED = 405;
-  static const int CONFLICT = 409;
-  static const int PRECONDITION_FAILED = 412;
-
-  // 服务器错误
-  static const int INTERNAL_SERVER_ERROR = 500;
-  static const int SERVICE_UNAVAILABLE = 503;
-  static const int GATEWAY_TIMEOUT = 504;
-
-  // 用户模块
-  static const int NEW_USER = 101;
-  static const int PHONE_REGISTERED_API_CODE = 102;
-  static const int USERNAME_ALREADY_EXISTS = 103;
-  static const int USER_NOT_FOUND = 104;
-  static const int INVALID_CREDENTIALS = 105;
-  // 自定义业务错误码（可根据实际后端定义调整）
-  static const int CUSTOM_ERROR_START = 600;
-
-  static const int TOKEN_EXPIRED = 625;
-  static const int TOKEN_INVALID = 626;
-  static const int PERMISSION_DENIED = 628;
-  static const int RESOURCE_NOT_FOUND = 629;
-  static const int VALIDATION_FAILED = 632;
-  static const int RATE_LIMIT_EXCEEDED = 643;
-  static const int ACTION_FAILED = 650;
-  static const int DATA_ALREADY_EXISTS = 652;
-  static const int OPERATION_TIMEOUT = 658;
-  static const int NETWORK_ERROR = 662;
-  static const int FILE_TOO_LARGE = 688;
-  static const int UNSUPPORTED_FILE_TYPE = 689;
-  static const int PAYMENT_REQUIRED = 701;
-  static const int CUSTOM_ERROR_END = 799;
-
-  // 网络相关错误
-  static const int NETWORK_CONNECT_TIMEOUT_ERROR = 8888;
-}
+// class ApiCode {
+//   // 成功
+//   static const int SUCCESS = 200;
+//
+//   // 重定向
+//   static const int REDIRECT = 302;
+//   static const int NOT_MODIFIED = 304;
+//
+//   // 客户端错误
+//   static const int BAD_REQUEST = 400;
+//   static const int UNAUTHORIZED = 401;
+//   static const int FORBIDDEN = 403;
+//   static const int NOT_FOUND = 404;
+//   static const int METHOD_NOT_ALLOWED = 405;
+//   static const int CONFLICT = 409;
+//   static const int PRECONDITION_FAILED = 412;
+//
+//   // 服务器错误
+//   static const int INTERNAL_SERVER_ERROR = 500;
+//   static const int SERVICE_UNAVAILABLE = 503;
+//   static const int GATEWAY_TIMEOUT = 504;
+//
+//   // 用户模块
+//   static const int NEW_USER = 101;
+//   static const int PHONE_REGISTERED_API_CODE = 102;
+//   static const int USERNAME_ALREADY_EXISTS = 103;
+//   static const int USER_NOT_FOUND = 104;
+//   static const int INVALID_CREDENTIALS = 105;
+//   // 自定义业务错误码（可根据实际后端定义调整）
+//   static const int CUSTOM_ERROR_START = 600;
+//
+//   static const int TOKEN_EXPIRED = 625;
+//   static const int TOKEN_INVALID = 626;
+//   static const int PERMISSION_DENIED = 628;
+//   static const int RESOURCE_NOT_FOUND = 629;
+//   static const int VALIDATION_FAILED = 632;
+//   static const int RATE_LIMIT_EXCEEDED = 643;
+//   static const int ACTION_FAILED = 650;
+//   static const int DATA_ALREADY_EXISTS = 652;
+//   static const int OPERATION_TIMEOUT = 658;
+//   static const int NETWORK_ERROR = 662;
+//   static const int FILE_TOO_LARGE = 688;
+//   static const int UNSUPPORTED_FILE_TYPE = 689;
+//   static const int PAYMENT_REQUIRED = 701;
+//   static const int CUSTOM_ERROR_END = 799;
+//
+//   // 网络相关错误
+//   static const int NETWORK_CONNECT_TIMEOUT_ERROR = 8888;
+// }

@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:imath/config/constants.dart';
+
+import 'package:imath/constant/errors.dart';
 import 'package:imath/http/auth.dart';
 import 'package:go_router/go_router.dart';
+import 'package:imath/http/payload.dart';
 import 'package:imath/services/auth_service.dart';
-import 'package:imath/utils/phone_validator.dart';
+import 'package:imath/state/global_state.dart';
 
-class PhoneLoginPage extends StatefulWidget {
-  const PhoneLoginPage({Key? key}) : super(key: key);
+class LoginPage extends ConsumerStatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
-  State<PhoneLoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<PhoneLoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwdController = TextEditingController();
 
@@ -161,27 +164,28 @@ class _LoginPageState extends State<PhoneLoginPage> {
                     String passwd = _passwdController.text.trim();
                     if (username.isNotEmpty) {
                       // 调用登录接口
-                      final res =
-                          await AuthHttp.signIn(username, passwd) as Map;
-                      if (res['code'] == ApiCode.NEW_USER) {
+                      final ResponseData res =
+                          await AuthHttp.signIn(username, passwd);
+                      if (res.code == SUCCESS) {
+                        AuthService.saveUser(res.payload);
+                        ref.read(loggingStateProvider.notifier).state = true;
+                        // 登录成功，跳转到用户中心
+                        context.go('/profile');
+                      } else if (res.code == Errors.NEW_USER) {
                         // 新用户需要验证手机号是否合法
                         SmartDialog.showToast('用户不存在，请先注册');
                         context.go('/register');
-                      } else if (res['code'] == 104) {
+                      } else if (res.code == Errors.USER_NOT_FOUND) {
                         // USER_NOT_FOUND
                         SmartDialog.showToast('用户名不存在');
-                      } else if (res['code'] == 105) {
+                      } else if (res.code == Errors.PASSWORD_ERROR) {
                         // INVALID_CREDENTIALS
                         SmartDialog.showToast('密码错误');
-                      } else if (res['code'] == ApiCode.INTERNAL_SERVER_ERROR) {
-                        SmartDialog.showToast(res['message']);
-                      } else if (res['code'] == ApiCode.SUCCESS) {
-                        AuthService.saveUser(res);
-                        // 登录成功，跳转到用户中心
-                        context.go('/profile');
+                      } else if (res.code == Errors.INTERNAL_ERROR) {
+                        SmartDialog.showToast(res.msg);
                       } else {
                         // 处理其他错误情况
-                        SmartDialog.showToast(res['message'] ?? '登录失败，请重试');
+                        SmartDialog.showToast(res.msg);
                       }
                     } else {
                       SmartDialog.showToast('请输入用户名');

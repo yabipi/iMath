@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:imath/config/constants.dart';
+import 'package:imath/constant/errors.dart';
 
 import 'package:imath/http/auth.dart';
+import 'package:imath/http/payload.dart';
 import 'package:imath/state/global_state.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -163,8 +165,8 @@ class AuthService extends ApiService {
    */
   static Future<bool> signinWithPhone(String phone, String pincode, String? password) async {
     try {
-      final result = await AuthHttp.verifyCaptcha(phone, pincode, password);
-      if (result['code'] == ApiCode.SUCCESS) {
+      final ResponseData result = await AuthHttp.verifyCaptcha(phone, pincode, 'register');
+      if (result.code == SUCCESS) {
         // SmartDialog.showToast('验证码正确');
         saveUser(result);
         return true;

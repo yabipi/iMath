@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
+import 'package:imath/constant/errors.dart';
 
 import 'package:imath/http/auth.dart';
+import 'package:imath/http/payload.dart';
 import 'package:imath/models/user.dart';
 import 'package:imath/services/auth_service.dart';
 import 'package:imath/widgets/timer_button.dart';
@@ -97,26 +99,38 @@ class _PinputScreenState extends State<PinputScreen> {
 
   Future<void> _handleRegisterVerification(String pin) async {
     try {
-      final result = await AuthHttp.verifyCaptcha(
+      final ResponseData _result = await AuthHttp.verifyCaptcha(
         widget.phone,
         pin,
-        widget.password,
-        username: widget.username ?? '', // 传递用户名参数
+        'register',
       );
       // 后端按规范返回 { httpState, code, user, token, message }
-      if (result != null && (result['code'] == 200)) {
-        SmartDialog.showToast('注册成功');
+      if (_result != null && (_result.code == SUCCESS)) {
+        // SmartDialog.showToast('注册成功');
         // 可选：保存用户并进入个人中心
-        try {
-          AuthService.saveUser(result);
-          await Future.delayed(const Duration(milliseconds: 300));
-          if (mounted) context.go('/profile');
-        } catch (_) {
-          // 即使保存失败也允许返回登录
-          if (mounted) context.go('/login');
-        }
+        String verification_token = _result.payload['verification_token'];
+        final ResponseData result = await AuthHttp.register(
+            widget.username!,
+            widget.phone, // 传递用户名参数
+            widget.password!,
+            verification_token
+        );
+        if (result != null && result.code == SUCCESS) {
+          // 登录成功
+          SmartDialog.showToast('注册成功');
+          // 保存用户信息
+          try {
+            AuthService.saveUser(result.payload);
+            await Future.delayed(const Duration(milliseconds: 300));
+            if (mounted) context.go('/profile');
+          } catch (_) {
+            // 即使保存失败也允许返回登录
+            if (mounted) context.go('/login');
+          }
+         }
+
       } else {
-        SmartDialog.showToast(result?['message'] ?? '验证码验证失败');
+        SmartDialog.showToast(_result.msg ?? '验证码验证失败');
         pinController.clear();
       }
     } catch (e) {
@@ -128,7 +142,12 @@ class _PinputScreenState extends State<PinputScreen> {
   Future<void> _handleForgotPasswordVerification(String pin) async {
     // 这里应该调用忘记密码验证的API
     // 由于需求中没有明确的后端API，我们先模拟成功
-    if (pin == '123456') {
+    final ResponseData result = await AuthHttp.verifyCaptcha(
+      widget.phone,
+      pin,
+      'reset_password',
+    );
+    if (result.code == SUCCESS) {
       // 验证码写死为123456
       SmartDialog.showToast('验证成功');
       // 延迟一下再跳转

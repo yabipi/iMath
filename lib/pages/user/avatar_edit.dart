@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:imath/config/constants.dart';
+import 'package:imath/constant/errors.dart';
 import 'package:imath/state/global_state.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
@@ -593,7 +594,7 @@ class _AvatarEditScreenState extends State<AvatarEditScreen> {
       });
 
               // 检查响应结果
-        if (response['code'] == ApiCode.SUCCESS) {
+        if (response['code'] == SUCCESS) {
           // 更新本地用户信息
           if (currentUser != null) {
             // 更新用户头像信息
