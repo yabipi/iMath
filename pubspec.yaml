@@ -81,6 +81,7 @@ dependencies:
   flutter_quill_extensions: ^11.0.0
   flutter_html_math: ^3.0.0
   html_editor_enhanced: ^2.7.1
+  receive_sharing_intent: ^1.8.1
 
 #    git:
 ##      url: https://github.com/yabipi/flutter_math.git
