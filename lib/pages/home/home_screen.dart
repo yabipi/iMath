@@ -3,6 +3,9 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imath/config/config.dart';
 import 'package:imath/pages/common/bottom_navigation_bar.dart';
+import 'package:imath/http/article.dart';
+import 'package:imath/models/article.dart';
+import 'package:imath/config/constants.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -11,33 +14,76 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentCarouselIndex = 0;
-  
+  List<Article> _hotArticles = [];
+  bool _isLoadingHotArticles = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHotArticles();
+  }
+
+  // 加载热门文章
+  Future<void> _loadHotArticles() async {
+    try {
+      final response = await ArticleHttp.loadArticles(
+        articleType: ArticleType.hot,
+        pageNo: 1,
+        pageSize: 10,
+      );
+
+      if (response != null && response['data'] != null) {
+        final List<dynamic> articlesData = response['data'];
+        setState(() {
+          _hotArticles =
+              articlesData.map((json) => Article.fromJson(json)).toList();
+          _isLoadingHotArticles = false;
+        });
+      } else {
+        setState(() {
+          _isLoadingHotArticles = false;
+        });
+      }
+    } catch (e) {
+      print('加载热门文章失败: $e');
+      setState(() {
+        _isLoadingHotArticles = false;
+      });
+    }
+  }
+
   // 轮播图数据
   final List<Map<String, dynamic>> carouselData = [
     {
-      'image': 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=400&fit=crop',
+      'image':
+          'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=400&fit=crop',
       'title': '数学之美',
       'subtitle': '探索数学的无限魅力',
     },
     {
-      'image': 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800&h=400&fit=crop',
+      'image':
+          'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800&h=400&fit=crop',
       'title': '几何世界',
       'subtitle': '从欧几里得到现代几何学',
     },
     {
-      'image': 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=400&fit=crop',
+      'image':
+          'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=400&fit=crop',
       'title': '代数基础',
       'subtitle': '代数学的发展历程',
     },
     {
-      'image': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=400&fit=crop',
+      'image':
+          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=400&fit=crop',
       'title': '数学思维',
       'subtitle': '培养逻辑思维能力',
     },
     {
-      'image': 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=400&fit=crop',
+      'image':
+          'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=400&fit=crop',
       'title': '数学大师',
-      'subtitle': '高斯、黎曼、伽罗瓦、欧拉、牛顿、阿基米德、笛卡尔、费马、拉格朗日、柯西、庞加莱、希尔伯特、哥德尔、图灵、陈省身、华罗庚等二十位数学巨匠',
+      'subtitle':
+          '高斯、黎曼、伽罗瓦、欧拉、牛顿、阿基米德、笛卡尔、费马、拉格朗日、柯西、庞加莱、希尔伯特、哥德尔、图灵、陈省身、华罗庚等二十位数学巨匠',
     },
   ];
 
@@ -84,10 +130,10 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             // 轮播图部分
             _buildCarouselSection(),
-            
+
             // 功能区部分
             _buildFunctionSection(),
-            
+
             // 文章列表部分
             _buildArticleSection(),
           ],
@@ -273,7 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildFunctionItem(HOME_COLUMN item) {
     return GestureDetector(
       onTap: () {
-        switch(item) {
+        switch (item) {
           case HOME_COLUMN.BOOKS:
             context.push('/booklist');
             break;
@@ -286,10 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
           case HOME_COLUMN.PROBLEMS:
             context.push('/problems');
             break;
-          default:
-            break;
         }
-
       },
       child: Container(
         height: 32,
@@ -337,6 +380,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // 文章列表组件
   Widget _buildArticleSection() {
+    // 合并热门文章和mock数据
+    List<dynamic> allArticles = [];
+
+    // 添加热门文章（后台数据）
+    for (var article in _hotArticles) {
+      allArticles.add({
+        'id': article.id,
+        'title': article.title,
+        'subtitle': article.subtitle,
+        'icon': Icons.whatshot,
+        'isHot': true,
+        'author': article.author,
+        'date': article.date,
+      });
+    }
+
+    // 添加mock数据
+    allArticles.addAll(articles);
+
     return Container(
       margin: EdgeInsets.all(16),
       child: Column(
@@ -351,14 +413,22 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           SizedBox(height: 16),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: articles.length,
-            itemBuilder: (context, index) {
-              return _buildArticleItem(articles[index]);
-            },
-          ),
+          if (_isLoadingHotArticles)
+            Center(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: CircularProgressIndicator(),
+              ),
+            )
+          else
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: allArticles.length,
+              itemBuilder: (context, index) {
+                return _buildArticleItem(allArticles[index]);
+              },
+            ),
         ],
       ),
     );
@@ -366,6 +436,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // 文章项组件
   Widget _buildArticleItem(Map<String, dynamic> article) {
+    bool isHot = article['isHot'] == true;
+
     return GestureDetector(
       onTap: () {
         // 处理文章点击事件
@@ -380,6 +452,9 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
+          border: isHot
+              ? Border.all(color: Colors.orange.withOpacity(0.3), width: 1)
+              : null,
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.1),
@@ -394,13 +469,15 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
+                color: isHot
+                    ? Colors.orange.withOpacity(0.1)
+                    : Colors.blue.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 article['icon'],
                 size: 24,
-                color: Colors.blue,
+                color: isHot ? Colors.orange : Colors.blue,
               ),
             ),
             SizedBox(width: 16),
@@ -408,13 +485,38 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    article['title'],
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
+                  Row(
+                    children: [
+                      if (isHot) ...[
+                        Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.orange,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            '热门',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                      ],
+                      Expanded(
+                        child: Text(
+                          article['title'],
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 4),
                   Text(
@@ -426,6 +528,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  if (isHot && article['author'] != null) ...[
+                    SizedBox(height: 4),
+                    Text(
+                      '作者: ${article['author']}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
