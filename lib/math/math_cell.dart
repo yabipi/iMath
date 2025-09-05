@@ -33,7 +33,7 @@ class MathCell extends StatelessWidget {
           widgets.add(
             Math.tex(
               formula,
-              textStyle: this.textStyle ?? const TextStyle(fontSize: 16),
+              textStyle: this.textStyle ?? const TextStyle(fontSize: 18),
               mathStyle: MathStyle.display,
             ),
           );
