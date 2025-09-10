@@ -388,9 +388,22 @@ mixin ImageViewerMixin {
         RegExp imageRegex = RegExp(r'!\[([^\]]*)\]\(([^)]+)\)');
         Match? imageMatch = imageRegex.firstMatch(content);
 
+        // 检查内容是否包含HTTP/HTTPS URL（可能前面有数字或其他字符）
+        RegExp urlRegex = RegExp(r'https?://[^\s]+');
+        Match? urlMatch = urlRegex.firstMatch(content);
+
         if (imageMatch != null) {
-          // 包含图片的选项
+          // 包含markdown图片格式的选项
           String imageUrl = imageMatch.group(2)!;
+          options.add(OptionItem(
+            label: optionLabel,
+            content: content,
+            imageUrl: imageUrl,
+            isImage: true,
+          ));
+        } else if (urlMatch != null) {
+          // 包含HTTP/HTTPS URL的选项（如：① https://example.com/image.jpg）
+          String imageUrl = urlMatch.group(0)!;
           options.add(OptionItem(
             label: optionLabel,
             content: content,
