@@ -3,6 +3,7 @@ import 'package:imath/utils/enum_util.dart';
 
 class Article {
   final int id;
+  final int type;
   final String title;
   final String subtitle;
   final String level;
@@ -17,6 +18,7 @@ class Article {
 
   Article({
     required this.id,
+    required this.type,
     required this.title,
     required this.subtitle,
     required this.level,
@@ -33,6 +35,7 @@ class Article {
   factory Article.fromJson(Map<String, dynamic> json) {
     return Article(
       id: json['id'] ?? 0,
+      type: json['type'] ?? ArticleType.normal.value,
       title: json['title'] ?? '',
       subtitle: json['subtitle'] ?? '',
       level: json['level'] ?? '',
@@ -41,7 +44,7 @@ class Article {
       html: json['html'] ?? '',
       markdown: json['markdown'] ?? '',
       lake: json['lake'] ?? '',
-      format: EnumUtil.fromString(ContentFormat.values, json['format']) ,
+      format: json['format'] == null ? ContentFormat.plain :EnumUtil.fromString(ContentFormat.values, json['format']) ,
       author: json['author'] ?? '',
       date: DateTime.parse(json['gmt_modified']),
     );

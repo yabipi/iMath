@@ -155,8 +155,9 @@ class ArticleViewerState extends State<ArticleViewer> {
                     ? SizedBox(
                         width: double.infinity,
                         child: GptMarkdown(
-                          _content!,
-                          style: const TextStyle(color: Colors.black),
+                            _content!,
+                            style: const TextStyle(color: Colors.black),
+                            useDollarSignsForLatex: true
                         ))
                     : Html(
                         extensions: [

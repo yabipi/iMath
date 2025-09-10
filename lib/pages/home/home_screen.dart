@@ -385,19 +385,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // 添加热门文章（后台数据）
     for (var article in _hotArticles) {
-      allArticles.add({
-        'id': article.id,
-        'title': article.title,
-        'subtitle': article.subtitle,
-        'icon': Icons.whatshot,
-        'isHot': true,
-        'author': article.author,
-        'date': article.date,
-      });
+      allArticles.add(article);
+      // allArticles.add({
+      //   'id': article.id,
+      //   'title': article.title,
+      //   'subtitle': article.subtitle,
+      //   'icon': Icons.whatshot,
+      //   'isHot': true,
+      //   'author': article.author,
+      //   'date': article.date,
+      // });
     }
 
     // 添加mock数据
-    allArticles.addAll(articles);
+    // allArticles.addAll(articles);
 
     return Container(
       margin: EdgeInsets.all(16),
@@ -435,16 +436,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // 文章项组件
-  Widget _buildArticleItem(Map<String, dynamic> article) {
-    bool isHot = article['isHot'] == true;
+  Widget _buildArticleItem(Article article) {
+    bool isHot = article.type == ArticleType.hot.value;
 
     return GestureDetector(
       onTap: () {
         // 处理文章点击事件
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(content: Text('点击了${article['title']}')),
-        // );
-        context.go('/newsdetail');
+        context.push("/article", extra: article);
       },
       child: Container(
         margin: EdgeInsets.only(bottom: 12),
@@ -475,7 +473,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
-                article['icon'],
+                Icons.whatshot,
+                // article['icon'],
                 size: 24,
                 color: isHot ? Colors.orange : Colors.blue,
               ),
@@ -508,7 +507,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                       Expanded(
                         child: Text(
-                          article['title'],
+                          article.title,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -520,7 +519,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    article['subtitle'],
+                    article.subtitle,
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -528,10 +527,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (isHot && article['author'] != null) ...[
+                  if (isHot && article.author != null) ...[
                     SizedBox(height: 4),
                     Text(
-                      '作者: ${article['author']}',
+                      '作者: ${article.author}',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[500],
