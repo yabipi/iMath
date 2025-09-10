@@ -25,7 +25,7 @@ import 'package:imath/http/index.dart';
 import 'package:imath/config/api_config.dart';
 import 'package:imath/route/global_router.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+// import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 import 'config/constants.dart';
 
@@ -102,19 +102,6 @@ void initWebView() {
   // WebView.platform = LinuxWebView();
 }
 
-void initShareReceiver() {
-  // ShareHandler.init();
-  // Listen to media sharing coming from outside the app while the app is in the memory.
-  StreamSubscription _intentSub = ReceiveSharingIntent.instance.getMediaStream().listen((value) {
-    // setState(() {
-    //
-    // });
-  }, onError: (err) {
-    print("getIntentDataStream error: $err");
-  });
-
-}
-
 Future<void> initializeApp() async {
   // final dio = Dio();
   GlobalRouter.init(router);
@@ -151,6 +138,8 @@ void main() async {
 
   HttpOverrides.global = MyHttpOverrides();
   await initializeApp();
+  // 监听分享
+  // initShareReceiver();
   if (DeviceUtil.isLinux) {
     // initWebView();
   }
