@@ -84,7 +84,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview>
   }
 
   Widget _buildQuestionCard(Question question, int index) {
-    if (question.title == null) {
+    if (question.title == null || question.content == null) {
       return const Card(
         child: ListTile(
           title: Text('无效的题目数据'),
@@ -94,7 +94,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview>
 
     List<String> imageUrls = parseImageUrls(question.qImages);
     bool isChoice = isChoiceQuestion(question);
-
+    final content = question.content!.trim() + '\n';
     return SingleChildScrollView(
       child: Container(
         padding: const EdgeInsets.all(16.0),
@@ -115,14 +115,12 @@ class _QuestionListviewState extends ConsumerState<QuestionListview>
             // Text(question.content ?? ''),
             // 题目内容
             MathCell(
-              content: question.content ?? '',
+              content: content,
             ),
             const SizedBox(height: 8),
             // 图片位置：选择题放在题干和选项之间，非选择题放在题目下方
             if (imageUrls.isNotEmpty && isChoice)
               buildQuestionImages(imageUrls),
-            const SizedBox(height: 8),
-
             // 选项内容（如果有的话）
             if (question.options != null && question.options!.isNotEmpty)
               buildOptionsDisplay(parseOptionsWithImages(question.options!)),

@@ -360,24 +360,20 @@ mixin ImageViewerMixin {
   }
 
   // 解析选项中的图片，返回选项列表，每个选项包含选项标识符和图片URL（如果有的话）
-  List<OptionItem> parseOptionsWithImages(String? optionsString) {
-    if (optionsString == null || optionsString.trim().isEmpty) {
-      return [];
-    }
-
+  List<OptionItem> parseOptionsWithImages(String lineStr) {
+    List<OptionItem> options = [];
     // 按换行符分割选项
-    List<String> optionLines = optionsString
-        .split('\n')
+    List<String> optionLines = lineStr
+        .split(RegExp(r'\r\n|\n|\\n|[;,]'))
         .where((line) => line.trim().isNotEmpty)
         .toList();
-    List<OptionItem> options = [];
 
     for (String line in optionLines) {
       line = line.trim();
       if (line.isEmpty) continue;
 
-      // 匹配选项格式：A. 内容 或 A、内容
-      RegExp optionRegex = RegExp(r'^([A-D])[\.、]\s*(.*)$');
+      RegExp optionRegex = RegExp(r'^([A-F]|[①②③④⑤⑥⑦⑧]|\([A-Z]\))[\.、\s]\s*(.*)$');
+      RegExp urlRegex = RegExp(r'^(https?://).*');
       Match? match = optionRegex.firstMatch(line);
 
       if (match != null) {
@@ -389,7 +385,6 @@ mixin ImageViewerMixin {
         Match? imageMatch = imageRegex.firstMatch(content);
 
         // 检查内容是否包含HTTP/HTTPS URL（可能前面有数字或其他字符）
-        RegExp urlRegex = RegExp(r'https?://[^\s]+');
         Match? urlMatch = urlRegex.firstMatch(content);
 
         if (imageMatch != null) {
