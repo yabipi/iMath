@@ -155,7 +155,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview>
       onPageChanged: (int page) {
         try {
           if (page >= 0 && page < questions.length) {
-            debugPrint('页面切换到: $page');
+            // debugPrint('页面切换到: $page');
             ref.read(currentQuestionProvider.notifier).state = questions[page];
           } else {
             debugPrint('无效的页面索引: $page, 总页数: ${questions.length}');
