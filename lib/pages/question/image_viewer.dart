@@ -16,6 +16,95 @@ class OptionItem {
   });
 }
 
+// 图片选项组件
+class _ImageOptionWidget extends StatefulWidget {
+  final OptionItem option;
+  final VoidCallback onTap;
+
+  const _ImageOptionWidget({
+    required this.option,
+    required this.onTap,
+  });
+
+  @override
+  State<_ImageOptionWidget> createState() => _ImageOptionWidgetState();
+}
+
+class _ImageOptionWidgetState extends State<_ImageOptionWidget> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // 图片内容 - 按实际宽度显示
+            Image.network(
+              widget.option.imageUrl!,
+              fit: BoxFit.contain,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Container(
+                  height: 100,
+                  color: Colors.grey[200],
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  height: 100,
+                  color: Colors.grey[200],
+                  child: const Center(
+                    child: Icon(
+                      Icons.broken_image,
+                      color: Colors.grey,
+                      size: 30,
+                    ),
+                  ),
+                );
+              },
+            ),
+            // 悬停时显示的放大图标
+            if (_isHovered)
+              Positioned(
+                top: 4,
+                right: 4,
+                child: AnimatedOpacity(
+                  opacity: _isHovered ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 200),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Icon(
+                      Icons.zoom_in,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 mixin ImageViewerMixin {
   late BuildContext context;
 
@@ -345,78 +434,9 @@ mixin ImageViewerMixin {
 
   // 构建图片选项
   Widget _buildImageOption(OptionItem option) {
-    return Container(
-      height: 100, // 固定高度
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: GestureDetector(
-          onTap: () => showImageDialog(option.imageUrl!),
-          child: Stack(
-            children: [
-              // 图片内容
-              Center(
-                child: Image.network(
-                  option.imageUrl!,
-                  width: double.infinity,
-                  height: double.infinity,
-                  fit: BoxFit.contain,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      color: Colors.grey[200],
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                        ),
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: Icon(
-                          Icons.broken_image,
-                          color: Colors.grey,
-                          size: 30,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              // 点击提示
-              Positioned(
-                top: 4,
-                right: 4,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Icon(
-                    Icons.zoom_in,
-                    size: 12,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    return _ImageOptionWidget(
+      option: option,
+      onTap: () => showImageDialog(option.imageUrl!),
     );
   }
 }
