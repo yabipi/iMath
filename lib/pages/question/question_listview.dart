@@ -23,7 +23,8 @@ class QuestionListview extends ConsumerStatefulWidget {
   ConsumerState<QuestionListview> createState() => _QuestionListviewState();
 }
 
-class _QuestionListviewState extends ConsumerState<QuestionListview> with ImageViewerMixin, QuestionMixin {
+class _QuestionListviewState extends ConsumerState<QuestionListview>
+    with ImageViewerMixin, QuestionMixin {
   // List<Question> _questions = <Question>[];
 
   late PageController _pageController; // 新增：用于监听 PageView 滑动事件
@@ -98,7 +99,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> with ImageV
       child: Container(
         padding: const EdgeInsets.all(16.0),
         child: // Text('第${content}题')
-        Column(
+            Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           // children: List.generate(
@@ -124,9 +125,7 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> with ImageV
 
             // 选项内容（如果有的话）
             if (question.options != null && question.options!.isNotEmpty)
-              MathCell(
-                content: question.options!,
-              ),
+              buildOptionsDisplay(parseOptionsWithImages(question.options!)),
 
             // if (question.options != null && question.options!.isNotEmpty) ...[
             //   MathCell(
@@ -145,8 +144,6 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> with ImageV
     );
   }
 
-
-
   Widget _buildQuestionsPageView(List<Question> questions) {
     return PageView.builder(
       controller: _pageController,
@@ -160,7 +157,6 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> with ImageV
           if (page >= 0 && page < questions.length) {
             debugPrint('页面切换到: $page');
             ref.read(currentQuestionProvider.notifier).state = questions[page];
-
           } else {
             debugPrint('无效的页面索引: $page, 总页数: ${questions.length}');
           }
@@ -405,7 +401,6 @@ class _QuestionListviewState extends ConsumerState<QuestionListview> with ImageV
     // 等待加载完成
     await Future.delayed(const Duration(milliseconds: 500));
   }
-
 
   // 判断是否显示左箭头
   bool _shouldShowLeftArrow(List<Question> questions) {
