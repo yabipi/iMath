@@ -107,6 +107,97 @@ class _ImageOptionWidgetState extends State<_ImageOptionWidget> {
   }
 }
 
+// 题目图片组件
+class _QuestionImageWidget extends StatefulWidget {
+  final String imageUrl;
+  final VoidCallback onTap;
+
+  const _QuestionImageWidget({
+    required this.imageUrl,
+    required this.onTap,
+  });
+
+  @override
+  State<_QuestionImageWidget> createState() => _QuestionImageWidgetState();
+}
+
+class _QuestionImageWidgetState extends State<_QuestionImageWidget> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: IntrinsicWidth(
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // 图片内容 - 按实际宽度显示，确保完整显示
+              Image.network(
+                widget.imageUrl,
+                fit: BoxFit.contain, // 保持宽高比，确保图片完整显示
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    height: 140, // 保持原有的高度设置
+                    color: Colors.grey[200],
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 140, // 保持原有的高度设置
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: Icon(
+                        Icons.broken_image,
+                        color: Colors.grey,
+                        size: 40,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              // 悬停时显示的放大图标
+              if (_isHovered)
+                Positioned(
+                  top: 4,
+                  right: 4,
+                  child: AnimatedOpacity(
+                    opacity: _isHovered ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Icon(
+                        Icons.zoom_in,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 mixin ImageViewerMixin {
   late BuildContext context;
 
@@ -121,10 +212,7 @@ mixin ImageViewerMixin {
       children: [
         const SizedBox(height: 8),
         if (imageUrls.length == 1)
-          SizedBox(
-            height: 140,
-            child: buildImageItem(imageUrls.first),
-          )
+          buildImageItem(imageUrls.first)
         else
           // 多张图片时使用垂直列表布局，确保每张图片都能完整显示
           ListView.separated(
@@ -133,92 +221,18 @@ mixin ImageViewerMixin {
             itemCount: imageUrls.length,
             separatorBuilder: (context, index) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
-              return SizedBox(
-                height: 120, // 固定高度确保图片不会被裁剪
-                child: buildImageItem(imageUrls[index]),
-              );
+              return buildImageItem(imageUrls[index]);
             },
           ),
-        // Expanded(
-        //
-        // ),
       ],
     );
   }
 
   // 构建单个图片项
   Widget buildImageItem(String imageUrl) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: GestureDetector(
-          onTap: () => showImageDialog(imageUrl),
-          child: Stack(
-            children: [
-              // 使用 Center 包装确保图片居中显示
-              Center(
-                child: Image.network(
-                  imageUrl,
-                  width: double.infinity,
-                  height: double.infinity,
-                  fit: BoxFit.contain, // 保持宽高比，确保图片完整显示
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      color: Colors.grey[200],
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                        ),
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: Icon(
-                          Icons.broken_image,
-                          color: Colors.grey,
-                          size: 40,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              // 添加点击提示
-              Positioned(
-                top: 4,
-                right: 4,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.6),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Icon(
-                    Icons.zoom_in,
-                    size: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    return _QuestionImageWidget(
+      imageUrl: imageUrl,
+      onTap: () => showImageDialog(imageUrl),
     );
   }
 
