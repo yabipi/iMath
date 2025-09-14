@@ -110,12 +110,14 @@ class _QuestionListviewState extends ConsumerState<QuestionListview>
             MathCell(
                 content: question.title ?? '',
                 textStyle:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             // Text(question.content ?? ''),
             // 题目内容
             MathCell(
-              content: content,
+                content: content,
+                textStyle:
+                const TextStyle(fontSize: 18),
             ),
             const SizedBox(height: 8),
             // 图片位置：选择题放在题干和选项之间，非选择题放在题目下方
