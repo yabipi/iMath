@@ -44,17 +44,17 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               const SizedBox(height: 40),
 
               // 标题
-              const Text(
-                '修改密码',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-                textAlign: TextAlign.center,
-              ),
+              // const Text(
+              //   '修改密码',
+              //   style: TextStyle(
+              //     fontSize: 28,
+              //     fontWeight: FontWeight.bold,
+              //     color: Colors.black87,
+              //   ),
+              //   textAlign: TextAlign.center,
+              // ),
 
-              const SizedBox(height: 40),
+              // const SizedBox(height: 40),
 
               // 当前密码输入框
               TextField(

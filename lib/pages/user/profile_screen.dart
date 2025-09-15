@@ -178,7 +178,7 @@ class ProfileScreen extends ConsumerWidget {
           ),
           ListTile(
             leading: const Icon(Icons.lock),
-            // title: const Text('修改密码'),
+            title: const Text('修改密码'),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
               // 导航到修改密码页面
