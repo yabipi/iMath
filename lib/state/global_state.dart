@@ -8,6 +8,9 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 final loggingStateProvider = StateProvider<bool>((ref)  {
   // 先检测是否已登录过期
   String token = GStorage.userInfo.get(Constants.USER_TOKEN) ?? '';
+  if (token.isEmpty) {
+    return false;
+  }
   bool hasExpired = JwtDecoder.isExpired(token);
   DateTime expiredDate = JwtDecoder.getExpirationDate(token);
   print(expiredDate);
