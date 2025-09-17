@@ -95,53 +95,62 @@ class _QuestionListviewState extends ConsumerState<QuestionListview>
     List<String> imageUrls = parseImageUrls(question.qImages);
     bool isChoice = isChoiceQuestion(question);
     final content = question.content!.trim() + '\n';
-    return SingleChildScrollView(
-      // scrollDirection: Axis.horizontal,
-      child: Container(
-        padding: const EdgeInsets.all(16.0),
-        child: // Text('第${content}题')
-            Column(
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // 获取实际可用宽度，减去padding
+        final availableWidth = constraints.maxWidth - 32;
+
+        return SingleChildScrollView(
+          // 垂直滚动查看完整题目内容
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
-              // children: List.generate(
-              //   50, // 重复次数
-              //       (index) => MathCell(content: question.title ?? ''), // 要重复的组件
-              // ),
               children: [
-                MathCell(
+                // 题目标题
+                SizedBox(
+                  width: availableWidth,
+                  child: MathCell(
                     content: question.title ?? '',
-                    textStyle:
-                        const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                // Text(question.content ?? ''),
-                // 题目内容
-                MathCell(
-                    content: content,
-                    textStyle:
-                    const TextStyle(fontSize: 18),
+                    textStyle: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
                 ),
                 const SizedBox(height: 8),
+
+                // 题目内容
+                SizedBox(
+                  width: availableWidth,
+                  child: MathCell(
+                    content: content,
+                    textStyle: const TextStyle(fontSize: 18),
+                  ),
+                ),
+                const SizedBox(height: 8),
+
                 // 图片位置：选择题放在题干和选项之间，非选择题放在题目下方
                 if (imageUrls.isNotEmpty && isChoice)
                   buildQuestionImages(imageUrls),
+
                 // 选项内容（如果有的话）
                 if (question.options != null && question.options!.isNotEmpty)
-                  buildOptionsDisplay(parseOptionsWithImages(question.options!)),
+                  SizedBox(
+                    width: availableWidth,
+                    child: buildOptionsDisplay(
+                        parseOptionsWithImages(question.options!)),
+                  ),
 
-                // if (question.options != null && question.options!.isNotEmpty) ...[
-                //   MathCell(
-                //     content: question.options!,
-                //   ),
-                //   const SizedBox(height: 8),
-                // ],
                 // 图片位置：非选择题放在题目下方
                 const SizedBox(height: 8),
                 if (imageUrls.isNotEmpty && !isChoice)
                   buildQuestionImages(imageUrls),
-                // Spacer(),
               ],
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 
