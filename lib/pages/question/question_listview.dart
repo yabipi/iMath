@@ -319,7 +319,8 @@ class _QuestionListviewState extends ConsumerState<QuestionListview>
 
   // 获取当前题目列表
   List<Question> _getCurrentQuestions() {
-    return ref.read(questionsProvider).value ?? [];
+    final questionsAsync = ref.read(questionsProvider);
+    return questionsAsync.value ?? [];
   }
 
   // 获取当前题目
@@ -349,17 +350,12 @@ class _QuestionListviewState extends ConsumerState<QuestionListview>
   @override
   Widget build(BuildContext context) {
     this.context = context;
-    final questions = ref.watch(questionsProvider).value ?? [];
+    final questionsAsync = ref.watch(questionsProvider);
     // widget.onCurrentQuestionChanged?.call(questions[0]);
     // 监听分类变化和加载状态
     ref.watch(categoryChangeProvider);
     ref.watch(pageChangeProvider);
     ref.watch(autoQuestionsFutureProvider); // 自动触发初始加载
-    final isLoading = ref.watch(isLoadingProvider);
-    // final questions = ref.watch(questionsProvider);
-    // 更新本地状态
-    // _isLoading = isLoading;
-    // _hasMore = hasMore;
 
     return KeyboardListener(
       focusNode: FocusNode(),
@@ -379,20 +375,64 @@ class _QuestionListviewState extends ConsumerState<QuestionListview>
       child: RefreshIndicator(
         // onRefresh: ref.refresh(questionsProvider.future),
         onRefresh: _onRefresh,
-        child: Stack(
-          children: [
-            _buildQuestionsPageView(questions),
-            // 显示加载指示器
-            if (isLoading)
-              const Center(
-                child: CircularProgressIndicator(),
-              ),
-            // 显示无数据提示
-            if (!isLoading && questions.isEmpty)
-              const Center(
+        child: questionsAsync.when(
+          data: (questions) {
+            // 数据加载完成
+            if (questions.isEmpty) {
+              // 加载完成但没有数据
+              return const Center(
                 child: Text('暂无数据'),
+              );
+            }
+            // 有数据，显示题目列表
+            return _buildQuestionsPageView(questions);
+          },
+          loading: () {
+            // 正在加载中
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          },
+          error: (error, stackTrace) {
+            // 加载出错
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '加载失败',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.red.shade700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    error.toString(),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      // ignore: unused_result
+                      ref.refresh(questionsProvider);
+                    },
+                    child: const Text('重试'),
+                  ),
+                ],
               ),
-          ],
+            );
+          },
         ),
       ),
     );
