@@ -5,7 +5,6 @@ import 'package:imath/constant/errors.dart';
 
 import 'package:imath/http/auth.dart';
 import 'package:imath/http/payload.dart';
-import 'package:imath/models/user.dart';
 import 'package:imath/services/auth_service.dart';
 import 'package:imath/widgets/timer_button.dart';
 import 'package:pinput/pinput.dart';
@@ -68,7 +67,7 @@ class _PinputScreenState extends State<PinputScreen> {
       text: Text('重新发送验证码'),
       duration: 60,
     ); // 初始化控制器
-    timerBtnController = timerBtn?.controller;
+    timerBtnController = timerBtn.controller;
     timerBtn.controller?.startTimer();
   }
 
@@ -105,32 +104,31 @@ class _PinputScreenState extends State<PinputScreen> {
         'register',
       );
       // 后端按规范返回 { httpState, code, user, token, message }
-      if (_result != null && (_result.code == SUCCESS)) {
+      if (_result.code == SUCCESS) {
         // SmartDialog.showToast('注册成功');
         // 可选：保存用户并进入个人中心
-        String verification_token = _result.getValue<String>('verification_token') ?? '';
+        String verification_token =
+            _result.getValue<String>('verification_token') ?? '';
         final ResponseData result = await AuthHttp.register(
             widget.username!,
             widget.phone, // 传递用户名参数
             widget.password!,
-            verification_token
-        );
-        if (result != null && result.code == SUCCESS) {
+            verification_token);
+        if (result.code == SUCCESS) {
           // 登录成功
           SmartDialog.showToast('注册成功');
-                      // 保存用户信息
-            try {
-              AuthService.saveUser(result);
+          // 保存用户信息
+          try {
+            AuthService.saveUser(result);
             await Future.delayed(const Duration(milliseconds: 300));
             if (mounted) context.go('/profile');
           } catch (_) {
             // 即使保存失败也允许返回登录
             if (mounted) context.go('/login');
           }
-         }
-
+        }
       } else {
-        SmartDialog.showToast(_result.msg ?? '验证码验证失败');
+        SmartDialog.showToast(_result.msg);
         pinController.clear();
       }
     } catch (e) {
@@ -140,21 +138,31 @@ class _PinputScreenState extends State<PinputScreen> {
   }
 
   Future<void> _handleForgotPasswordVerification(String pin) async {
-    // 这里应该调用忘记密码验证的API
-    // 由于需求中没有明确的后端API，我们先模拟成功
-    final ResponseData result = await AuthHttp.verifyCaptcha(
-      widget.phone,
-      pin,
-      'reset_password',
-    );
-    if (result.code == SUCCESS) {
-      // 验证码写死为123456
-      SmartDialog.showToast('验证成功');
-      // 延迟一下再跳转
-      await Future.delayed(Duration(milliseconds: 500));
-      context.go('/reset-password?phone=${widget.phone}');
-    } else {
-      SmartDialog.showToast('验证码错误');
+    try {
+      final ResponseData result = await AuthHttp.verifyCaptcha(
+        widget.phone,
+        pin,
+        'reset_password',
+      );
+
+      if (result.code == SUCCESS) {
+        // 获取verification_token
+        String verificationToken =
+            result.getValue<String>('verification_token') ?? '';
+
+        SmartDialog.showToast('验证成功');
+        // 延迟一下再跳转
+        await Future.delayed(Duration(milliseconds: 500));
+
+        // 跳转到重置密码页面，传递verification_token
+        context.go(
+            '/reset-password?phone=${widget.phone}&verification_token=$verificationToken');
+      } else {
+        SmartDialog.showToast(result.msg);
+        pinController.clear();
+      }
+    } catch (e) {
+      SmartDialog.showToast('网络错误，请重试');
       pinController.clear();
     }
   }

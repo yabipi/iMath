@@ -1,7 +1,6 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imath/models/article.dart';
-import 'package:imath/models/knowledges.dart';
 import 'package:imath/models/question.dart';
 import 'package:imath/models/user.dart';
 import 'package:imath/pages/admin/admin_screen.dart';
@@ -49,7 +48,6 @@ import 'package:imath/pages/user/reset_password.dart';
 import 'package:imath/pages/user/change_password.dart';
 import 'package:imath/pages/user/settings.dart';
 import 'package:imath/pages/user/slider_captcha_client_verify.dart';
-import 'package:imath/utils/device_util.dart';
 import 'package:flutter/foundation.dart';
 
 final router = GoRouter(
@@ -171,7 +169,10 @@ final router = GoRouter(
       path: '/reset-password',
       builder: (context, state) {
         final String? phone = state.uri.queryParameters['phone'];
-        return ResetPasswordPage(phone: phone ?? '');
+        final String? verificationToken =
+            state.uri.queryParameters['verification_token'];
+        return ResetPasswordPage(
+            phone: phone ?? '', verificationToken: verificationToken ?? '');
       },
     ),
     GoRoute(

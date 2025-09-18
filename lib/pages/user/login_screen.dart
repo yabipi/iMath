@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
@@ -6,11 +5,9 @@ import 'package:imath/http/auth.dart';
 
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../controllers/login_controller.dart';
-// 新增：导入通用导航栏组件
-import '../common/bottom_navigation_bar.dart';
 
 // extends GetView<LoginController>
-class LoginScreen extends StatelessWidget{
+class LoginScreen extends StatelessWidget {
   late LoginController controller;
   late TabController tabController;
 
@@ -19,26 +16,10 @@ class LoginScreen extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     controller = LoginController(context);
-    tabController =  TabController(length: 3, vsync: Navigator.of(context));
+    tabController = TabController(length: 3, vsync: Navigator.of(context));
     final _formKey = GlobalKey<FormState>();
 
     bool _isLoading = false;
-    bool _showCodeInput = false;
-    int _countdown = 60;
-    Timer? _timer;
-    bool mounted = false;
-
-    void _startCountdown() {
-      _countdown = 60;
-      _timer?.cancel();
-      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        if (_countdown > 0) {
-          _countdown--;
-        } else {
-          timer.cancel();
-        }
-      });
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -80,12 +61,12 @@ class LoginScreen extends StatelessWidget{
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SizedBox(
-                                width: 280, height: 280,
-                                child:QrImageView(
+                                width: 280,
+                                height: 280,
+                                child: QrImageView(
                                   data: 'xxx',
                                   backgroundColor: Colors.white,
-                                )
-                            )
+                                ))
                           ],
                         )),
                   ),
@@ -120,12 +101,12 @@ class LoginScreen extends StatelessWidget{
                                         }
                                         return null;
                                       },
-                                    )
-                                ),
+                                    )),
                                 const SizedBox(height: 16),
                                 ElevatedButton(
                                   onPressed: () {
-                                    String phone = controller.phoneController.text;
+                                    String phone =
+                                        controller.phoneController.text;
                                     if (phone.isEmpty || phone.length < 11) {
                                       SmartDialog.showToast('请输入手机号');
                                       return;
@@ -198,8 +179,8 @@ class LoginScreen extends StatelessWidget{
                                 children: [
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      padding:
-                                      const EdgeInsets.symmetric(vertical: 16),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16),
                                     ),
                                     onPressed: () {
                                       context.go('/register');
@@ -215,17 +196,38 @@ class LoginScreen extends StatelessWidget{
                                     //     ? null
                                     //     : controller.login,
                                     style: ElevatedButton.styleFrom(
-                                      padding:
-                                      const EdgeInsets.symmetric(vertical: 16),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16),
                                     ),
                                     child: _isLoading
                                         ? const CircularProgressIndicator()
                                         : const Text('登录'),
                                   ),
-
                                 ],
                               ),
 
+                              const SizedBox(height: 16),
+
+                              // 忘记密码链接
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      context.go('/forgot-password');
+                                    },
+                                    child: Text(
+                                      '忘记密码？',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.blue.shade400,
+                                        fontWeight: FontWeight.w500,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -245,28 +247,5 @@ class LoginScreen extends StatelessWidget{
 
   void goToCaptchaPage(BuildContext context) {
     context.go('/captcha');
-  }
-
-  void _showCaptchaDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('请完成验证'),
-          content: const Text('请完成验证，以继续登录。'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('取消'),
-            ),
-            TextButton(
-              onPressed: () {}, child: const Text('确定'),
-            )
-          ]
-        );
-      }
-    );
   }
 }

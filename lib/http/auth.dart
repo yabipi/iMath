@@ -4,7 +4,6 @@ import 'package:imath/http/payload.dart';
 import 'init.dart';
 
 class AuthHttp {
-
   static Future<ResponseData> checkUsername(String username) async {
     final response = await Request().post(
       '${ApiConfig.AUTH_BASE_URL}/api/v1/auth/checkname',
@@ -29,7 +28,8 @@ class AuthHttp {
     return ResponseData.fromJson(response.data);
   }
 
-  static Future<ResponseData> register(String username, String phoneNumber, String password, String verification_token) async {
+  static Future<ResponseData> register(String username, String phoneNumber,
+      String password, String verification_token) async {
     final response = await Request().post(
       '${ApiConfig.AUTH_BASE_URL}/api/v1/auth/register',
       options: Options(contentType: Headers.jsonContentType),
@@ -52,7 +52,8 @@ class AuthHttp {
     return ResponseData.fromJson(response.data);
   }
 
-  static Future<ResponseData> verifyCaptcha(String phone, String captcha, String type) async {
+  static Future<ResponseData> verifyCaptcha(
+      String phone, String captcha, String type) async {
     final response = await Request().post(
       '${ApiConfig.AUTH_BASE_URL}/api/v1/auth/verifyCaptcha',
       options: Options(contentType: Headers.jsonContentType),
@@ -85,13 +86,26 @@ class AuthHttp {
 
   static Future<ResponseData> changePassword(
       String oldPassword, String newPassword) async {
-      final response = await Request().post(
-          '${ApiConfig.AUTH_BASE_URL}/api/v1/auth/changePassword',
-          options: Options(contentType: Headers.jsonContentType),
-          data: {
-            'oldPassword': oldPassword,
-            'newPassword': newPassword,
-          });
+    final response = await Request().post(
+        '${ApiConfig.AUTH_BASE_URL}/api/v1/auth/changePassword',
+        options: Options(contentType: Headers.jsonContentType),
+        data: {
+          'oldPassword': oldPassword,
+          'newPassword': newPassword,
+        });
+    return ResponseData.fromJson(response.data);
+  }
+
+  static Future<ResponseData> resetPassword(
+      String phone, String newPassword, String verificationToken) async {
+    final response = await Request().post(
+        '${ApiConfig.AUTH_BASE_URL}/api/v1/auth/resetPassword',
+        options: Options(contentType: Headers.jsonContentType),
+        data: {
+          'phone': phone,
+          'newPassword': newPassword,
+          'verification_token': verificationToken,
+        });
     return ResponseData.fromJson(response.data);
   }
 }
