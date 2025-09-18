@@ -18,8 +18,39 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  final usernameFocusNode = FocusNode();
+  final phoneFocusNode = FocusNode();
   bool _isLoading = false;
   bool _agreedToTerms = false; // 是否同意协议
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    usernameFocusNode.addListener(() async {
+      if (!usernameFocusNode.hasFocus) {
+        // 输入框失去焦点时，检查用户名是否为空
+        if (_usernameController.text.isEmpty) {
+          SmartDialog.showToast('请输入用户名');
+          return;
+        }
+        ResponseData response = await AuthHttp.checkUsername(_usernameController.text);
+        print(response.msg);
+        SmartDialog.showToast(response.msg);
+      }
+    });
+    phoneFocusNode.addListener(() async {
+      if (!phoneFocusNode.hasFocus) {
+        // 输入框失去焦点时，检查手机号是否为空
+        if (_phoneController.text.isEmpty) {
+          SmartDialog.showToast('请输入手机号');
+          return;
+        }
+        ResponseData response = await AuthHttp.checkPhone(_phoneController.text);
+        SmartDialog.showToast(response.msg);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,9 +76,10 @@ class _RegisterPageState extends State<RegisterPage> {
               // 用户名输入框
               TextField(
                 controller: _usernameController,
+                focusNode: usernameFocusNode,
                 decoration: InputDecoration(
                   labelText: '用户名',
-                  hintText: '请输入用户名',
+                  hintText: '请输入用户名, 长度不少于3个字符',
                   prefixIcon: Icon(Icons.person, color: Colors.grey.shade600),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -73,6 +105,7 @@ class _RegisterPageState extends State<RegisterPage> {
               // 手机号输入框
               TextField(
                 controller: _phoneController,
+                focusNode: phoneFocusNode,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
                   labelText: '手机号',
@@ -303,11 +336,23 @@ class _RegisterPageState extends State<RegisterPage> {
     if (_usernameController.text.trim().isEmpty) {
       SmartDialog.showToast('请输入用户名');
       return;
+    } else {
+      final ResponseData result = await AuthHttp.checkUsername(_usernameController.text.trim());
+      if (result.code != SUCCESS) {
+        SmartDialog.showToast(result.msg);
+        return;
+      }
     }
 
     if (_phoneController.text.trim().isEmpty) {
       SmartDialog.showToast('请输入手机号');
       return;
+    } else {
+      final ResponseData result = await AuthHttp.checkPhone(_phoneController.text.trim());
+      if (result.code != SUCCESS) {
+        SmartDialog.showToast(result.msg);
+        return;
+      }
     }
 
     if (!PhoneValidator.isValid(_phoneController.text.trim())) {

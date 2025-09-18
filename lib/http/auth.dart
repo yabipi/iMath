@@ -5,6 +5,30 @@ import 'init.dart';
 
 class AuthHttp {
 
+  static Future<ResponseData> checkUsername(String username) async {
+    final response = await Request().post(
+      '${ApiConfig.AUTH_BASE_URL}/api/v1/auth/checkname',
+      options: Options(contentType: Headers.jsonContentType),
+      data: {
+        'username': username,
+        // 'verification_token': verification_token,
+      },
+    );
+    return ResponseData.fromJson(response.data);
+  }
+
+  static Future<ResponseData> checkPhone(String phone) async {
+    final response = await Request().post(
+      '${ApiConfig.AUTH_BASE_URL}/api/v1/auth/checkphone',
+      options: Options(contentType: Headers.jsonContentType),
+      data: {
+        'phone': phone,
+        // 'verification_token': verification_token,
+      },
+    );
+    return ResponseData.fromJson(response.data);
+  }
+
   static Future<ResponseData> register(String username, String phoneNumber, String password, String verification_token) async {
     final response = await Request().post(
       '${ApiConfig.AUTH_BASE_URL}/api/v1/auth/register',
