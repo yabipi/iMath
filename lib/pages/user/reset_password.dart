@@ -21,7 +21,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('设置新密码'),
+        title: Text('重置密码'),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
