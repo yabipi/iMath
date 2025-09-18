@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:imath/constant/errors.dart';
-import 'package:imath/core/context.dart';
 import 'package:imath/http/auth.dart';
 import 'package:imath/http/payload.dart';
 import 'package:imath/utils/phone_validator.dart';
@@ -20,34 +19,47 @@ class _RegisterPageState extends State<RegisterPage> {
       TextEditingController();
   final usernameFocusNode = FocusNode();
   final phoneFocusNode = FocusNode();
+  final passwordFocusNode = FocusNode();
+  final confirmPasswordFocusNode = FocusNode();
   bool _isLoading = false;
   bool _agreedToTerms = false; // 是否同意协议
 
+  // 错误信息状态
+  String _usernameError = '';
+  String _phoneError = '';
+  String _passwordError = '';
+  String _confirmPasswordError = '';
+  String _agreementError = '';
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+
+    // 用户名失去焦点校验
     usernameFocusNode.addListener(() async {
       if (!usernameFocusNode.hasFocus) {
-        // 输入框失去焦点时，检查用户名是否为空
-        if (_usernameController.text.isEmpty) {
-          SmartDialog.showToast('请输入用户名');
-          return;
-        }
-        ResponseData response = await AuthHttp.checkUsername(_usernameController.text);
-        print(response.msg);
-        SmartDialog.showToast(response.msg);
+        await _validateUsername();
       }
     });
+
+    // 手机号失去焦点校验
     phoneFocusNode.addListener(() async {
       if (!phoneFocusNode.hasFocus) {
-        // 输入框失去焦点时，检查手机号是否为空
-        if (_phoneController.text.isEmpty) {
-          SmartDialog.showToast('请输入手机号');
-          return;
-        }
-        ResponseData response = await AuthHttp.checkPhone(_phoneController.text);
-        SmartDialog.showToast(response.msg);
+        await _validatePhone();
+      }
+    });
+
+    // 密码失去焦点校验
+    passwordFocusNode.addListener(() {
+      if (!passwordFocusNode.hasFocus) {
+        _validatePassword();
+      }
+    });
+
+    // 确认密码失去焦点校验
+    confirmPasswordFocusNode.addListener(() {
+      if (!confirmPasswordFocusNode.hasFocus) {
+        _validateConfirmPassword();
       }
     });
   }
@@ -94,11 +106,33 @@ class _RegisterPageState extends State<RegisterPage> {
                     borderSide:
                         BorderSide(color: Colors.blue.shade400, width: 2),
                   ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        BorderSide(color: Colors.red.shade400, width: 1),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        BorderSide(color: Colors.red.shade400, width: 2),
+                  ),
                   filled: true,
                   fillColor: Colors.grey.shade50,
                 ),
                 maxLength: 20,
               ),
+              // 用户名错误提示
+              if (_usernameError.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    _usernameError,
+                    style: TextStyle(
+                      color: Colors.red.shade400,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
 
               const SizedBox(height: 20),
 
@@ -124,17 +158,40 @@ class _RegisterPageState extends State<RegisterPage> {
                     borderSide:
                         BorderSide(color: Colors.blue.shade400, width: 2),
                   ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        BorderSide(color: Colors.red.shade400, width: 1),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        BorderSide(color: Colors.red.shade400, width: 2),
+                  ),
                   filled: true,
                   fillColor: Colors.grey.shade50,
                 ),
                 maxLength: 11,
               ),
+              // 手机号错误提示
+              if (_phoneError.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    _phoneError,
+                    style: TextStyle(
+                      color: Colors.red.shade400,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
 
               const SizedBox(height: 20),
 
               // 密码输入框
               TextField(
                 controller: _passwordController,
+                focusNode: passwordFocusNode,
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: '密码',
@@ -153,17 +210,40 @@ class _RegisterPageState extends State<RegisterPage> {
                     borderSide:
                         BorderSide(color: Colors.blue.shade400, width: 2),
                   ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        BorderSide(color: Colors.red.shade400, width: 1),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        BorderSide(color: Colors.red.shade400, width: 2),
+                  ),
                   filled: true,
                   fillColor: Colors.grey.shade50,
                 ),
                 maxLength: 20,
               ),
+              // 密码错误提示
+              if (_passwordError.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    _passwordError,
+                    style: TextStyle(
+                      color: Colors.red.shade400,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
 
               const SizedBox(height: 20),
 
               // 确认密码输入框
               TextField(
                 controller: _confirmPasswordController,
+                focusNode: confirmPasswordFocusNode,
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: '确认密码',
@@ -183,11 +263,33 @@ class _RegisterPageState extends State<RegisterPage> {
                     borderSide:
                         BorderSide(color: Colors.blue.shade400, width: 2),
                   ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        BorderSide(color: Colors.red.shade400, width: 1),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        BorderSide(color: Colors.red.shade400, width: 2),
+                  ),
                   filled: true,
                   fillColor: Colors.grey.shade50,
                 ),
                 maxLength: 20,
               ),
+              // 确认密码错误提示
+              if (_confirmPasswordError.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    _confirmPasswordError,
+                    style: TextStyle(
+                      color: Colors.red.shade400,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
 
               const SizedBox(height: 20),
 
@@ -202,6 +304,10 @@ class _RegisterPageState extends State<RegisterPage> {
                       onChanged: (value) {
                         setState(() {
                           _agreedToTerms = value ?? false;
+                          // 清除协议错误信息
+                          if (_agreedToTerms) {
+                            _agreementError = '';
+                          }
                         });
                       },
                       activeColor: Colors.blue.shade400,
@@ -215,6 +321,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     onTap: () {
                       setState(() {
                         _agreedToTerms = !_agreedToTerms;
+                        // 清除协议错误信息
+                        if (_agreedToTerms) {
+                          _agreementError = '';
+                        }
                       });
                     },
                     child: RichText(
@@ -258,6 +368,19 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ],
               ),
+              // 协议错误提示
+              if (_agreementError.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    _agreementError,
+                    style: TextStyle(
+                      color: Colors.red.shade400,
+                      fontSize: 12,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
 
               const SizedBox(height: 40),
 
@@ -332,51 +455,28 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Future<void> _handleRegister() async {
-    // 验证输入
-    if (_usernameController.text.trim().isEmpty) {
-      SmartDialog.showToast('请输入用户名');
-      return;
-    } else {
-      final ResponseData result = await AuthHttp.checkUsername(_usernameController.text.trim());
-      if (result.code != SUCCESS) {
-        SmartDialog.showToast(result.msg);
-        return;
-      }
-    }
+    // 清除所有错误信息
+    setState(() {
+      _usernameError = '';
+      _phoneError = '';
+      _passwordError = '';
+      _confirmPasswordError = '';
+      _agreementError = '';
+    });
 
-    if (_phoneController.text.trim().isEmpty) {
-      SmartDialog.showToast('请输入手机号');
-      return;
-    } else {
-      final ResponseData result = await AuthHttp.checkPhone(_phoneController.text.trim());
-      if (result.code != SUCCESS) {
-        SmartDialog.showToast(result.msg);
-        return;
-      }
-    }
+    // 验证所有输入
+    await _validateUsername();
+    await _validatePhone();
+    _validatePassword();
+    _validateConfirmPassword();
+    _validateAgreement();
 
-    if (!PhoneValidator.isValid(_phoneController.text.trim())) {
-      SmartDialog.showToast('请输入合法的手机号码');
-      return;
-    }
-
-    if (_passwordController.text.isEmpty) {
-      SmartDialog.showToast('请输入密码');
-      return;
-    }
-
-    if (_passwordController.text.length < 6) {
-      SmartDialog.showToast('密码长度不能少于6位');
-      return;
-    }
-
-    if (_passwordController.text != _confirmPasswordController.text) {
-      SmartDialog.showToast('两次输入的密码不一致');
-      return;
-    }
-
-    if (!_agreedToTerms) {
-      SmartDialog.showToast('请阅读并同意用户协议和隐私政策');
+    // 检查是否有任何错误
+    if (_usernameError.isNotEmpty ||
+        _phoneError.isNotEmpty ||
+        _passwordError.isNotEmpty ||
+        _confirmPasswordError.isNotEmpty ||
+        _agreementError.isNotEmpty) {
       return;
     }
 
@@ -386,7 +486,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
     try {
       // 调用后台发送验证码
-      final ResponseData result = await AuthHttp.sendCaptcha(_phoneController.text.trim());
+      final ResponseData result =
+          await AuthHttp.sendCaptcha(_phoneController.text.trim());
 
       if (result.code == SUCCESS) {
         SmartDialog.showToast('验证码已发送');
@@ -506,12 +607,108 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  // 校验用户名
+  Future<void> _validateUsername() async {
+    String error = '';
+    if (_usernameController.text.trim().isEmpty) {
+      error = '请输入用户名';
+    } else if (_usernameController.text.trim().length < 3) {
+      error = '用户名长度不能少于3个字符';
+    } else {
+      try {
+        ResponseData response =
+            await AuthHttp.checkUsername(_usernameController.text.trim());
+        if (response.code != SUCCESS) {
+          error = response.msg;
+        }
+      } catch (e) {
+        error = '网络错误，请重试';
+      }
+    }
+
+    setState(() {
+      _usernameError = error;
+    });
+  }
+
+  // 校验手机号
+  Future<void> _validatePhone() async {
+    String error = '';
+    if (_phoneController.text.trim().isEmpty) {
+      error = '请输入手机号';
+    } else if (!PhoneValidator.isValid(_phoneController.text.trim())) {
+      error = '请输入合法的手机号码';
+    } else {
+      try {
+        ResponseData response =
+            await AuthHttp.checkPhone(_phoneController.text.trim());
+        if (response.code != SUCCESS) {
+          error = response.msg;
+        }
+      } catch (e) {
+        error = '网络错误，请重试';
+      }
+    }
+
+    setState(() {
+      _phoneError = error;
+    });
+  }
+
+  // 校验密码
+  void _validatePassword() {
+    String error = '';
+    if (_passwordController.text.isEmpty) {
+      error = '请输入密码';
+    } else if (_passwordController.text.length < 6) {
+      error = '密码长度不能少于6位';
+    }
+
+    setState(() {
+      _passwordError = error;
+      // 如果密码有变化，重新校验确认密码
+      if (_confirmPasswordController.text.isNotEmpty) {
+        _validateConfirmPassword();
+      }
+    });
+  }
+
+  // 校验确认密码
+  void _validateConfirmPassword() {
+    String error = '';
+    if (_confirmPasswordController.text.isEmpty) {
+      error = '请确认密码';
+    } else if (_passwordController.text != _confirmPasswordController.text) {
+      error = '两次输入的密码不一致';
+    }
+
+    setState(() {
+      _confirmPasswordError = error;
+    });
+  }
+
+  // 校验协议勾选
+  void _validateAgreement() {
+    String error = '';
+    if (!_agreedToTerms) {
+      error = '请阅读并同意用户协议和隐私政策';
+    }
+
+    setState(() {
+      _agreementError = error;
+    });
+  }
+
   @override
   void dispose() {
     _usernameController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    usernameFocusNode.dispose();
+    phoneFocusNode.dispose();
+    passwordFocusNode.dispose();
+    confirmPasswordFocusNode.dispose();
     super.dispose();
   }
 }

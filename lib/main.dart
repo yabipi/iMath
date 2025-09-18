@@ -13,7 +13,6 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter/material.dart';
 
 import 'package:imath/models/user.dart';
-import 'package:imath/pages/home/splash_view.dart';
 import 'package:imath/route/router.dart';
 import 'package:imath/services/connectivity_service.dart';
 import 'package:imath/state/global_state.dart';
@@ -24,7 +23,6 @@ import 'package:imath/http/index.dart';
 
 import 'package:imath/config/api_config.dart';
 import 'package:imath/route/global_router.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 // import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 import 'config/constants.dart';
@@ -33,7 +31,7 @@ import 'core/context.dart';
 import 'core/global.dart';
 import 'db/Storage.dart';
 import 'http/category.dart';
-
+import 'theme/app_theme.dart';
 
 // 创建一个简单的 AppState 类来管理状态
 // class AppState with ChangeNotifier {
@@ -54,7 +52,7 @@ class MyHttpOverrides extends HttpOverrides {
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
       ..badCertificateCallback =
-      (X509Certificate cert, String host, int port) => true;
+          (X509Certificate cert, String host, int port) => true;
   }
 }
 
@@ -79,7 +77,6 @@ Future<void> initMathData() async {
     Global.set(MATH_LEVEL.Primary.value, primary_categories);
     Global.set(MATH_LEVEL.Advanced.value, advanced_categories);
     GStorage.mathdata.put(CATEGORIES_KEY, json.encode(_categories));
-
   } else {
     // String? categoriesStr = GStorage.mathdata.get(CATEGORIES_KEY);
     // if (categoriesStr != null) {
@@ -119,7 +116,6 @@ Future<void> initializeApp() async {
   // log('Initialize');
 }
 
-
 void main() async {
   // runApp(SplashView()); // 启动加载页，此方法不灵
   WidgetsFlutterBinding.ensureInitialized();
@@ -134,7 +130,8 @@ void main() async {
     ApiConfig.environment = Environment.PROD;
   }
   // ApiConfig.environment = Environment.DEV; // 或 Environment.PROD
-  logger.d('environment: ${ApiConfig.environment}, SERVER_BASE_URL: ${ApiConfig.SERVER_BASE_URL}');
+  logger.d(
+      'environment: ${ApiConfig.environment}, SERVER_BASE_URL: ${ApiConfig.SERVER_BASE_URL}');
 
   HttpOverrides.global = MyHttpOverrides();
   await initializeApp();
@@ -144,11 +141,8 @@ void main() async {
     // initWebView();
   }
 
-  runApp(ProviderScope(
-      child: MyApp()
-  ));
+  runApp(ProviderScope(child: MyApp()));
 }
-
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
@@ -161,16 +155,15 @@ class MyApp extends StatelessWidget {
     GlobalState.refreshToken();
     final originalMap = GStorage.userInfo.get(Constants.USER_KEY);
     if (originalMap != null) {
-      final Map<String, dynamic> userJson = Map<String, dynamic>.from(originalMap);
-      if (userJson != null) {
-        final user = User.fromJson(userJson);
-        GlobalState.currentUser = user;
-      }
+      final Map<String, dynamic> userJson =
+          Map<String, dynamic>.from(originalMap);
+      final user = User.fromJson(userJson);
+      GlobalState.currentUser = user;
     }
 
     String? categoriesStr = GStorage.mathdata.get(CATEGORIES_KEY);
     if (categoriesStr != null) {
-      Map<String, dynamic> _categories = json.decode(categoriesStr ?? '{}');
+      Map<String, dynamic> _categories = json.decode(categoriesStr);
       GlobalState.set(CATEGORIES_KEY, _categories);
     }
     return _buildScreenFitApp(context);
@@ -183,22 +176,34 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       title: '数学宝典',
       // scrollBehavior: MyBehavior(),
-      theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white,
-        //colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
+      theme: AppTheme.lightTheme.copyWith(
         textTheme: TextTheme(
-            bodyLarge: TextStyle(
-              fontSize: DeviceUtil.isWeb ? 16.0 : 20.0, // Web平台稍大
-              fontWeight: FontWeight.w500,
-            ),
-            bodyMedium: TextStyle(
-              fontSize: DeviceUtil.isWeb ? 14.0 : 20.0,
-            ),
-            bodySmall: TextStyle(
-              fontSize: DeviceUtil.isWeb ? 12.0 : 20.0,
-            ),
+          bodyLarge: TextStyle(
+            fontSize: DeviceUtil.isWeb ? 16.0 : 20.0, // Web平台稍大
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
+          bodyMedium: TextStyle(
+            fontSize: DeviceUtil.isWeb ? 14.0 : 20.0,
+            color: Colors.black87,
+          ),
+          bodySmall: TextStyle(
+            fontSize: DeviceUtil.isWeb ? 12.0 : 20.0,
+            color: Colors.black87,
+          ),
+          titleLarge: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.w600,
+          ),
+          titleMedium: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.w500,
+          ),
+          titleSmall: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-        useMaterial3: true,
       ),
       routerConfig: router,
       builder: FlutterSmartDialog.init(),
@@ -220,7 +225,7 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       // Use builder only if you need to use library outside ScreenUtilInit context
-      builder: (_ , child) {
+      builder: (_, child) {
         return _buildRouterApp(context);
       },
       // child: const HomePage(title: 'First Method'),
@@ -231,8 +236,7 @@ class MyApp extends StatelessWidget {
 class MyBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
-    PointerDeviceKind.touch,
-    PointerDeviceKind.mouse,
-  };
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
 }
-
