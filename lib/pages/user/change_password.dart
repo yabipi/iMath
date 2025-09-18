@@ -299,12 +299,16 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
       if (result.code == SUCCESS) {
         SmartDialog.showToast('密码修改成功');
-        // 返回上一页
+
+        // 延迟一下再跳转，让用户看到成功提示
+        await Future.delayed(Duration(milliseconds: 500));
+
+        // 跳转到登录页面
         if (context.mounted) {
-          context.pop();
+          context.go('/login');
         }
       } else {
-        SmartDialog.showToast(result.msg ?? '密码修改失败');
+        SmartDialog.showToast(result.msg);
       }
     } catch (e) {
       SmartDialog.showToast('网络错误，请重试');
