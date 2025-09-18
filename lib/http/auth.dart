@@ -103,7 +103,7 @@ class AuthHttp {
         options: Options(contentType: Headers.jsonContentType),
         data: {
           'phone': phone,
-          'newPassword': newPassword,
+          'new_password': newPassword,
           'verification_token': verificationToken,
         });
     return ResponseData.fromJson(response.data);
